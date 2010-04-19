@@ -2,6 +2,6 @@
 #include <stdio.h>
 
 int main() {
-	printf("Hola Mundo y Probando el Update =)!\n");
+	printf("Hola Mundo!\n");
 	return 0;
 }
