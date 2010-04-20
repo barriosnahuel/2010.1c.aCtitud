@@ -42,7 +42,7 @@ main()
 	/* fork() devuelve 0 al proceso hijo.*/
 	if (idProceso == 0)
 	{
-		char comando[]; 
+		char comando[20]; 
 		printf("Ingrese un comando:");
 		scanf("%d",&comando);
 		printf("El comando elegido es: %d",comando);
