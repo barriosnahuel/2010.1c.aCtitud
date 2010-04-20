@@ -42,6 +42,12 @@ main()
 	/* fork() devuelve 0 al proceso hijo.*/
 	if (idProceso == 0)
 	{
+		char comando[]; 
+		printf("Ingrese un comando:");
+		scanf("%d",&comando);
+		printf("El comando elegido es: %d",comando);
+		
+		
 		/* El hijo escribe su pid en pantalla y el valor de variable */
 		printf ("Hijo  : Mi pid es %d. El pid de mi padre es %d\n", 
 			getpid(), getppid());
