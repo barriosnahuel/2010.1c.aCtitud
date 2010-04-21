@@ -8,7 +8,8 @@ using namespace std;
 
 main()
 {
-	/*vector<string> VectorDeComandos;
+	vector<string> VectorDeComandos;
+	vector<int> VectorDeParametros;
 	
 	VectorDeComandos.push_back("List newsgroups");
 	VectorDeComandos.push_back("Quit");
@@ -16,22 +17,23 @@ main()
 	VectorDeComandos.push_back("Article");
 	VectorDeComandos.push_back("Stat");
 	VectorDeComandos.push_back("Head");
-	VectorDeComandos.push_back("Body");*/
+	VectorDeComandos.push_back("Body");
 	
-	char* Comando;
-	Comando = new char[sizeof(char)*50+1];
+	VectorDeParametros.push_back(0);
+	VectorDeParametros.push_back(0);
+	VectorDeParametros.push_back(1);
+	VectorDeParametros.push_back(1);
+	VectorDeParametros.push_back(1);
+	VectorDeParametros.push_back(1);
+	VectorDeParametros.push_back(1);
 	
-	vector<string> VectorDeComandos;
-	VectorDeComandos = new vector[sizeof(Comando)*7];
-	
-	VectorDeComandos[2] = "Hola";
 
-   cout << "Mostrando los comandos:" << endl;
+   cout << "Mostrando los comandos y sus flags:" << endl;
 
    int ii;
-   for(ii=0; ii < VectorDeComandos.size(); ii++)
+   for(ii=0; ii < VectorDeParametros.size(); ii++)
    {
-      cout << VectorDeComandos[ii] << endl;
+      cout << VectorDeComandos[ii] << "--" << VectorDeParametros[ii] << endl;
 
    }
 }
