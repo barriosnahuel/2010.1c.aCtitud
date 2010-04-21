@@ -11,13 +11,13 @@ class PruebaDeManejoDelArray {
 			vector<string> VectorDeComandos;
 			vector<int> VectorDeParametros;
 			
-			VectorDeComandos.push_back("List newsgroups");
-			VectorDeComandos.push_back("Quit");
-			VectorDeComandos.push_back("Listgroup");
-			VectorDeComandos.push_back("Article");
-			VectorDeComandos.push_back("Stat");
-			VectorDeComandos.push_back("Head");
-			VectorDeComandos.push_back("Body");
+			VectorDeComandos.push_back("LIST NEWSGROUPS");
+			VectorDeComandos.push_back("QUIT");
+			VectorDeComandos.push_back("LISTGROUP");
+			VectorDeComandos.push_back("ARTICLE");
+			VectorDeComandos.push_back("STAT");
+			VectorDeComandos.push_back("HEAD");
+			VectorDeComandos.push_back("BODY");
 			
 			VectorDeParametros.push_back(0);
 			VectorDeParametros.push_back(0);
