@@ -1,13 +1,15 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "pruebaDeManejoDelArray.h"
 
-using namespace std;
+	//Constructor
+	pruebaDeManejoDelArray::pruebaDeManejoDelArray(void) {
 
-
-class PruebaDeManejoDelArray {
-	public:
-		int mostrarArray(void) {
+	}
+	
+	//Metodo a ejecutar
+	pruebaDeManejoDelArray::void mostrarArray(void) {
 			vector<string> VectorDeComandos;
 			vector<int> VectorDeParametros;
 			
@@ -36,7 +38,6 @@ class PruebaDeManejoDelArray {
 			  cout << VectorDeComandos[ii] << " -Lleva parametros? (1 = Sí, 0 = No) = " << VectorDeParametros[ii] << endl;
 
 		   }
-		   return 1;
 	   }
 };
 	
