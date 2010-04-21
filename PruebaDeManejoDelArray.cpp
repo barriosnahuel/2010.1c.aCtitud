@@ -33,7 +33,7 @@ main()
    int ii;
    for(ii=0; ii < VectorDeParametros.size(); ii++)
    {
-      cout << VectorDeComandos[ii] << "--" << VectorDeParametros[ii] << endl;
+      cout << VectorDeComandos[ii] << "- Lleva parametros? (1 = Sí, 0 = No) -" << VectorDeParametros[ii] << endl;
 
    }
 }
