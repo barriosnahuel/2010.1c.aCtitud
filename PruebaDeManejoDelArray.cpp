@@ -39,10 +39,4 @@ class PruebaDeManejoDelArray {
 		   return 1;
 	   }
 };
-
-int main() {
-		PruebaDeManejoDelArray pruebaDeManejoDelArray;
-		pruebaDeManejoDelArray.mostrarArray();
-		return 1;
-}
 	
