@@ -1,5 +1,3 @@
-
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -9,7 +7,7 @@ using namespace std;
 
 class PruebaDeManejoDelArray {
 	public:
-		int mostrarArray() {
+		int mostrarArray(void) {
 			vector<string> VectorDeComandos;
 			vector<int> VectorDeParametros;
 			
@@ -41,4 +39,10 @@ class PruebaDeManejoDelArray {
 		   return 1;
 	   }
 };
+
+int main() {
+		PruebaDeManejoDelArray pruebaDeManejoDelArray;
+		pruebaDeManejoDelArray.mostrarArray();
+		return 1;
+}
 	
