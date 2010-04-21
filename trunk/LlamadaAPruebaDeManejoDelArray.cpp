@@ -1,11 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "pruebaDeManejoDelArray.h"
 
 using namespace std;
 
 int main() {
-	PruebaDeManejoDelArray pruebaDeManejoDelArray123;
-	
-	int valor = pruebaDeManejoDelArray.mostrarArray();
+	pruebaDeManejoDelArray p1();
+	p1.mostrarArray();
+	return 1;
 }
