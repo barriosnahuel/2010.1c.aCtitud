@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void main() {
+int main() {
 	PruebaDeManejoDelArray pruebaDeManejoDelArray123;
 	
 	int valor = pruebaDeManejoDelArray.mostrarArray();
