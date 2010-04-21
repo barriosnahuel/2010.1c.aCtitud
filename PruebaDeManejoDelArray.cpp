@@ -9,7 +9,7 @@ using namespace std;
 
 class PruebaDeManejoDelArray {
 	public:
-		void mostrarArray() {
+		int mostrarArray() {
 			vector<string> VectorDeComandos;
 			vector<int> VectorDeParametros;
 			
@@ -38,6 +38,7 @@ class PruebaDeManejoDelArray {
 			  cout << VectorDeComandos[ii] << " -Lleva parametros? (1 = Sí, 0 = No) = " << VectorDeParametros[ii] << endl;
 
 		   }
+		   return 1;
 	   }
 };
 	
