@@ -5,11 +5,11 @@
 #include <string>
 
 using namespace std;
-void mostrarArray(void);
+
 
 class PruebaDeManejoDelArray {
 	public:
-		mostrarArray() {
+		void mostrarArray() {
 			vector<string> VectorDeComandos;
 			vector<int> VectorDeParametros;
 			
