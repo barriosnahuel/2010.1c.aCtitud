@@ -5,6 +5,7 @@
 #include <string>
 
 using namespace std;
+void mostrarArray(void);
 
 class PruebaDeManejoDelArray {
 	public:
