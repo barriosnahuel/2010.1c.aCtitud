@@ -3,6 +3,7 @@
 
 #include <iostream.h>
 #include "comando.h"
+using namespace std;
 
 class parseadorValidadorDeComando
 {
@@ -13,3 +14,4 @@ class parseadorValidadorDeComando
             //Metodo
             comando validarYConvertirAObjetoComando(string* comandoEscritoPorElUsuario);
     }
+#endif

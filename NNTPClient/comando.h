@@ -2,6 +2,7 @@
 #define __COMANDO_H__
 
 #include <iostream.h>
+using namespace std;
 
 class comando
 {
@@ -34,3 +35,4 @@ class comando
                 this.llevaParametro = valor;
             }
     }
+#endif
