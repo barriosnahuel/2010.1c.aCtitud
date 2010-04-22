@@ -51,14 +51,15 @@ int inicializarBO(void){
 	return EXIT_SUCCESS;
 }
 
-int obtenerComandoDelUsuario(string* comando){
+//FGUERRA: Esta funcion no se va a usar más porque la va a implementar Alan y hacer lo que debemos hacer.
+/*int obtenerComandoDelUsuario(string* comando){
 	cout << "Ingrese un comando: " << endl;
 	cin >> *comando;
 
 	//	NBarrios-TODO: Aca tendríamos que ver validar errores, tiempo, y varias cosas mas que en este momento no se me ocurren, y ver si tengo que retornar por bien o por mal
 
 	return EXIT_SUCCESS;
-}
+}*/
 
 void* funcionSegundoThread(void* unParametro){
 	cout << "Bienvenido al hilo 2." << endl;
@@ -75,21 +76,19 @@ int crearSegundoThread(Comando param){
 }
 
 int main(){
-	string comando;
+	string comandoEscritoPorElUsuario;
 
-	if(inicializarDAO())
-		if(inicializarBO())
-			if(obtenerComandoDelUsuario(&comando)){
-				Comando comandoIngresado;
-				comandoIngresado.setComando(comando);
-				//	NBarrios-TODO: Aca también tengo que setear en el objeto command todas las opciones y demas. Pero primero ver si no hay algo ya hecho!
+	inicializarDAO();
+    inicializarBO();
 
-				if(crearSegundoThread(comandoIngresado)){
-					cout << "Esto es del hilo uno, y no hubo errores al crear el hilo 2!" << endl;
+    //TODO: Llamar a la funcion de ALAN.¿Como llamamos a la funcion?
+    //Invocamos al metodo validarYConvertirAObjetoComando.
+	Comando comandoIngresado = validarYConvertirAObjetoComando(&comandoEscritoPorElUsuario);
 
-					return EXIT_SUCCESS;
-				}
-			}
+    if(crearSegundoThread(comandoIngresado)){
+        cout << "Esto es del hilo uno, y no hubo errores al crear el hilo 2!" << endl;
+		return EXIT_SUCCESS;
+	}
 
 	cout << "Se ha producido un error y la aplicacion no puede ejecutarse. Comuniquese con aCtitud." << endl;
 	return EXIT_FAILURE;
