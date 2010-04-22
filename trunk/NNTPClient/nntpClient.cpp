@@ -19,10 +19,10 @@ class Comando {
 
 
 public:
-	string obtenerComando(void){
+	string getComando(void){
 		return comando;
 	}
-	void setearComando(string cadena){
+	void setComando(string cadena){
 //		command= newCadena; //	NBarrios-TODO:Ver como trabajar con los string, tira siempre segmentation fault.
 	}
 
@@ -81,7 +81,7 @@ int main(){
 		if(inicializarBO())
 			if(obtenerComandoDelUsuario(&comando)){
 				Comando comandoIngresado;
-				comandoIngresado.setearComando(comando);
+				comandoIngresado.setComando(comando);
 				//	NBarrios-TODO: Aca también tengo que setear en el objeto command todas las opciones y demas. Pero primero ver si no hay algo ya hecho!
 
 				if(crearSegundoThread(comandoIngresado)){
