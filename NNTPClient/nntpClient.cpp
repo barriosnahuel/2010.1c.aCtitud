@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <pthread.h>
+#include "parseadorValidadorDeComando.h"
+#include "comando.h"
 using namespace std;
 
 int EXIT_SUCCESS= 1;

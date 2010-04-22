@@ -1,10 +1,25 @@
 #include <vector>
 #include<iostream>
+#include "parseadorValidadorDeComando.h"
+#include "comando.h"
 //#include <string> esta dentro de iostream
 //#include <ctype.h>
 using namespace std;
-class parserComando
-{
+
+//Construyo el objeto.
+parseadorValidadorDeComando:parseadorValidadorDeComando(void){}
+
+//Implemento el metodo
+comando parseadorValidadorDeComando::validarYConvertirAObjetoComando(string* comandoEscritoPorElUsuario) {
+    //Aca les dejo un ejemplo de como creo el objeto, le seteo cosas y lo retorno.
+    comando();
+    comando.setllevaParametro(1);
+    comando.setNombreComando("Article");
+    return comando;
+
+}
+
+/*{
     public:
     string comandoNombre;
     string parametro;
@@ -94,7 +109,7 @@ class parserComando
 
         int estado;
         estado = validarComando(comandoNombre);
-    }
+    }*/
 /*
     void setNombre(string nombreComandoIngresado)
     {
@@ -105,7 +120,7 @@ class parserComando
         parametro = parametroIngresado;
     };*/
 
-    int validarComando(string comandoIngresado)
+   /* int validarComando(string comandoIngresado)
     {
         int comandoValido;
         for(int i = 0; i<8;i++)
@@ -133,7 +148,7 @@ int main()
 
     string requerimientoUsuario;
 
-    parserComando comandoIngresado;
+    parseadorValidadorDeComando comandoIngresado;
     comandoIngresado.inicializacionVector();
     cout<<"Ingrese un comando:"<<endl;
     getline(cin, requerimientoUsuario, '\n'); //Ya que cin corta la cadena
@@ -142,4 +157,4 @@ int main()
     comandoIngresado.extraerNombreYParametro(requerimientoUsuario);
 
     return 0;
-}
+}*/
