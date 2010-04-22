@@ -5,12 +5,14 @@
 using namespace std;
 class parserComando
 {
+    public:
     string comandoNombre;
     string parametro;
     vector<string> vectorDeComandos;
     vector<int> vectorDeParametros;
 
     public:
+
     void inicializacionVector()
     {
 
@@ -57,12 +59,13 @@ class parserComando
         return cadenaTransformada;
 
     }
-    void extraerNombreYParametro(string comandoEntero)
+    int extraerNombreYParametro(string comandoEntero)
     {
+        int i = 0;
+
+        comandoEntero = trimR(comandoEntero); //SACA ESPACIOS A IZQUIERDA
 
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
-        comandoEntero = trimR(comandoEntero); //SACA ESPACIOS A IZQUIERDA
-        int i = 0;
         for(i;i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
         {
              comandoNombre = comandoNombre + comandoEntero[i];
@@ -76,7 +79,6 @@ class parserComando
         if(comandoNombre=="LIST")
         {
             comandoNombre = comandoNombre + ' ';
-            cout<<"Largo Cadena:"<<comandoNombre.length();
             for(i=comandoNombre.length();i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
                 comandoNombre = comandoNombre + comandoEntero[i];
         }
@@ -87,6 +89,9 @@ class parserComando
             parametro = parametro + comandoEntero[i];
         }
         cout<<"Parametro:"<<parametro;
+
+
+
     }
 /*
     void setNombre(string nombreComandoIngresado)
@@ -122,7 +127,7 @@ int main()
     cout<<"Ingrese un comando:"<<endl;
     getline(cin, requerimientoUsuario, '\n'); //Ya que cin corta la cadena
 
-    //cout<<requerimientoUsuario<<endl;
+
     comandoIngresado.extraerNombreYParametro(requerimientoUsuario);
 
     return 0;
