@@ -23,6 +23,8 @@ class parserComando
         vectorDeComandos.push_back("STAT");
         vectorDeComandos.push_back("HEAD");
         vectorDeComandos.push_back("BODY");
+        vectorDeComandos.push_back("GROUP");
+        vectorDeComandos.push_back("NEXT");
         vectorDeParametros.push_back(0);
 		vectorDeParametros.push_back(0);
 		vectorDeParametros.push_back(1);
@@ -30,6 +32,9 @@ class parserComando
 		vectorDeParametros.push_back(1);
 		vectorDeParametros.push_back(1);
 		vectorDeParametros.push_back(1);
+		vectorDeParametros.push_back(1);
+		vectorDeParametros.push_back(1);
+
     }
     void setNombreYParametro()
     {
@@ -62,7 +67,6 @@ class parserComando
     int extraerNombreYParametro(string comandoEntero)
     {
         int i = 0;
-
         comandoEntero = trimR(comandoEntero); //SACA ESPACIOS A IZQUIERDA
 
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
@@ -72,9 +76,7 @@ class parserComando
              cout <<"digito :"<<i<<":"<<comandoNombre[i]<<endl;
 
         }
-        // comando = comando + '\0'; CREO QUE ESTO NO HACE FALTA
         cout << "Nombre Comando:" << comandoNombre<<endl;
-
         //ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
         if(comandoNombre=="LIST")
         {
@@ -90,8 +92,8 @@ class parserComando
         }
         cout<<"Parametro:"<<parametro;
 
-
-
+        int estado;
+        estado = validarComando(comandoNombre);
     }
 /*
     void setNombre(string nombreComandoIngresado)
@@ -105,7 +107,16 @@ class parserComando
 
     int validarComando(string comandoIngresado)
     {
-
+        int comandoValido;
+        for(int i = 0; i<8;i++)
+            if(comandoNombre == vectorDeComandos[i])
+            {
+                cout<<"COMANDO RECONOCIDO :"<<vectorDeComandos[i];
+                comandoValido = 1;
+                return comandoValido;
+            }
+        cout<<"COMANDO NO RECONOCIDO !!";
+        return 0 ;
 
     }
     string aMayusculas(string cadena)
