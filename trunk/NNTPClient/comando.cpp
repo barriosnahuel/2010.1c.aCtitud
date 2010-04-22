@@ -1,6 +1,6 @@
 #include <vector>
-#include<iostream.h>
-//#include <string>
+#include<iostream>
+//#include <string> esta dentro de iostream
 //#include <ctype.h>
 using namespace std;
 class parserComando
@@ -47,7 +47,7 @@ class parserComando
            if(cadena[i]==' ')                     //SI EL SIGUIENTE ES UN ESPACIO TIENE QUE SEGUIR
             desde=desde+1;
            else
-             break;                               //SI NO COMIENZA CON ESPACIO NO  HACE NADA
+            break;                               //SI NO COMIENZA CON ESPACIO NO  HACE NADA
 
 
         cout<<"EL ULTIMO ESPACIO ESTA EN "<<desde<<endl;
@@ -59,6 +59,7 @@ class parserComando
     }
     void extraerNombreYParametro(string comandoEntero)
     {
+
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
         comandoEntero = trimR(comandoEntero); //SACA ESPACIOS A IZQUIERDA
         int i = 0;
@@ -69,9 +70,17 @@ class parserComando
 
         }
         // comando = comando + '\0'; CREO QUE ESTO NO HACE FALTA
-        cout<<"Largo Cadena Comando:"<<i-1;
         cout << "Nombre Comando:" << comandoNombre<<endl;
 
+        //ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
+        if(comandoNombre=="LIST")
+        {
+            comandoNombre = comandoNombre + ' ';
+            cout<<"Largo Cadena:"<<comandoNombre.length();
+            for(i=comandoNombre.length();i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
+                comandoNombre = comandoNombre + comandoEntero[i];
+        }
+        cout << "Nombre Comando:" << comandoNombre<<endl;
         // EL RESTO DE LA CADENA ES EL PARAMETRO
         for(i=comandoNombre.length()+1;i<comandoEntero.length();i++)
         {
@@ -91,6 +100,7 @@ class parserComando
 
     int validarComando(string comandoIngresado)
     {
+
 
     }
     string aMayusculas(string cadena)
