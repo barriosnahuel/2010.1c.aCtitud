@@ -3,7 +3,7 @@
 //#include <string>
 //#include <ctype.h>
 using namespace std;
-class comando
+class parserComando
 {
     string comandoNombre;
     string parametro;
@@ -78,7 +78,7 @@ class comando
             parametro = parametro + comandoEntero[i];
         }
         cout<<"Parametro:"<<parametro;
-    };
+    }
 /*
     void setNombre(string nombreComandoIngresado)
     {
@@ -92,13 +92,13 @@ class comando
     int validarComando(string comandoIngresado)
     {
 
-    };
+    }
     string aMayusculas(string cadena)
     {
         for(int i = 0; i < cadena.length(); i++)
          cadena[i] = toupper(cadena[i]);
         return cadena;
-    };
+    }
 
 
 };
@@ -107,7 +107,7 @@ int main()
 
     string requerimientoUsuario;
 
-    comando comandoIngresado;
+    parserComando comandoIngresado;
     comandoIngresado.inicializacionVector();
     cout<<"Ingrese un comando:"<<endl;
     getline(cin, requerimientoUsuario, '\n'); //Ya que cin corta la cadena
