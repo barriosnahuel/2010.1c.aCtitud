@@ -40,7 +40,7 @@ class parserComando
     {
     }
 
-    string trimR(string cadena)
+    string sacaEspaciosIzquierda(string cadena)
     {
         string cadenaTransformada;
         int desde = 0;
@@ -67,7 +67,7 @@ class parserComando
     int extraerNombreYParametro(string comandoEntero)
     {
         int i = 0;
-        comandoEntero = trimR(comandoEntero); //SACA ESPACIOS A IZQUIERDA
+        comandoEntero = sacaEspaciosIzquierda(comandoEntero); //SACA ESPACIOS A IZQUIERDA
 
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
         for(i;i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
