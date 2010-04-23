@@ -82,8 +82,8 @@ void LoguearInformacion(const char *czData, const char *czNombreProceso) {
 	SetearFechaYHora();
 
 	/*registramos todo en el archivo */
-	fprintf(stderr, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),gettid());
-	fprintf(stderr, "%s: %s\n","INFO",czData);
+	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << gettid() << "] ";
+	arch << "INFO: " << czData << endl;
 
 	CerrarArchivoLogProceso();
 }
@@ -95,8 +95,8 @@ void LoguearWarning(const char *czData, const char *czNombreProceso) {
 	SetearFechaYHora();
 
 	/*registramos todo en el archivo */
-	fprintf(stderr, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),gettid());
-	fprintf(stderr, "%s: %s\n","WARN",czData);
+	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << gettid() << "] ";
+	arch << "WARN: " << czData << endl;
 
 	CerrarArchivoLogProceso();
 }
@@ -107,8 +107,8 @@ void LoguearError(const char *czData, const char *czNombreProceso) {
 	SetearFechaYHora();
 
 	/*registramos todo en el archivo */
-	fprintf(stderr, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),gettid());
-	fprintf(stderr, "%s: %s\n","ERROR",czData);
+	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << gettid() << "] ";
+	arch << "ERROR: " << czData << endl;
 
 	CerrarArchivoLogProceso();
 }
@@ -119,8 +119,8 @@ void LoguearDebugging(const char *czData, const char *czNombreProceso) {
 	SetearFechaYHora();
 
 	/*registramos todo en el archivo */
-	fprintf(stderr, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),gettid());
-	fprintf(stderr, "%s: %s\n","DEBUG",czData);
+	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << gettid() << "] ";
+	arch << "DEBUG: " << czData << endl;
 
 	CerrarArchivoLogProceso();
 }
