@@ -1,31 +1,12 @@
-#include <sys/types.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <iostream>
+#include <fstream>
 #include <time.h>
 #include "logger.hpp"
 
-class Logger {
-	private:
-		FILE *arch;
-		time_t tiempoActual;
-		char *czNombreArchivo;
-		char czFecha[50];
-
-		void PrepararArchivoLogProceso(char *czNombreProceso);
-		void CerrarArchivoLogProceso(void);
-		void SetearFechaYHora(void);
-	public:
-		//constructor
-		Logger(void);
-		//destructor
-		~Logger(void);
-		//métodos de logging
-        void EscribirLog(char cTipoLog, char *czData, char *czNombreProceso);
-		void LoguearInformacion(char *czData, char *czNombreProceso);
-		void LoguearWarning(char *czData, char *czNombreProceso);
-		void LoguearError(char *czData, char *czNombreProceso);
-		void LoguearDebugging(char *czData, char *czNombreProceso);
-};
+using namespace std;
 
 //constructor
 Logger :: Logger(void) {
@@ -41,19 +22,19 @@ Logger :: ~Logger(void) {
 }
 
 //privados
-void Logger :: PrepararArchivoLogProceso(char *czNombreProceso) {
+void Logger :: PrepararArchivoLogProceso(const char *czNombreProceso) {
 
 	/* seteamos el nombre de archivo */
 	sprintf(czNombreArchivo, "./logs/%s%d.LOG", czNombreProceso, getpid());
 
 	/* se abre o crea al archivo log */
-	if((arch = fopen(czNombreArchivo, "a+")) == NULL)
-		printf("Error al generar el archivo Log.\n\n");
-	else
-		stderr = arch;
+    arch.open(czNombreArchivo, ios::in);
+    if (!(arch.is_open()))
+        cout << "No se pudo abrir el archivo de LOG.";
 }
 void Logger :: CerrarArchivoLogProceso(void) {
-	if(arch) fclose(arch);
+	if(arch.is_open())
+        arch.close();
 }
 void Logger :: SetearFechaYHora(void) {
 	/*Se obtiene el tiempo actual*/
@@ -64,36 +45,38 @@ void Logger :: SetearFechaYHora(void) {
 }
 
 //métodos de logging
-void Logger :: EscribirLog(char cTipoLog, char *czData, char *czNombreProceso) {
+void Logger :: EscribirLog(char cTipoLog, const char *czData, const char *czNombreProceso) {
 
 	PrepararArchivoLogProceso(czNombreProceso);
 	SetearFechaYHora();
 
 	/*registramos todo en el archivo */
-	fprintf(stderr, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),gettid());
+    arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << gettid() << "] ";
 
 	switch(cTipoLog) {
 		case _INFO:
-			fprintf(stderr, "%s: %s\n","INFO",czData);
+            arch << "INFO";
 			break;
 		case _WARN:
-			fprintf(stderr, "%s: %s\n","WARN",czData);
+            arch << "WARN";
 			break;
 		case _ERROR:
-			fprintf(stderr, "%s: %s\n","ERROR",czData);
+            arch << "ERROR";
 			break;
-		case _DEBUG: 
-			fprintf(stderr, "%s: %s\n","DEBUG",czData);
+		case _DEBUG:
+            arch << "DEBUG";
 			break;
 		default:
-			fprintf(stderr, "%s: %s\n","MSG",czData);
+            arch << "MSG";
 			break;
-	}
+	};
+
+    arch << ": " << czData << endl;
 
 	CerrarArchivoLogProceso();
 }
 
-void LoguearInformacion(char *czData, char *czNombreProceso) {
+void LoguearInformacion(const char *czData, const char *czNombreProceso) {
 
 	PrepararArchivoLogProceso(czNombreProceso);
 	SetearFechaYHora();
@@ -106,7 +89,7 @@ void LoguearInformacion(char *czData, char *czNombreProceso) {
 }
 
 
-void LoguearWarning(char *czData, char *czNombreProceso) {
+void LoguearWarning(const char *czData, const char *czNombreProceso) {
 
 	PrepararArchivoLogProceso(czNombreProceso);
 	SetearFechaYHora();
@@ -118,7 +101,7 @@ void LoguearWarning(char *czData, char *czNombreProceso) {
 	CerrarArchivoLogProceso();
 }
 
-void LoguearError(char *czData, char *czNombreProceso) {
+void LoguearError(const char *czData, const char *czNombreProceso) {
 
 	PrepararArchivoLogProceso(czNombreProceso);
 	SetearFechaYHora();
@@ -130,7 +113,7 @@ void LoguearError(char *czData, char *czNombreProceso) {
 	CerrarArchivoLogProceso();
 }
 
-void LoguearDebugging(char *czData, char *czNombreProceso) {
+void LoguearDebugging(const char *czData, const char *czNombreProceso) {
 
 	PrepararArchivoLogProceso(czNombreProceso);
 	SetearFechaYHora();
