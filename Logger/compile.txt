@@ -1,0 +1,2 @@
+g++ loggertest.cpp logger.cpp -o loggertest
+
