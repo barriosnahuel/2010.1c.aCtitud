@@ -1,30 +1,35 @@
 #include <vector>
 #include "parseadorValidadorDeComando.hpp"
-#include <ctype.h>
-#include <iostream>
 
-
-using namespace std;
-
-//Imple del constructor
-ParseadorValidadorDeComando::ParseadorValidadorDeComando() {
-   cout << "ParseadorValidadorDeComando creado." << endl;
-}
-
-//Imple del destructor
-ParseadorValidadorDeComando::~ParseadorValidadorDeComando() {
-   cout << "ParseadorValidadorDeComando destruído." << endl;
-}
 
 //Implemento el metodo
 Comando ParseadorValidadorDeComando::validarYConvertirAObjetoComando(string* comandoEscritoPorElUsuario) {
     //Aca les dejo un ejemplo de como creo el objeto, le seteo cosas y lo retorno.
-    Comando comando = Comando();
-    comando.setLlevaParametro(1);
-    comando.setNombreComando("Article");
+    Comando comando;
+    //comando.setLlevaParametro(1);
+    //comando.setNombreComando("Article");
+    //cout << "El nombre del comando es: " << comando.getNombreComando() << "y el valor de si lleva parametros o no es: " << comando.getLlevaParametro() << endl;
     return comando;
 
 };
+
+//Imple del constructor
+ParseadorValidadorDeComando::ParseadorValidadorDeComando() {
+   cout << "ParseadorValidadorDeComando creado." << endl;
+};
+
+//Imple del destructor
+ParseadorValidadorDeComando::~ParseadorValidadorDeComando() {
+   cout << "ParseadorValidadorDeComando destruído." << endl;
+};
+
+int main () {
+
+  cout << "Lo hise!!\n" << endl;
+
+  return 1;
+
+  }
 
 /*{
     public:
