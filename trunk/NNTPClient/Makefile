@@ -3,17 +3,17 @@ NNTPClient: Comando.o Comando.cpp NNTPClientBO.o NNTPClientBO.cpp NNTPClientDAO.
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-Comando.o: Comando.o Comando.cpp
+Comando.o: Comando.cpp
 	g++ -c -o Comando.o Comando.cpp
 
-NNTPClientBO.o: NNTPClientBO.o NNTPClientBO.cpp
+NNTPClientBO.o: NNTPClientBO.cpp
 	g++ -c -o NNTPClientBO.o NNTPClientBO.cpp
 
-NNTPClientDAO.o: NNTPClientDAO.o NNTPClientDAO.cpp
+NNTPClientDAO.o: NNTPClientDAO.cpp
 	g++ -c -o NNTPClientDAO.o NNTPClientDAO.cpp
 
-ParseadorValidadorDeComandos.o: ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp
+ParseadorValidadorDeComandos.o: ParseadorValidadorDeComandos.cpp
 	g++ -c -o ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp
 
-nntpClient.o: nntpClient.o nntpClient.cpp
+nntpClient.o: nntpClient.cpp
 	g++ -c -o nntpClient.o nntpClient.cpp
