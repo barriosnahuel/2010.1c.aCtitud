@@ -1,32 +1,27 @@
-#include <string>
+#include "comando.hpp"
 
-using namespace std;
+    Comando::Comando() {
+       cout << "Comando creado." << endl;
+      }
 
-class Comando
-{
-    private:
-            //Esto es por ej "Article".
-            string nombreComando;
-            //Esto es 1 o 0 si el comando lleva parametro. Por ej para "Article 321", esto iria en 1.
-            int llevaParametro;
+      // Implementacion de destructor. Util para liberar memoria.
+      Comando::~Comando() {
+       cout << "Comando destruido." << endl;
+      }
 
-    public:
-            //Constructor
-            Comando comando(void);
+        string Comando::getNombreComando(void){
+            return nombreComando;
+        }
 
-            string getNombreComando(void){
-                return nombreComando;
-            }
+        int Comando::getLlevaParametro(void){
+            return llevaParametro;
+        }
 
-            int getLlevaParametro(void){
-                return llevaParametro;
-            }
+        void Comando::setNombreComando(string nombreDelComando){
+            nombreComando = nombreDelComando;
+        }
 
-            void setNombreComando(string nombreDelComando){
-                nombreComando = nombreDelComando;
-            }
+        void Comando::setLlevaParametro(int valor){
+            llevaParametro = valor;
+        }
 
-            void setLlevaParametro(int valor){
-                llevaParametro = valor;
-            }
-};
