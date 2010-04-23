@@ -5,3 +5,4 @@ NNTPClientTest: Comando.o Comando.cpp NNTPClientBO.o NNTPClientBO.cpp NNTPClient
 	g++ -c -o ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp
 	g++ -c -o nntpClient.o nntpClient.cpp
 	g++ -o NNTPClientTest ./Comando.o ./NNTPClientBO.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
+	@echo 'Finished building target: $@'
