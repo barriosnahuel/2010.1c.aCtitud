@@ -1,4 +1,8 @@
+#include <iostream>
+#include <fstream>
 #include "logger.hpp"
+
+using namespace std;
 
 int main(int argn, char *argv[]){
 	Logger unLogger;
@@ -14,5 +18,4 @@ int main(int argn, char *argv[]){
 	unLogger.LoguearError("Log de error",argv[0]);
 	unLogger.LoguearDebugging("Log de debug",argv[0]);
 
-	return EXIT_SUCCESS;
 }
