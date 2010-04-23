@@ -8,17 +8,20 @@
 #ifndef COMANDO_H_
 #define COMANDO_H_
 
+#include <iostream>	//	Necesario para poder usar el struct string.
+using namespace std;//	Necesario para poder usar el struct string.
+
 class Comando {
 	//	Lo privado
-    char* nombreComando;
+    string nombreComando;
     bool  llevaParametro;
 
 public:
 	Comando(void);
 	~Comando(void);
 
-	void  setNombreComando(char* nombre);
-	char* getNombreComando(void);
+	void  setNombreComando(string nombre);
+	string getNombreComando(void);
 
 	bool getLlevaParametro(void);
 	void setLlevaParametro(int valor);

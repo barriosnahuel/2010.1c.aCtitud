@@ -21,11 +21,11 @@ using namespace std;
 		cout << "Comando::~Comando(void)" << endl;
 	}
 
-	void Comando::setNombreComando(char* nombre){
+	void Comando::setNombreComando(string nombre){
 		nombreComando= nombre;
 	}
 
-	char* Comando::getNombreComando(void){
+	string Comando::getNombreComando(void){
 		return nombreComando;
 	}
 
