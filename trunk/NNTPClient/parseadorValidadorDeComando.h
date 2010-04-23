@@ -1,7 +1,6 @@
 #ifndef __PARSEADORVALIDADORDECOMANDO_H__
 #define __PARSEADORVALIDADORDECOMANDO_H__
 
-#include <iostream.h>
 #include "comando.h"
 
 
@@ -12,6 +11,6 @@ class parseadorValidadorDeComando
             parseadorValidadorDeComando(void);
 
             //Metodo
-            comando validarYConvertirAObjetoComando(string* comandoEscritoPorElUsuario);
+            string validarYConvertirAObjetoComando(string* comandoEscritoPorElUsuario);
     }
 #endif
