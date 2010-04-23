@@ -1,2 +1,2 @@
-nntpClient: nntpClient.cpp parseadorValidadorDeComando.h comando.h
+nntpClient: nntpClient.cpp
 	g++ -lpthread -o nntpClient nntpClient.cpp
