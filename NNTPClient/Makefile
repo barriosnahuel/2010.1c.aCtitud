@@ -3,7 +3,7 @@ NNTPClient: Comando.o Comando.cpp NNTPClientBO.o NNTPClientBO.cpp NNTPClientDAO.
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-Comando.o: Comando.o Comado.cpp
+Comando.o: Comando.o Comando.cpp
 	g++ -c -o Comando.o Comando.cpp
 
 NNTPClientBO.o: NNTPClientBO.o NNTPClientBO.cpp
