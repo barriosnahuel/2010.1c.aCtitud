@@ -28,11 +28,11 @@ class comando
             }
 
             void setNombreComando(string nombreDelComando){
-                this.nombreComando = nombreDelComando;
+                nombreComando = nombreDelComando;
             }
 
             void setllevaParametro(int valor){
-                this.llevaParametro = valor;
+                llevaParametro = valor;
             }
     }
 #endif

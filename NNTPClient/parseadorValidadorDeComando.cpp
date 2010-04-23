@@ -4,15 +4,11 @@
 #include "comando.h"
 //#include <string> esta dentro de iostream
 //#include <ctype.h>
-using namespace std;
-
-//Construyo el objeto.
-parseadorValidadorDeComando:parseadorValidadorDeComando(void){}
 
 //Implemento el metodo
 comando parseadorValidadorDeComando::validarYConvertirAObjetoComando(string* comandoEscritoPorElUsuario) {
     //Aca les dejo un ejemplo de como creo el objeto, le seteo cosas y lo retorno.
-    comando();
+    comando comando;
     comando.setllevaParametro(1);
     comando.setNombreComando("Article");
     return comando;
