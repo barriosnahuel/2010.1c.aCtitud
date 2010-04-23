@@ -1,5 +1,7 @@
 #ifndef _LOGGER_HPP
 
+#define _LOGGER_HPP
+
 #include <iostream>
 #include <fstream>
 
@@ -15,7 +17,8 @@ class Logger {
         ofstream arch;
         time_t tiempoActual;
         char *czNombreArchivo;
-        char *czFecha[50];
+        char czFecha[50];
+        pid_t tid;
 
         void PrepararArchivoLogProceso(const char *czNombreProceso);
         void CerrarArchivoLogProceso(void);
