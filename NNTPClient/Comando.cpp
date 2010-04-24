@@ -49,7 +49,7 @@ using namespace std;
     	cout << "Entro bien a la funcion: void Comando::funcionDePrueba(void)" << endl;
     }
 
-/*
+
     void Comando::inicializacionVector()
     {
 
@@ -102,27 +102,27 @@ using namespace std;
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
         for(i;i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
         {
-             comandoNombre = comandoNombre + comandoEntero[i];
-             cout <<"digito :"<<i<<":"<<comandoNombre[i]<<endl;
+             nombreComando = nombreComando + comandoEntero[i];
+             cout <<"digito :"<<i<<":"<<nombreComando[i]<<endl;
 
         }
-        cout << "Nombre Comando:" << comandoNombre<<endl;
+        cout << "Nombre Comando:" << nombreComando<<endl;
         //ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
-        if(comandoNombre=="LIST")
+        if(nombreComando=="LIST")
         {
-            comandoNombre = comandoNombre + ' ';
-            for(i=comandoNombre.length();i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
-                comandoNombre = comandoNombre + comandoEntero[i];
+            nombreComando = nombreComando + ' ';
+            for(i=nombreComando.length();i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
+                nombreComando = nombreComando + comandoEntero[i];
         }
-        cout << "Nombre Comando:" << comandoNombre<<endl;
+        cout << "Nombre Comando:" << nombreComando<<endl;
         // EL RESTO DE LA CADENA ES EL PARAMETRO
-        for(i=comandoNombre.length()+1;i<comandoEntero.length();i++)
+        for(i=nombreComando.length()+1;i<nombreComando.length();i++)
         {
             parametro = parametro + comandoEntero[i];
         }
         cout<<"Parametro:"<<parametro;
 
-        int estado;
-        estado = validarComando(comandoNombre);
+        /*int estado;
+        estado = validarComando();*/
     }
-*/
+
