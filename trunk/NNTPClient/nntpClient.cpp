@@ -12,7 +12,7 @@
 #include "NNTPClientBO.h"
 #include "NNTPClientDAO.h"
 #include <stdlib.h>
-#include "util.h"
+//#include "util.h"
 using namespace std;
 
 int EXIT_OK= 1;
@@ -32,8 +32,8 @@ int inicializarBO(void){
 /**
  * Esta funcion es la que seria el "main" del nuevo thread que creamos encargado de la interfaz de usuario.
  */
-void* threadInterfazDeUsuario(void* comando){
-	//	NBarrios-TODO: Casteo el parametro a Comando* asi comparto el recurso entre los hilos.
+void* threadInterfazDeUsuario(void* parametro){
+	 Comando* comando = (Comando*)parametro;//	Casteo el parametro a Comando* asi comparto el recurso entre los hilos.
 
 	while(true){//	loop infinito porque necesito que corra todo el tiempo y nunca llegue al final de la funcion.
 		cout << "Ingrese un comando:" << endl;
@@ -43,9 +43,9 @@ void* threadInterfazDeUsuario(void* comando){
 		//	NBarrios-TODO: aca hago el enterCritical que dijo Scarfiello para sincronizar hilos.
 		//	En este espacio, solo este hilo de ejecucion puede acceder a comando.
 
-//		comando.cargateDesdeUnString(cadenaIngresadaPorElUsuario);	//	Esto es el anterior parservalidator que ahora esta adentro de Comando.
+//		(*comando).cargateDesdeUnString(cadenaIngresadaPorElUsuario);	//	Esto es el anterior parservalidator que ahora esta adentro de Comando.
 //		cout << "Pruebo el parseo:" << endl;
-//		cout << comando.getNombreComando() << endl;
+//		cout << (*comando).getNombreComando() << endl;
 
 		//	NBarrios-TODO: aca hago el exitCritical que dijo Scarfiello para sincronizar hilos.
 
@@ -78,9 +78,12 @@ int main(void){
    	    //	NBarrios-TODO: Conectar un servidor NNTP (ej: nntpd) por medio de un canal seguro (openSSL)
 
 
+
    	    //	NBarrios-TODO: aca hago el enterCritical que dijo Scarfiello para sincronizar hilos.
    	    string nombreDelComandoLeido=comando.getNombreComando();
    	    //	NBarrios-TODO: aca hago el exitCritical que dijo Scarfiello para sincronizar hilos.
+
+
 
    	    //	NBarrios-TODO: Ver si esta bien cortar el programa de esta manera cuando el usuario ingresa quit.
    	    //	Tener en cuenta que el comando se setea en el otro thread y va a estar sincronizado por eso andar. creo.
