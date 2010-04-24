@@ -9,7 +9,6 @@
 #include <pthread.h>
 #include "Comando.hpp"
 #include "ParseadorValidadorDeComandos.h"
-#include "NNTPClientBO.h"
 #include "NNTPClientDAO.h"
 #include <stdlib.h>
 #include "util.h"
