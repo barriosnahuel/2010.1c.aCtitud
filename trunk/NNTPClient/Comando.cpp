@@ -48,7 +48,7 @@ using namespace std;
     void Comando::funcionDePrueba(void){
     	cout << "Entro bien a la funcion: void Comando::funcionDePrueba(void)" << endl;
     }
-
+/*
 
     void Comando::inicializacionVector()
     {
@@ -125,4 +125,4 @@ using namespace std;
         int estado;
         estado = validarComando(comandoNombre);
     }
-
+*/
