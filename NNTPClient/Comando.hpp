@@ -16,6 +16,8 @@ class Comando {
     string nombreComando;
     string respuestaAlUsuario;//	Pongo este atributo porque Comando es el recurso que voy a compartir entre los hilos.
     bool   llevaParametro;
+
+    string parametro;
     vector<string> vectorDeComandos;
     vector<int> vectorDeParametros;
 
@@ -33,8 +35,10 @@ public:
 	void setLlevaParametro(int valor);
 
 	void funcionDePrueba(void);
-	/*void inicializacionVector(void);
-	string sacaEspaciosIzquierda(string cadena);*/
+
+	void inicializacionVector(void);
+	string sacaEspaciosIzquierda(string cadena);
+    int extraerNombreYParametro(string comandoEntero);
 };
 
 #endif /* COMANDO_H_ */
