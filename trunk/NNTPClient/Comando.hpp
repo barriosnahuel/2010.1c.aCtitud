@@ -13,11 +13,12 @@ using namespace std;//	Necesario para poder usar el struct string.
 
 class Comando {
 	//	Lo privado
+    string parametro;
     string nombreComando;
     string respuestaAlUsuario;//	Pongo este atributo porque Comando es el recurso que voy a compartir entre los hilos.
     bool   llevaParametro;
 
-    string parametro;
+
     vector<string> vectorDeComandos;
     vector<int> vectorDeParametros;
 
