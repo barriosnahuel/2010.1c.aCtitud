@@ -11,15 +11,8 @@
 #include <iostream>
 using namespace std;
 
-	Comando::Comando(void)
-	{
-		cout << "Comando::Comando(void)" << endl;
-	}
-
-	Comando::~Comando(void)
-	{
-		cout << "Comando::~Comando(void)" << endl;
-	}
+	Comando::Comando(void){}
+	Comando::~Comando(void){}
 
 	void Comando::setNombreComando(string nombre){
 		nombreComando= nombre;
