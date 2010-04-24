@@ -48,8 +48,8 @@ using namespace std;
     void Comando::funcionDePrueba(void){
     	cout << "Entro bien a la funcion: void Comando::funcionDePrueba(void)" << endl;
     }
-/*
 
+/*
     void Comando::inicializacionVector()
     {
 
@@ -69,7 +69,7 @@ using namespace std;
          vectorDeParametros.push_back(1);
     }
 
-    string sacaEspaciosIzquierda(string cadena)
+    string Comando::sacaEspaciosIzquierda(string cadena)
     {
         string cadenaTransformada;
         int desde = 0;
@@ -94,7 +94,7 @@ using namespace std;
 
     }
 
-    int extraerNombreYParametro(string comandoEntero)
+    int Comando::extraerNombreYParametro(string comandoEntero)
     {
         int i = 0;
         comandoEntero = sacaEspaciosIzquierda(comandoEntero); //SACA ESPACIOS A IZQUIERDA
