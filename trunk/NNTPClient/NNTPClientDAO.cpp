@@ -11,12 +11,9 @@ using namespace std;
 
 
 NNTPClientDAO::NNTPClientDAO() {
-	// TODO Auto-generated constructor stub
-
 }
 
 NNTPClientDAO::~NNTPClientDAO() {
-	// TODO Auto-generated destructor stub
 }
 
 void NNTPClientDAO::funcionDePrueba(){
