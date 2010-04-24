@@ -28,11 +28,6 @@ int inicializarDAO(void){
 }
 
 
-int inicializarBO(void){
-	NNTPClientBO bo;
-	return EXIT_OK;
-}
-
 /**
  * Esta funcion es la que seria el "main" del nuevo thread que creamos encargado de la interfaz de usuario.
  */
