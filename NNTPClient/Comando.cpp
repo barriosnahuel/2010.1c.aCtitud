@@ -29,6 +29,14 @@ using namespace std;
 		return nombreComando;
 	}
 
+	void Comando::setRespuestaAlUsuario(string respuesta){
+		respuestaAlUsuario= respuesta;
+	}
+
+	string Comando::getRespuestaAlUsuario(void){
+		return respuestaAlUsuario;
+	}
+
     bool Comando::getLlevaParametro(void){
         return llevaParametro;
     }

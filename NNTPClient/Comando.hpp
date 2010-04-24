@@ -14,7 +14,9 @@ using namespace std;//	Necesario para poder usar el struct string.
 class Comando {
 	//	Lo privado
     string nombreComando;
-    bool  llevaParametro;
+    string respuestaAlUsuario;//	Pongo este atributo porque Comando es el recurso que voy a compartir entre los hilos.
+    bool   llevaParametro;
+
 
 public:
 	Comando(void);
@@ -22,6 +24,9 @@ public:
 
 	void  setNombreComando(string nombre);
 	string getNombreComando(void);
+
+	void  setRespuestaAlUsuario(string respuesta);
+	string getRespuestaAlUsuario(void);
 
 	bool getLlevaParametro(void);
 	void setLlevaParametro(int valor);
