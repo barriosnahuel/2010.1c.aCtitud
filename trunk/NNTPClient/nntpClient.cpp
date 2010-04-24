@@ -12,11 +12,15 @@
 #include "NNTPClientBO.h"
 #include "NNTPClientDAO.h"
 #include <stdlib.h>
-//#include "util.h"
+#include "util.h"
 using namespace std;
 
 int EXIT_OK= 1;
 int EXIT_ERROR= 0;
+
+Semaforo semaforoConexion;
+Semaforo semaforoUI;
+
 
 int inicializarDAO(void){
 	NNTPClientDAO dao;
@@ -40,17 +44,24 @@ void* threadInterfazDeUsuario(void* parametro){
 		string cadenaIngresadaPorElUsuario;
 		cin >> cadenaIngresadaPorElUsuario;
 
-		//	NBarrios-TODO: aca hago el enterCritical que dijo Scarfiello para sincronizar hilos.
-		//	En este espacio, solo este hilo de ejecucion puede acceder a comando.
+		semaforoUI.setEstasOcupado(true);	//	enterCritical.
 
-//		(*comando).cargateDesdeUnString(cadenaIngresadaPorElUsuario);	//	Esto es el anterior parservalidator que ahora esta adentro de Comando.
-//		cout << "Pruebo el parseo:" << endl;
-//		cout << (*comando).getNombreComando() << endl;
+		//	Aca trabajo con los recursos compartidos.
+//			(*comando).cargateDesdeUnString(cadenaIngresadaPorElUsuario);	//	Esto es el anterior parservalidator que ahora esta adentro de Comando.
+		cout << "Pruebo el parseo:" << endl;
+		cout << (*comando).getNombreComando() << endl;
 
-		//	NBarrios-TODO: aca hago el exitCritical que dijo Scarfiello para sincronizar hilos.
+		semaforoUI.setEstasOcupado(false);//	exitCritical.
+		//	Espero dos segundos, porque es un tiempo considerable (creo) para que la cpu comience a trabajar con el otro hilo
+		//	y este otro hilo setee bloquee el semaforo.
+		sleep(2);
 
-		//	NBarrios-TODO: Muestro la respuesta.
-//		cout << (*comando).getRespuestaAlUsuario() << endl;
+
+		while(semaforoConexion.estasOcupado())
+			;//	Con este while y la sentencia nula me quedo esperando hasta poder acceder al recurso compartido.
+		semaforoUI.setEstasOcupado(true);	//	enterCritical.
+
+		cout << (*comando).getRespuestaAlUsuario() << endl;
 		cout << "--------------------------------------------" << endl;
 	}
 
@@ -61,13 +72,22 @@ bool crearThreadDeUI(Comando* param){
 	pthread_t threadUI;//	Declaro un nuevo thread.
 	//	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread.
 
-	return true;
+	return false;
 //	return !pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, &param);
 }
 
 
 int main(void){
+	cout << "* Iniciando NNTPClient v0.4..." << endl;
+	sleep(1);
+	cout << "." << endl;
+	sleep(1);
+	cout << "." << endl;
+	sleep(1);
+	cout << "." << endl;
+
     Comando comando;//	Recurso que voy a compartir entre los threads.
+    semaforoUI.setEstasOcupado(true);//	Seteando este semaforo como ocupado, primero voy a poder leer los datos por consola.
 
     if(crearThreadDeUI(&comando)){
     	//	Si estoy aca es porque se pudo crear correctamente el nuevo thread.
@@ -77,29 +97,24 @@ int main(void){
 
    	    //	NBarrios-TODO: Conectar un servidor NNTP (ej: nntpd) por medio de un canal seguro (openSSL)
 
-
-
-   	    //	NBarrios-TODO: aca hago el enterCritical que dijo Scarfiello para sincronizar hilos.
-   	    string nombreDelComandoLeido=comando.getNombreComando();
-   	    //	NBarrios-TODO: aca hago el exitCritical que dijo Scarfiello para sincronizar hilos.
-
-
+    	while(semaforoUI.estasOcupado())
+    		;//	Con este while y la sentencia nula me quedo esperando hasta poder acceder al recurso compartido.
+		semaforoConexion.setEstasOcupado(true);	//	enterCritical.
 
    	    //	NBarrios-TODO: Ver si esta bien cortar el programa de esta manera cuando el usuario ingresa quit.
    	    //	Tener en cuenta que el comando se setea en el otro thread y va a estar sincronizado por eso andar. creo.
-   	    while(nombreDelComandoLeido.compare("QUIT")!=0){
+   	    while(dosStringsSonIguales(comando.getNombreComando(), "QUIT")){
 
    	    	//	NBarrios-TODO: Envio el comando al nntp server y obtengo la respuesta al usuario.
    	    	string respuesta= "No existe esa noticia campeon";
 
+			comando.setRespuestaAlUsuario(respuesta);
+			semaforoConexion.setEstasOcupado(false);
+			sleep(2);
 
-   			//	NBarrios-TODO: aca hago el enterCritical que dijo Scarfiello para sincronizar hilos.
-   			//	En este espacio, solo este hilo de ejecucion puede acceder a comando.
-   	    	comando.setRespuestaAlUsuario(respuesta);
-
-   			//	NBarrios-TODO: aca hago el exitCritical que dijo Scarfiello para sincronizar hilos.
-
-   	    	nombreDelComandoLeido= comando.getNombreComando();
+			while(semaforoUI.estasOcupado())
+				;
+			semaforoConexion.setEstasOcupado(true);
    	    }
 
    	    //	NBarrios-TODO: Cierro la conexion.

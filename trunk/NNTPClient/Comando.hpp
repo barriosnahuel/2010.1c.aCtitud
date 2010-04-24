@@ -26,10 +26,10 @@ public:
 	Comando(void);
 	~Comando(void);
 
-	void  setNombreComando(string nombre);
+	void   setNombreComando(string nombre);
 	string getNombreComando(void);
 
-	void  setRespuestaAlUsuario(string respuesta);
+	void   setRespuestaAlUsuario(string respuesta);
 	string getRespuestaAlUsuario(void);
 
 	bool getLlevaParametro(void);
