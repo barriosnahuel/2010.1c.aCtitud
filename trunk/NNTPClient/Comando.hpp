@@ -7,7 +7,7 @@
 
 #ifndef COMANDO_H_
 #define COMANDO_H_
-
+#include<vector>
 #include <iostream>	//	Necesario para poder usar el struct string.
 using namespace std;//	Necesario para poder usar el struct string.
 
@@ -16,7 +16,8 @@ class Comando {
     string nombreComando;
     string respuestaAlUsuario;//	Pongo este atributo porque Comando es el recurso que voy a compartir entre los hilos.
     bool   llevaParametro;
-
+    vector<string> vectorDeComandos;
+    vector<int> vectorDeParametros;
 
 public:
 	Comando(void);
