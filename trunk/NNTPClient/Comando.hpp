@@ -33,6 +33,8 @@ public:
 	void setLlevaParametro(int valor);
 
 	void funcionDePrueba(void);
+	/*void inicializacionVector(void);
+	string sacaEspaciosIzquierda(string cadena);*/
 };
 
 #endif /* COMANDO_H_ */
