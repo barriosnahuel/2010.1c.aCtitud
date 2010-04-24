@@ -9,9 +9,6 @@ util.o: util.cpp
 Comando.o: Comando.cpp
 	g++ -c -o Comando.o Comando.cpp
 
-NNTPClientBO.o: NNTPClientBO.cpp
-	g++ -c -o NNTPClientBO.o NNTPClientBO.cpp
-
 NNTPClientDAO.o: NNTPClientDAO.cpp
 	g++ -c -o NNTPClientDAO.o NNTPClientDAO.cpp
 
