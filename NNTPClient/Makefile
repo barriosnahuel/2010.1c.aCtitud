@@ -1,5 +1,5 @@
-NNTPClient: util.o util.cpp Comando.o Comando.cpp NNTPClientBO.o NNTPClientBO.cpp NNTPClientDAO.o NNTPClientDAO.cpp ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp nntpClient.o nntpClient.cpp
-	g++ -o NNTPClient ./util.o ./Comando.o ./NNTPClientBO.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
+NNTPClient: util.o util.cpp Comando.o Comando.cpp NNTPClientDAO.o NNTPClientDAO.cpp ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp nntpClient.o nntpClient.cpp
+	g++ -o NNTPClient ./util.o ./Comando.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
 	@echo 'Finished building target: $@'
 	@echo ' '
 
