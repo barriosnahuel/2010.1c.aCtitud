@@ -62,40 +62,73 @@ using namespace std;
 	    llevaParametro= 0;
 	}
 
+      int Comando::parseaYValida(string cadenaIngresada)
+    {
+        extraerNombreYParametro(cadenaIngresada);
+        inicializacionVector();
+        return validacion();
+    }
+
     void Comando::inicializacionVector()
     {
 
-         vectorDeComandos.push_back("LIST NEWSGROUPS");
-         vectorDeComandos.push_back("QUIT");
-         vectorDeComandos.push_back("LISTGROUP");
-         vectorDeComandos.push_back("ARTICLE");
-         vectorDeComandos.push_back("STAT");
-         vectorDeComandos.push_back("HEAD");
-         vectorDeComandos.push_back("BODY");
-         vectorDeParametros.push_back(0);
-         vectorDeParametros.push_back(0);
-         vectorDeParametros.push_back(1);
-         vectorDeParametros.push_back(1);
-         vectorDeParametros.push_back(1);
-         vectorDeParametros.push_back(1);
-         vectorDeParametros.push_back(1);
+         vectorDeComandos[0]="LIST NEWSGROUPS";
+         vectorDeComandos[1]="QUIT";
+         vectorDeComandos[2]="LISTGROUP";
+         vectorDeComandos[3]="ARTICLE";
+         vectorDeComandos[4]="STAT";
+         vectorDeComandos[5]="HEAD";
+         vectorDeComandos[6]="BODY";
+
+         vectorDeParametros[0]= 0;
+         vectorDeParametros[1]= 0;
+         vectorDeParametros[2]= 1;
+         vectorDeParametros[3]= 1;
+         vectorDeParametros[4]= 1;
+         vectorDeParametros[5]= 1;
+         vectorDeParametros[6]= 1;
     }
 
     int Comando::validacion()
-    {/*
+    {
+
       cout<<"NombreComando:"<<nombreComando<<endl;
       cout<<"Parametro:"<<parametro<<endl;
-      cout<<"VECTOR DE COMANDOS 0:"<<vectorDeComandos.push_back[0];
+
       int i ;
       int existeComando = 0;
-      for(i=0;vectorDeComandos.size();i++)
+      int existeParametro = 0;
+      for(i=0;i<=6;i++)
         if(nombreComando == vectorDeComandos[i])
         {
+            cout<<nombreComando<<"=="<<vectorDeComandos[i]<<"?"<<endl;
             existeComando = 1;
             break;
         }
-      cout << "Existe Comando : "<< existeComando;
-        */
+
+     if(existeComando!=0)
+     {
+        if(vectorDeParametros[i]== 1 && parametro.empty()==0)
+            existeParametro = 1;
+        else
+            if(vectorDeParametros[i]==0 && parametro.empty()==1)
+            existeParametro = 1;
+     }
+     else
+     {
+         cout<<"El comando ingresado no existe"<<endl;;
+     }
+     if(existeParametro==0)
+     {
+          if(vectorDeParametros[i]== 1 && parametro.empty()!=0)
+            cout<<"El comando debe llevar un parametro"<<endl;
+          else
+            if(vectorDeParametros[i]==0 && parametro.empty()!=1)
+            cout<<"El comando no debe llevar parametros"<<endl;
+     }
+
+     return(existeComando!=0 && existeParametro!=0 );
+
     }
 
     string Comando::sacaEspaciosIzquierda(string cadena)
@@ -117,16 +150,27 @@ using namespace std;
         for(i = posicion;isspace(cadena.c_str()[i]);i++);
         return i;
     }
-    int Comando::extraerNombreYParametro(string comandoEntero)
+    string Comando::aMayusculas(string cadena)
     {
+        string cadenaTransformada="";
+        for(int i=0;i<cadena.length();i++)
+            cadenaTransformada = cadenaTransformada + (char)toupper(cadena.c_str()[i]);
+
+        return cadenaTransformada;
+
+    }
+    void Comando::extraerNombreYParametro(string comandoEntero)
+    {
+        int i = 0;
+        int espaciosDpsComando ;
+
         comandoEntero = sacaEspaciosIzquierda(comandoEntero);
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
-        int i = 0;
         for(i;i<comandoEntero.length()&& !isspace(comandoEntero.c_str()[i]);i++)
             nombreComando = nombreComando + comandoEntero[i];
 
         //ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
-        int espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
+        espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
         if(nombreComando=="LIST")
         {
             nombreComando = nombreComando + ' ';
@@ -141,4 +185,7 @@ using namespace std;
             parametro = parametro + comandoEntero[i];
         }
 
+        nombreComando=aMayusculas(nombreComando);
+
     }
+
