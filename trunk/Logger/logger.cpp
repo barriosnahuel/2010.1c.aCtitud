@@ -13,7 +13,7 @@
 using namespace std;
 
 //constructor
-Logger::Logger(void) {
+Logger::Logger() {
 	mkdir("./logs",0755);
 	czNombreArchivo = new char[40];
 	memset(czNombreArchivo, 0, 40);
@@ -21,7 +21,7 @@ Logger::Logger(void) {
 };
 
 //destructor
-Logger::~Logger(void) {
+virtual Logger::~Logger() {
 	/* libera memoria */
 	delete czNombreArchivo;
 };
@@ -35,7 +35,7 @@ void Logger::PrepararArchivoLogProceso(const char *czNombreProceso) {
 	/* se abre o crea al archivo log */
     arch.open(czNombreArchivo, ios::app);
     if (!(arch.is_open()))
-        cout << " No se pudo abrir el archivo de LOG." << endl;
+        perror("No se pudo abrir el archivo de LOG.");
 };
 void Logger::CerrarArchivoLogProceso(void) {
 	if(arch.is_open())
