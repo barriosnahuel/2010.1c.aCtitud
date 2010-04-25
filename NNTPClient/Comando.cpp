@@ -62,60 +62,66 @@ using namespace std;
          vectorDeParametros.push_back(1);
     }
 
-    string Comando::sacaEspaciosIzquierda(string cadena)
-    {
-        string cadenaTransformada;
-        int desde = 0;
-        for(int i =0;i<cadena.length();i++)
-          if(cadena[i]==' ' && cadena[i+1]!=' ')  //SI EL SIGUIENTE NO ES UN ESPACIO SALE
-          {
-           desde=desde+1;
-           break;
-          }
-          else
-           if(cadena[i]==' ')                     //SI EL SIGUIENTE ES UN ESPACIO TIENE QUE SEGUIR
-            desde=desde+1;
-           else
-            break;                               //SI NO COMIENZA CON ESPACIO NO  HACE NADA
-
-
-        cout<<"EL ULTIMO ESPACIO ESTA EN "<<desde<<endl;
-        for(int i=desde;i<cadena.length();i++)
-            cadenaTransformada=cadenaTransformada+cadena[i];
-        cout<<"CADENA FINAL SIN ESPACIOS A IZQUIERDA:"<<cadenaTransformada<<endl;
-        return cadenaTransformada;
-
+    int Comando::validacion()
+    {/*
+      cout<<"NombreComando:"<<nombreComando<<endl;
+      cout<<"Parametro:"<<parametro<<endl;
+      cout<<"VECTOR DE COMANDOS 0:"<<vectorDeComandos.push_back[0];
+      int i ;
+      int existeComando = 0;
+      for(i=0;vectorDeComandos.size();i++)
+        if(nombreComando == vectorDeComandos[i])
+        {
+            existeComando = 1;
+            break;
+        }
+      cout << "Existe Comando : "<< existeComando;
+        */
     }
 
+    string Comando::sacaEspaciosIzquierda(string cadena)
+    {
+       string cadenaTransformada;
+       int desde = 0;
+       desde = consumeEspaciosDesde(desde,cadena);
+       for(int i=desde;i<cadena.length();i++)
+            cadenaTransformada=cadenaTransformada+cadena[i];
+       return cadenaTransformada;
+
+    }
+    int Comando::consumeEspaciosDesde(int posicion,string cadena)
+    {
+      /* PARA DETECTAR ESPACIOS EXISTE LA FUNCION isspace(char*), PARA PODER PASARLE UN CARACTER DE LA CADENA
+       * DEBO HACER (cadena.c_str())[posicion]
+       */
+        int i;
+        for(i = posicion;isspace(cadena.c_str()[i]);i++);
+        return i;
+    }
     int Comando::extraerNombreYParametro(string comandoEntero)
     {
         int i = 0;
-        comandoEntero = sacaEspaciosIzquierda(comandoEntero); //SACA ESPACIOS A IZQUIERDA
+        int espaciosDpsComando ;
 
+        comandoEntero = sacaEspaciosIzquierda(comandoEntero);
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
-        for(i;i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
-        {
-             nombreComando = nombreComando + comandoEntero[i];
-             cout <<"digito :"<<i<<":"<<nombreComando[i]<<endl;
+        for(i;i<comandoEntero.length()&& !isspace(comandoEntero.c_str()[i]);i++)
+            nombreComando = nombreComando + comandoEntero[i];
 
-        }
-        cout << "Nombre Comando:" << nombreComando<<endl;
         //ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
+        espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
         if(nombreComando=="LIST")
         {
             nombreComando = nombreComando + ' ';
-            for(i=nombreComando.length();i<comandoEntero.length()&&comandoEntero[i]!=' ';i++)
+            for(i=espaciosDpsComando;i<comandoEntero.length()&&!isspace(comandoEntero.c_str()[i]);i++)
                 nombreComando = nombreComando + comandoEntero[i];
         }
-        cout << "Nombre Comando:" << nombreComando<<endl;
+
         // EL RESTO DE LA CADENA ES EL PARAMETRO
-        for(i=nombreComando.length()+1;i<nombreComando.length();i++)
+        espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
+        for( i = espaciosDpsComando;i<comandoEntero.length();i++)
         {
             parametro = parametro + comandoEntero[i];
         }
-        cout<<"Parametro:"<<parametro;
 
-        /*int estado;
-        estado = validarComando();*/
     }
-
