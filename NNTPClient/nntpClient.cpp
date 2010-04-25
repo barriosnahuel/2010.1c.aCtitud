@@ -92,7 +92,6 @@ int main(void){
 
    	    	//	NBarrios-TODO: Envio el comando al nntp server y obtengo la respuesta al usuario.
    	    	string respuesta= dao.enviarMensaje(comando.getCadenaIngresada());
-//   	    	string respuesta= "Aca se supone que mande el request, me respondio el server, y lo que estoy mostrando ahora es la rta.";
 
 			comando.setRespuestaAlUsuario(respuesta);
 			semaforoConexion.setEstasOcupado(false);
