@@ -14,6 +14,45 @@ NNTPClientDAO::NNTPClientDAO() {}
 //Destructor.
 NNTPClientDAO::~NNTPClientDAO() {}
 
+int OpenConnection(const char *hostname, int port)
+{
+        int sd;
+        struct hostent *host;
+        struct sockaddr_in addr;
+
+        sd = socket(PF_INET, SOCK_STREAM, 0);
+        bzero(&addr, sizeof(addr));
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(port);
+        addr.sin_addr.s_addr = *(long*)(host->h_addr);
+        if ( connect(sd, &addr, sizeof(addr)) != 0 )
+        {
+                close(sd);
+                perror(hostname);
+                abort();
+        }
+        return sd;
+}
+
+/* Levanta un nuevo contexto para arrancar la conexión.*/
+SSL_CTX* InitCTX(void)
+{
+        SSL_METHOD *method;
+        SSL_CTX *ctx;
+
+        SSL_library_init();
+        OpenSSL_add_all_algorithms();
+        SSL_load_error_strings();
+        method = SSLv23_client_method();
+        ctx = SSL_CTX_new(method);
+        if ( ctx == NULL )
+        {
+                cout << "ERROR!! El ctx es nullo" << endl;
+                abort();
+        }
+        return ctx;
+}
+
 void abrirConexion(void)
 {
         cout << "Se iniciará la apertura de la conexión con el servidor" << endl;
@@ -57,44 +96,7 @@ string enviarMensaje(string comandoEscritoPorUsuario) {
         return buff;
 }
 
-int OpenConnection(const char *hostname, int port)
-{
-        int sd;
-        struct hostent *host;
-        struct sockaddr_in addr;
 
-        sd = socket(PF_INET, SOCK_STREAM, 0);
-        bzero(&addr, sizeof(addr));
-        addr.sin_family = AF_INET;
-        addr.sin_port = htons(port);
-        addr.sin_addr.s_addr = *(long*)(host->h_addr);
-        if ( connect(sd, &addr, sizeof(addr)) != 0 )
-        {
-                close(sd);
-                perror(hostname);
-                abort();
-        }
-        return sd;
-}
-
-/* Levanta un nuevo contexto para arrancar la conexión.*/
-SSL_CTX* InitCTX(void)
-{
-        SSL_METHOD *method;
-        SSL_CTX *ctx;
-
-        SSL_library_init();
-        OpenSSL_add_all_algorithms();
-        SSL_load_error_strings();
-        method = SSLv23_client_method();
-        ctx = SSL_CTX_new(method);
-        if ( ctx == NULL )
-        {
-                cout << "ERROR!! El ctx es nullo" << endl;
-                abort();
-        }
-        return ctx;
-}
 
 int main() {
     cout << "esto anduvo :O" << endl;
