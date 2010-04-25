@@ -5,8 +5,8 @@
  *      Author: Barrios, Nahuel.
  */
 
-#ifndef UTIL_H_
-#define UTIL_H_
+#ifndef SEMAFORO_H_
+#define SEMAFORO_H_
 
 #include <iostream>
 using namespace std;
@@ -23,10 +23,4 @@ public:
 };
 
 
-//	Funciones utilitarias.
-bool dosStringsSonIguales(string cadena1,string cadena2);
-
-
-
-
-#endif /* UTIL_H_ */
+#endif /* SEMAFORO_H_ */

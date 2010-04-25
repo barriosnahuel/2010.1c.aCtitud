@@ -1,10 +1,10 @@
-NNTPClient: util.o util.cpp Comando.o Comando.cpp NNTPClientDAO.o NNTPClientDAO.cpp ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp nntpClient.o nntpClient.cpp
-	g++ -o NNTPClient ./util.o ./Comando.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
+NNTPClient: Semaforo.o Semaforo.cpp Comando.o Comando.cpp NNTPClientDAO.o NNTPClientDAO.cpp ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp nntpClient.o nntpClient.cpp
+	g++ -lpthread -o NNTPClient ./Semaforo.o ./Comando.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-util.o: util.cpp
-	g++ -c -o util.o util.cpp
+Semaforo.o: Semaforo.cpp
+	g++ -c -o Semaforo.o Semaforo.cpp
 
 Comando.o: Comando.cpp
 	g++ -c -o Comando.o Comando.cpp
@@ -17,3 +17,8 @@ ParseadorValidadorDeComandos.o: ParseadorValidadorDeComandos.cpp
 
 nntpClient.o: nntpClient.cpp
 	g++ -c -o nntpClient.o nntpClient.cpp
+	
+#	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos
+#			nuevamente cuando nos dice ya estan compilados con la ultima version.	
+clean:
+	rm *.o

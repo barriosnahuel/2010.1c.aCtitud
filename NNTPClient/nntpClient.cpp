@@ -11,7 +11,7 @@
 #include "ParseadorValidadorDeComandos.h"
 #include "NNTPClientDAO.h"
 #include <stdlib.h>
-#include "util.h"
+#include "Semaforo.h"
 using namespace std;
 
 int EXIT_OK= 1;
@@ -50,7 +50,6 @@ void* threadInterfazDeUsuario(void* parametro){
 		//	y este otro hilo setee bloquee el semaforo.
 		sleep(2);
 
-
 		while(semaforoConexion.estasOcupado())
 			;//	Con este while y la sentencia nula me quedo esperando hasta poder acceder al recurso compartido.
 		semaforoUI.setEstasOcupado(true);	//	enterCritical.
@@ -66,19 +65,14 @@ bool crearThreadDeUI(Comando* param){
 	pthread_t threadUI;//	Declaro un nuevo thread.
 	//	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread.
 
-	return false;
-//	return !pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, &param);
+//	return false;
+	return !pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, &param);
 }
 
 
 int main(void){
 	cout << "* Iniciando NNTPClient v0.4..." << endl;
 	sleep(1);
-	cout << "." << endl;
-	sleep(1);
-	cout << "." << endl;
-	sleep(1);
-	cout << "." << endl;
 
     Comando comando;//	Recurso que voy a compartir entre los threads.
     semaforoUI.setEstasOcupado(true);//	Seteando este semaforo como ocupado, primero voy a poder leer los datos por consola.
@@ -97,7 +91,7 @@ int main(void){
 
    	    //	NBarrios-TODO: Ver si esta bien cortar el programa de esta manera cuando el usuario ingresa quit.
    	    //	Tener en cuenta que el comando se setea en el otro thread y va a estar sincronizado por eso andar. creo.
-   	    while(dosStringsSonIguales(comando.getNombreComando(), "QUIT")){
+   	    while(comando.getNombreComando().compare("QUIT")==0){
 
    	    	//	NBarrios-TODO: Envio el comando al nntp server y obtengo la respuesta al usuario.
    	    	string respuesta= "No existe esa noticia campeon";
@@ -114,6 +108,7 @@ int main(void){
    	    //	NBarrios-TODO: Cierro la conexion.
    	    //	NBarrios-TODO: Libero la memoria que haya pedido.
 
+   	    cout << "Gracias por usar NNTPClient." << endl;
 		return EXIT_SUCCESS;//	Termino la aplicacion.
     }
 
