@@ -11,7 +11,14 @@
 #include <iostream>
 using namespace std;
 
-	Comando::Comando(void){}
+	Comando::Comando(void){
+		cadenaIngresada= "";
+		llevaParametro= 0;
+		nombreComando= "";
+		parametro= "";
+		respuestaAlUsuario= "";
+	}
+
 	Comando::~Comando(void){}
 
 	void Comando::setNombreComando(string nombre){
@@ -34,9 +41,26 @@ using namespace std;
         return llevaParametro;
     }
 
-    void Comando::setLlevaParametro(int valor){
-        llevaParametro = valor;
+    string Comando::getParametro(void){
+        return parametro;
     }
+
+	void Comando::init(string cadena){
+		cadenaIngresada= cadena;
+		extraerNombreYParametro(cadenaIngresada);
+	}
+
+	string Comando::getCadenaIngresada(void){
+		return cadenaIngresada;
+	}
+
+	void Comando::reset(void){
+		cadenaIngresada= "";
+	    parametro= "";
+	    nombreComando= "";
+	    respuestaAlUsuario= "";
+	    llevaParametro= 0;
+	}
 
     void Comando::inicializacionVector()
     {
@@ -95,16 +119,14 @@ using namespace std;
     }
     int Comando::extraerNombreYParametro(string comandoEntero)
     {
-        int i = 0;
-        int espaciosDpsComando ;
-
         comandoEntero = sacaEspaciosIzquierda(comandoEntero);
         //EXTRAE EL COMANDO DE LA CADENA INGRESADA
+        int i = 0;
         for(i;i<comandoEntero.length()&& !isspace(comandoEntero.c_str()[i]);i++)
             nombreComando = nombreComando + comandoEntero[i];
 
         //ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
-        espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
+        int espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
         if(nombreComando=="LIST")
         {
             nombreComando = nombreComando + ' ';
