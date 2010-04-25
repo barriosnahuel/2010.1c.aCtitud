@@ -25,7 +25,7 @@ int OpenConnection(const char *hostname, int port)
         addr.sin_family = AF_INET;
         addr.sin_port = htons(port);
         addr.sin_addr.s_addr = *(long*)(host->h_addr);
-        if ( connect(sd, &addr, sizeof(addr)) != 0 )
+        if ( connect(sd,(const sockaddr*) &addr, sizeof(addr)) != 0 )
         {
                 close(sd);
                 perror(hostname);
@@ -89,7 +89,7 @@ string NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
         cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << endl;
 
         // Envío el comando al servidor.
-        SSL_write(ssl, comandoEscritoPorUsuario, strlen(comandoEscritoPorUsuario));
+        SSL_write(ssl, comandoEscritoPorUsuario, strlen((const char*)comandoEscritoPorUsuario));
 
         // Me responde la cantidad de bytes de la respuesta.
         cantidadBytesDeRespuesta = SSL_read(ssl, buf, sizeof(buf));
