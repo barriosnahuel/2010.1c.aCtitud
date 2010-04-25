@@ -15,6 +15,12 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <openssl/ssl.h>
+#include <openssl/ssl2.h>
+#include <openssl/ssl3.h>
+#include <openssl/ssl23.h>
+#include <openssl/tls1.h>
+
 
 using namespace std;
 
