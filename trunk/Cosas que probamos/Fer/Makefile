@@ -1,5 +1,5 @@
 NNTPClient: NNTPClientDAO.o NNTPClientDAO.cpp
-	g++  -o -l NNTPClient ./NNTPClientDAO.o
+	g++  -o -l NNTPClientDAO ./NNTPClientDAO.o
 	@echo 'Finished building target: $@'
 	@echo ' '
 
