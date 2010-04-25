@@ -84,12 +84,12 @@ void NNTPClientDAO::cerrarConexion(void) {
     cout << "Se cerró la conexión con el servidor y se liberaron todos los recursos." << endl;
 }
 
-string NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
+string NNTPClientDAO::enviarMensaje(const string comandoEscritoPorUsuario) {
         int cantidadBytesDeRespuesta;
         cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << endl;
 
         // Envío el comando al servidor.
-        SSL_write(ssl, comandoEscritoPorUsuario, strlen((const char*)comandoEscritoPorUsuario));
+        SSL_write(ssl, comandoEscritoPorUsuario, strlen(comandoEscritoPorUsuario));
 
         // Me responde la cantidad de bytes de la respuesta.
         cantidadBytesDeRespuesta = SSL_read(ssl, buf, sizeof(buf));
