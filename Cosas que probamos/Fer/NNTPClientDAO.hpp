@@ -28,11 +28,11 @@
 using namespace std;
 
 class NNTPClientDAO {
-        SSL_CTX *ctx;
-        int server;
-        SSL *ssl;
-        char buf[1024];
-        int bytes;
+    SSL_CTX *ctx;
+    int server;
+    SSL *ssl;
+    char buf[1024];
+    int bytes;
 
     public:
         NNTPClientDAO();

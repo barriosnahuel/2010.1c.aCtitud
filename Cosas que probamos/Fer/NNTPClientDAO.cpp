@@ -53,7 +53,7 @@ SSL_CTX* InitCTX(void)
         return ctx;
 }
 
-void abrirConexion(void)
+void NNTPClientDAO::abrirConexion(void)
 {
         cout << "Se iniciará la apertura de la conexión con el servidor" << endl;
 
@@ -75,7 +75,7 @@ void abrirConexion(void)
         }
 }
 
-void cerrarConexion(void) {
+void NNTPClientDAO::cerrarConexion(void) {
     cout << "Se iniciará el cierre de la conexión con el servidor" << endl;
 
     SSL_free(ssl);
@@ -84,7 +84,7 @@ void cerrarConexion(void) {
     cout << "Se cerró la conexión con el servidor y se liberaron todos los recursos." << endl;
 }
 
-string enviarMensaje(string comandoEscritoPorUsuario) {
+string NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
         cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << endl;
 
         // Envío el comando al servidor.
