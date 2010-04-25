@@ -12,6 +12,7 @@
 #include "NNTPClientDAO.h"
 #include <stdlib.h>
 #include "Semaforo.h"
+#include "NNTPClientDAO.hpp"
 using namespace std;
 
 int inicializarDAO(void);
@@ -24,11 +25,6 @@ int EXIT_ERROR= 0;
 Semaforo semaforoConexion;
 Semaforo semaforoUI;
 
-
-int inicializarDAO(NNTPClientDAO* dao){
-
-	return EXIT_OK;
-}
 
 bool crearThreadDeUI(Comando* param){
 	pthread_t threadUI;//	Declaro un nuevo thread.
@@ -86,7 +82,6 @@ int main(void){
 
     if(crearThreadDeUI(&comando)){
     	//	Si estoy aca es porque se pudo crear correctamente el nuevo thread.
-    	inicializarDAO(&dao);
 
    	    //	NBarrios-TODO: Conectar un servidor NNTP (ej: nntpd) por medio de un canal seguro (openSSL)
 
