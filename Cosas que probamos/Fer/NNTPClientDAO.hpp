@@ -41,7 +41,7 @@ class NNTPClientDAO {
         void abrirConexion(void);
         void cerrarConexion(void);
 
-        string enviarMensaje(string);
+        string enviarMensaje(const string);
 
 };
 
