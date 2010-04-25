@@ -7,15 +7,16 @@
 
 #include <iostream>
 #include <pthread.h>
-#include "Comando.hpp"
-#include "ParseadorValidadorDeComandos.h"
 #include <stdlib.h>
-#include "Semaforo.h"
+
+#include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
+#include "Semaforo.h"
+
 using namespace std;
 
-int inicializarDAO(void);
-bool crearThreadDeUI(Comando* param);
+int   inicializarDAO(void);
+bool  crearThreadDeUI(Comando* param);
 void* threadInterfazDeUsuario(void* parametro);
 
 int EXIT_OK= 1;
