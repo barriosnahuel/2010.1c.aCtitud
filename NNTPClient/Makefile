@@ -1,5 +1,5 @@
 NNTPClient: Semaforo.o Semaforo.cpp Comando.o Comando.cpp NNTPClientDAO.o NNTPClientDAO.cpp ParseadorValidadorDeComandos.o ParseadorValidadorDeComandos.cpp nntpClient.o nntpClient.cpp
-	g++ -lpthread -o NNTPClient ./Semaforo.o ./Comando.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
+	g++ -lpthread -lssl -o NNTPClient ./Semaforo.o ./Comando.o ./NNTPClientDAO.o ./ParseadorValidadorDeComandos.o ./nntpClient.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
