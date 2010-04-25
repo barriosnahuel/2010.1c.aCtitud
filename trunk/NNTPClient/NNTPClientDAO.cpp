@@ -101,8 +101,8 @@ string NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 
 
 
-int main() {
-    cout << "esto anduvo :O" << endl;
-    return 1;
-    }
+//int main() {
+//    cout << "esto anduvo :O" << endl;
+//    return 1;
+//    }
 
