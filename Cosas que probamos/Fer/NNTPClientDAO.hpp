@@ -8,18 +8,21 @@
 #ifndef NNTPCLIENTDAO_H_
 #define NNTPCLIENTDAO_H_
 
-#include <string>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libssl3.h>
-#include <ssl2.h>
-#include <ssl3.h>
-#include <ssl23.h>
-#include <tls1.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <netdb.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <unistd.h>
+#include <string>
+
+#include <openssl/ssl.h>
+
 
 
 using namespace std;
