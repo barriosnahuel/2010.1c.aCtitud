@@ -40,6 +40,8 @@ public:
 	void inicializacionVector(void);
 	string sacaEspaciosIzquierda(string cadena);
     int extraerNombreYParametro(string comandoEntero);
+    int consumeEspaciosDesde(int posicion,string cadena);
+    int validacion(void);
 };
 
 #endif /* COMANDO_H_ */
