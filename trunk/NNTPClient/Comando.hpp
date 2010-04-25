@@ -20,8 +20,8 @@ class Comando {
     bool   llevaParametro;
 
 
-    vector<string> vectorDeComandos;
-    vector<int> vectorDeParametros;
+    string vectorDeComandos[7];
+    int    vectorDeParametros[7];
 
 public:
 	Comando(void);
@@ -45,11 +45,13 @@ public:
 
 	string getParametro(void);
 
+    int parseaYValida(string cadenaIngresada);
 	void inicializacionVector(void);
 	string sacaEspaciosIzquierda(string cadena);
-    int extraerNombreYParametro(string comandoEntero);
+    void extraerNombreYParametro(string comandoEntero);
     int consumeEspaciosDesde(int posicion,string cadena);
     int validacion(void);
+    string aMayusculas(string cadena);
 };
 
 #endif /* COMANDO_H_ */
