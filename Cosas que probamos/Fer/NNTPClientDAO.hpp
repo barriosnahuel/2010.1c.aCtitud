@@ -28,8 +28,6 @@
 using namespace std;
 
 class NNTPClientDAO {
-
-    private:
         SSL_CTX *ctx;
         int server;
         SSL *ssl;
