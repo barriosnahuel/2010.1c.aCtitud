@@ -38,11 +38,6 @@ using namespace std;
         llevaParametro = valor;
     }
 
-    void Comando::funcionDePrueba(void){
-    	cout << "Entro bien a la funcion: void Comando::funcionDePrueba(void)" << endl;
-    }
-
-
     void Comando::inicializacionVector()
     {
 

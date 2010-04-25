@@ -35,8 +35,6 @@ public:
 	bool getLlevaParametro(void);
 	void setLlevaParametro(int valor);
 
-	void funcionDePrueba(void);
-
 	void inicializacionVector(void);
 	string sacaEspaciosIzquierda(string cadena);
     int extraerNombreYParametro(string comandoEntero);
