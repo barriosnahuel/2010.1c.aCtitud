@@ -25,13 +25,12 @@ class Logger {
         void SetearFechaYHora(void);
     public:
         //constructor
-        Logger(void);
+        Logger();
         //destructor
-        ~Logger(void);
+        virtual ~Logger();
 
         //metodos de logging
-        void EscribirLog(char cTipoLog, const char *czData, const char
-*czNombreProceso);
+        void EscribirLog(char cTipoLog, const char *czData, const char *czNombreProceso);
         void LoguearInformacion(const char *czData, const char *czNombreProceso);
         void LoguearWarning(const char *czData, const char *czNombreProceso);
         void LoguearError(const char *czData, const char *czNombreProceso);
