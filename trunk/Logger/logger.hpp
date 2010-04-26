@@ -27,7 +27,7 @@ class Logger {
         //constructor
         Logger();
         //destructor
-        virtual ~Logger();
+        ~Logger();
 
         //metodos de logging
         void EscribirLog(char cTipoLog, const char *czData, const char *czNombreProceso);

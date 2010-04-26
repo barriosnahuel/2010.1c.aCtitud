@@ -21,7 +21,7 @@ Logger::Logger() {
 };
 
 //destructor
-virtual Logger::~Logger() {
+Logger::~Logger() {
 	/* libera memoria */
 	delete czNombreArchivo;
 };
