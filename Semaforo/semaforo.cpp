@@ -38,9 +38,12 @@ Semaforo::Semaforo(int intClave, int intValor) {
     //obtenemos el semáforo deseado
 	intIdSemaforo = semget( kClave, 0, 0);
 
-	//si no existe o hubo problema, intentamos crearlo con persimos 0666 (rw-rw-rw-)
-    if(!(intIdSemaforo > 0))
+	//si existe lo eliminamos e intentamos crearlo con
+    //persimos 0666 (rw-rw-rw-)
+    if(intIdSemaforo > 0) {
+        semctl(intIdSemaforo, 0, IPC_RMID);
         intIdSemaforo = CrearSemaforo(kClave,intValor);
+    };
 
 	//si no se pudo crear, se levanta un error
 	if(intIdSemaforo < 0)
