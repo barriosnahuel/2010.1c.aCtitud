@@ -11,7 +11,7 @@
 
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
-#include "Semaforo.h"
+#include "Semaforo.hpp"
 
 using namespace std;
 
@@ -21,10 +21,6 @@ void* threadInterfazDeUsuario(void* parametro);
 
 int EXIT_OK= 1;
 int EXIT_ERROR= 0;
-
-Semaforo semaforoConexion;
-Semaforo semaforoUI;
-
 
 bool crearThreadDeUI(Comando* param){
 	pthread_t threadUI;//	Declaro un nuevo thread.
@@ -39,10 +35,13 @@ bool crearThreadDeUI(Comando* param){
  * Esta funcion es la que seria el "main" del nuevo thread que creamos encargado de la interfaz de usuario.
  */
 void* threadInterfazDeUsuario(void* parametro){
-	 Comando* comando = ((Comando*)parametro);//	Casteo el parametro a Comando* asi comparto el recurso entre los hilos.
+	Semaforo semConexion('§');
+	Semaforo semUI('¶');
 
+	Comando* comando = ((Comando*)parametro);//	Casteo el parametro a Comando* asi comparto el recurso entre los hilos.
+
+	semUI.Wait();
 	while(true){//	loop infinito porque necesito que corra todo el tiempo y nunca llegue al final de la funcion.
-		semaforoUI.setEstasOcupado(true);	//	enterCritical.
 
 		//	Aca trabajo con los recursos compartidos.
 		cout << "Ingrese un comando:" << endl;
@@ -50,18 +49,9 @@ void* threadInterfazDeUsuario(void* parametro){
 		getline(cin, cadenaIngresadaPorElUsuario, '\n'); //Ya que cin corta la cadena
 
 		(*comando).init(cadenaIngresadaPorElUsuario);
-//		cout << "La cadena es: " << (*comando).getCadenaIngresada() << endl;
-//		cout << "El nombre del comando es: " << (*comando).getNombreComando() << endl;
-//		cout << "El parametro es: " << (*comando).getParametro() << endl;
 
-		semaforoUI.setEstasOcupado(false);//	exitCritical.
-		//	Espero dos segundos, porque es un tiempo considerable (creo) para que la cpu comience a trabajar con el otro hilo
-		//	y este otro hilo setee bloquee el semaforo.
-		sleep(1);
-
-		while(semaforoConexion.estasOcupado())
-			;//	Con este while y la sentencia nula me quedo esperando hasta poder acceder al recurso compartido.
-		semaforoUI.setEstasOcupado(true);	//	enterCritical.
+		semConexion.Signal();
+		semUI.Wait();
 
 		cout << (*comando).getRespuestaAlUsuario() << endl;
 		cout << "--------------------------------------------" << endl;
@@ -73,7 +63,10 @@ void* threadInterfazDeUsuario(void* parametro){
 
 int main(void){
 	cout << "* Iniciando NNTPClient v0.4..." << endl;
-//	sleep(1);
+
+	Semaforo semaforoConexion('§',0);
+	Semaforo semaforoUI('¶',1); //la ui ejecuta primero
+
 
 	NNTPClientDAO dao;
 	//Abrimos la conexion.
@@ -81,39 +74,37 @@ int main(void){
 
 	Comando comando;//	Recurso que voy a compartir entre los threads.
 
-    semaforoUI.setEstasOcupado(true);//	Seteando este semaforo como ocupado, primero voy a poder leer los datos por consola.
-
     if(crearThreadDeUI(&comando)){
     	//	Si estoy aca es porque se pudo crear correctamente el nuevo thread.
 
-    	while(semaforoUI.estasOcupado())
-    		;//	Con este while y la sentencia nula me quedo esperando hasta poder acceder al recurso compartido.
-		semaforoConexion.setEstasOcupado(true);	//	enterCritical.
-   	    while(comando.getNombreComando().compare("QUIT")!=0){
+		semaforoConexion.Wait(); /****** enter critical ******/
+		while(comando.getNombreComando().compare("QUIT")!=0){
 
-   	    	//	NBarrios-TODO: Envio el comando al nntp server y obtengo la respuesta al usuario.
-   	    	string respuesta= dao.enviarMensaje(comando.getCadenaIngresada());
+    		//	NBarrios-TODO: Envio el comando al nntp server y obtengo la respuesta al usuario.
+    		string respuesta= dao.enviarMensaje(comando.getCadenaIngresada());
 
 			comando.setRespuestaAlUsuario(respuesta);
-			semaforoConexion.setEstasOcupado(false);
-			sleep(1);
 
-			while(semaforoUI.estasOcupado())
-				;
-			semaforoConexion.setEstasOcupado(true);
-   	    }
+			semaforoUI.Signal(); /****** exit critical ******/
+			semaforoConexion.Wait();
+		}
 
-   	    //Cierro la conexion.
-   	    dao.cerrarConexion();
-   	    //	NBarrios-TODO: Libero la memoria que haya pedido.
 
-   	    cout << "\n-------------------------------" << endl;
-   	    cout << "-- Gracias por usar NNTPClient." << endl;
+		//Cierro la conexion.
+		dao.cerrarConexion();
+		//	NBarrios-TODO: Libero la memoria que haya pedido.
+
+		cout << "\n-------------------------------" << endl;
+		cout << "-- Gracias por usar NNTPClient." << endl;
+		semaforoConexion.EliminarSemaforo();
+		semaforoUI.EliminarSemaforo();
 		return EXIT_SUCCESS;//	Termino la aplicacion.
     }
 
     //	Si llego a este punto, es porque no se pudo crear el thread (ver si hay algun otro motivo)
 	cout << "Se ha producido un error y la aplicacion no puede ejecutarse. Comuniquese con aCtitud." << endl;
+	semaforoConexion.EliminarSemaforo();
+	semaforoUI.EliminarSemaforo();
 	return EXIT_FAILURE;
 }
 
