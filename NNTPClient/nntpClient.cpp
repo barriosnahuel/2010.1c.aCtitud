@@ -50,10 +50,6 @@ void* threadInterfazDeUsuario(void* parametro){
 		getline(cin, cadenaIngresadaPorElUsuario, '\n'); //Ya que cin corta la cadena
 
 		(*comando).init(cadenaIngresadaPorElUsuario);
-		if(((*comando).parseaYValida(cadenaIngresadaPorElUsuario)) != 1) {
-            cout << "Comando invalido" << endl;
-
-        }
 //		cout << "La cadena es: " << (*comando).getCadenaIngresada() << endl;
 //		cout << "El nombre del comando es: " << (*comando).getNombreComando() << endl;
 //		cout << "El parametro es: " << (*comando).getParametro() << endl;
