@@ -91,7 +91,7 @@ void NNTPClientDAO::cerrarConexion(void) {
 
 string NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
         int cantidadBytesDeRespuesta;
-        cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << "cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
+        cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
 
         // Envío el comando al servidor.
         SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
