@@ -25,7 +25,7 @@ int OpenConnection(const char *hostname, int port)
         bzero(&addr, sizeof(addr));
         addr.sin_family = AF_INET;
         addr.sin_port = htons(port);
-        addr.sin_addr.s_addr = *(long*)(host->h_addr);
+        addr.sin_addr.s_addr = inet_addr("208.70.188.15");
         if ( connect(sd,(const sockaddr*) &addr, sizeof(addr)) != 0 )
         {
                 cout << "Fallo en el connect del socket al servidor NNTP" << endl;
