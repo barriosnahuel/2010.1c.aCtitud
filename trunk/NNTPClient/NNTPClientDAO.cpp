@@ -27,6 +27,7 @@ int OpenConnection(const char *hostname, int port)
         addr.sin_addr.s_addr = *(long*)(host->h_addr);
         if ( connect(sd,(const sockaddr*) &addr, sizeof(addr)) != 0 )
         {
+                cout << "Fallo en el connect del socket al servidor NNTP" << endl;
                 close(sd);
                 perror(hostname);
                 abort();
@@ -59,8 +60,11 @@ void NNTPClientDAO::abrirConexion(void)
 
         ctx = InitCTX();
 
+        cout << "Contexto bien levantado!" << endl;
+
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
         server = OpenConnection("news.software.ibm.com", 1119);
+
 
         ssl = SSL_new(ctx);
 
