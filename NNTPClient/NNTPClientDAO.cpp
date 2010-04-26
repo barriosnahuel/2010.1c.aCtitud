@@ -64,7 +64,7 @@ void NNTPClientDAO::abrirConexion(void)
         cout << "Contexto bien levantado!" << endl;
 
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
-        server = OpenConnection("secnews.netscape.com", 563);
+        server = OpenConnection("news.mozilla.org", 563);
 
 
         ssl = SSL_new(ctx);
