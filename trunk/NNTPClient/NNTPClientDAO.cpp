@@ -21,6 +21,7 @@ int OpenConnection(const char *hostname, int port)
         struct hostent *host;
         struct sockaddr_in addr;
 
+        cout << "estoy por crear el socket" << endl;
         sd = socket(PF_INET, SOCK_STREAM, 0);
         bzero(&addr, sizeof(addr));
         addr.sin_family = AF_INET;
