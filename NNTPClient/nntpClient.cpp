@@ -72,18 +72,19 @@ void* threadInterfazDeUsuario(void* parametro){
 }
 
 int main(void){
-//	cout << "* Iniciando NNTPClient v0.4..." << endl;
+	cout << "* Iniciando NNTPClient v0.4..." << endl;
 //	sleep(1);
 
 	NNTPClientDAO dao;
+	//Abrimos la conexion.
+	dao.abrirConexion();
+
 	Comando comando;//	Recurso que voy a compartir entre los threads.
 
     semaforoUI.setEstasOcupado(true);//	Seteando este semaforo como ocupado, primero voy a poder leer los datos por consola.
 
     if(crearThreadDeUI(&comando)){
     	//	Si estoy aca es porque se pudo crear correctamente el nuevo thread.
-
-   	    //	NBarrios-TODO: Conectar un servidor NNTP (ej: nntpd) por medio de un canal seguro (openSSL)
 
     	while(semaforoUI.estasOcupado())
     		;//	Con este while y la sentencia nula me quedo esperando hasta poder acceder al recurso compartido.
@@ -102,7 +103,8 @@ int main(void){
 			semaforoConexion.setEstasOcupado(true);
    	    }
 
-   	    //	NBarrios-TODO: Cierro la conexion.
+   	    //Cierro la conexion.
+   	    dao.cerrarConexion();
    	    //	NBarrios-TODO: Libero la memoria que haya pedido.
 
    	    cout << "\n-------------------------------" << endl;
