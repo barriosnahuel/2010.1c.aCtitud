@@ -21,14 +21,11 @@ int OpenConnection(const char *hostname, int port)
         struct hostent *host;
         struct sockaddr_in addr;
 
-        cout << "estoy por crear el socket" << endl;
         sd = socket(PF_INET, SOCK_STREAM, 0);
         bzero(&addr, sizeof(addr));
         addr.sin_family = AF_INET;
         addr.sin_port = htons(port);
-        cout << "el error esta en la linea siguiente" << endl;
         addr.sin_addr.s_addr = *(long*)(host->h_addr);
-        cout << "estoy por hacer el connect" << endl;
         if ( connect(sd,(const sockaddr*) &addr, sizeof(addr)) != 0 )
         {
                 cout << "Fallo en el connect del socket al servidor NNTP" << endl;
@@ -36,7 +33,6 @@ int OpenConnection(const char *hostname, int port)
                 perror(hostname);
                 abort();
         }
-        cout << "salgo del open connection" << endl;
         return sd;
 }
 
@@ -68,7 +64,7 @@ void NNTPClientDAO::abrirConexion(void)
         cout << "Contexto bien levantado!" << endl;
 
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
-        server = OpenConnection("secnews.netscape.com", 1119);
+        server = OpenConnection("secnews.netscape.com", 563);
 
 
         ssl = SSL_new(ctx);
