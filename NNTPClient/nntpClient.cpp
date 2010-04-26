@@ -11,7 +11,7 @@
 
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
-#include "Semaforo.hpp"
+#include "semaforo.hpp"
 
 using namespace std;
 
@@ -134,4 +134,4 @@ int main1(void){
 
 	cout << "Ending..." << endl;
 	return 0;
-}
+s
