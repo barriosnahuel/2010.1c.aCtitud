@@ -60,7 +60,7 @@ void NNTPClientDAO::abrirConexion(void)
         ctx = InitCTX();
 
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
-        server = OpenConnection("news.sff.net", 1119);
+        server = OpenConnection("news.software.ibm.com", 1119);
 
         ssl = SSL_new(ctx);
 
