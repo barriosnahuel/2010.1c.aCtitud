@@ -8,13 +8,20 @@ Luego se sincronizan con el semáforo, y el primero que llegue imprimirá los 20 n
 corrido, y luego lo hará el otro.
 */
 
+#include <iostream>
 #include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "semaforo.hpp"
+
+using namespace std;
 
 int main(){
 
-	Semaforo unSem.Semaforo('S');
-
+    Semaforo unSem('S');
+   
 	int pid;
 	int i;
 
@@ -22,34 +29,47 @@ int main(){
 
 	if (pid==0) { //proceso padre
 
-		for (i = 0; i<10; i++) {
+		for (i = 0; i<3; i++) {
 			cout << "Soy el proceso " << getpid() << " en " << i << endl;
 			sleep (1);
 		};
 
-		sleep(2);
+        unSem.Wait();
 
-		unSem.Wait();
-		for (i = 0; i<10; i++) {
+        cout << "- Valor actual unSem " << unSem.ValorActual() << endl;
+        cout << "Proceso padre sale sincronizado..." << endl;
+
+		for (i = 0; i<3; i++) {
 			cout << "Soy el proceso " << getpid() << " en " << i << endl;
 			sleep (1);
 		};
-		unSem.Signal();
+
+        cout << "Terminado proceso padre" << endl;
+        //cout << "- Valor actual unSem " << unSem.ValorActual() << endl;
+        unSem.Signal();
 	}
 	else { //proceso hijo
 
-		for (i = 0; i<10; i++) {
-			cout << "Soy el proceso " << getpid() << " en " << i << endl;
+        Semaforo otroSem('S'); //debería devolver el mismo
+
+		for (i = 0; i<3; i++) {
+
+			cout << " Soy el proceso " << getpid() << " en " << i << endl;
 			sleep (1);
 		}
 
-		sleep(2);
+        otroSem.Wait();
+        cout << "- Valor actual otroSem " << otroSem.ValorActual() << endl;
+        cout << "Proceso hijo sale sincronizado..." << endl;
 
-		unSem.Wait();
-		for (i = 0; i<10; i++) {
-			cout << "Soy el proceso " << getpid() << " en " << i << endl;
+		for (i = 0; i<3; i++) {
+			cout << " Soy el proceso " << getpid() << " en " << i << endl;
 			sleep (1);
 		};
-		unSem.Signal();
+
+        cout << "Terminado proceso hijo" << endl;
+		otroSem.Signal();
+        sleep(1);
+        cout << "- Valor actual otroSem " << otroSem.ValorActual() << endl;
 	}
 }
