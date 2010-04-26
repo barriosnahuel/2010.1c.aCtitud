@@ -30,13 +30,12 @@ bool crearThreadDeUI(Comando* param){
 }
 
 
-
 /**
  * Esta funcion es la que seria el "main" del nuevo thread que creamos encargado de la interfaz de usuario.
  */
 void* threadInterfazDeUsuario(void* parametro){
-	Semaforo semConexion('§');
-	Semaforo semUI('¶');
+	Semaforo semConexion('C');
+	Semaforo semUI('U');
 
 	Comando* comando = ((Comando*)parametro);//	Casteo el parametro a Comando* asi comparto el recurso entre los hilos.
 
@@ -64,8 +63,8 @@ void* threadInterfazDeUsuario(void* parametro){
 int main(void){
 	cout << "* Iniciando NNTPClient v0.4..." << endl;
 
-	Semaforo semaforoConexion('§',0);
-	Semaforo semaforoUI('¶',1); //la ui ejecuta primero
+	Semaforo semaforoConexion('C',0);
+	Semaforo semaforoUI('U',1); //la ui ejecuta primero
 
 
 	NNTPClientDAO dao;
@@ -134,4 +133,4 @@ int main1(void){
 
 	cout << "Ending..." << endl;
 	return 0;
-s
+}
