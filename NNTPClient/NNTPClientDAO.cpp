@@ -16,7 +16,7 @@ NNTPClientDAO::~NNTPClientDAO() {}
 
 int OpenConnection(const char *hostname, int port)
 {
-    cout << "entre al open connection" << endl;
+
         int sd;
         struct hostent *host;
         struct sockaddr_in addr;
@@ -26,6 +26,7 @@ int OpenConnection(const char *hostname, int port)
         addr.sin_family = AF_INET;
         addr.sin_port = htons(port);
         addr.sin_addr.s_addr = *(long*)(host->h_addr);
+        cout << "estoy por hacer el connect" << endl;
         if ( connect(sd,(const sockaddr*) &addr, sizeof(addr)) != 0 )
         {
                 cout << "Fallo en el connect del socket al servidor NNTP" << endl;
