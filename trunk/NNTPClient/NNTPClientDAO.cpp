@@ -61,8 +61,6 @@ void NNTPClientDAO::abrirConexion(void)
 
         ctx = InitCTX();
 
-        cout << "Contexto bien levantado!" << endl;
-
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
         server = OpenConnection("news.giganews.com", 563);
 
