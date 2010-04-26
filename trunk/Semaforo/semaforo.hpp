@@ -7,7 +7,7 @@
 	// La union ya está definida en sys/sem.h
 #else
 	// Tenemos que definir la union
-	union semun { 
+	union semun {
 		int val;
 		struct semid_ds *buf;
 		unsigned short int *array;
@@ -29,6 +29,7 @@ class Semaforo {
 		void Wait(void);
 		void Signal(void);
 		int ValorActual(void);
+        int EliminarSemaforo(void);
 };
 
 #endif /* SEMAFORO_H_ */

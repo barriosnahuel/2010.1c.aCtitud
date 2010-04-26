@@ -1,0 +1,3 @@
+g++ semaforotest.cpp semaforo.cpp -o semaforotest
+g++ semaforotest2.cpp semaforo.cpp -o semaforotest2
+
