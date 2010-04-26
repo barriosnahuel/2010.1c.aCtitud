@@ -50,7 +50,7 @@ void* threadInterfazDeUsuario(void* parametro){
 		getline(cin, cadenaIngresadaPorElUsuario, '\n'); //Ya que cin corta la cadena
 
 		(*comando).init(cadenaIngresadaPorElUsuario);
-		if((comando.parseaYValida(cadenaIngresadaPorElUsuario)) != 1) {
+		if(((*comando).parseaYValida(cadenaIngresadaPorElUsuario)) != 1) {
             cout << "Comando invalido" << endl;
 
         }
