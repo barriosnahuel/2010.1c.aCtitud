@@ -82,51 +82,19 @@ void Logger::EscribirLog(char cTipoLog, const char *czData, const char *czNombre
 };
 
 void Logger::LoguearInformacion(const char *czData, const char *czNombreProceso) {
-
-	PrepararArchivoLogProceso(czNombreProceso);
-	SetearFechaYHora();
-
-	/*registramos todo en el archivo */
-	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << tid << "] ";
-	arch << "INFO: " << czData << endl;
-
-	CerrarArchivoLogProceso();
+	EscribirLog(1, czData, czNombreProceso);
 };
 
 
 void Logger::LoguearWarning(const char *czData, const char *czNombreProceso) {
-
-	PrepararArchivoLogProceso(czNombreProceso);
-	SetearFechaYHora();
-
-	/*registramos todo en el archivo */
-	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << tid << "] ";
-	arch << "WARN: " << czData << endl;
-
-	CerrarArchivoLogProceso();
+	EscribirLog(2, czData, czNombreProceso);
 };
 
 void Logger::LoguearError(const char *czData, const char *czNombreProceso) {
-
-	PrepararArchivoLogProceso(czNombreProceso);
-	SetearFechaYHora();
-
-	/*registramos todo en el archivo */
-	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << tid << "] ";
-	arch << "ERROR: " << czData << endl;
-
-	CerrarArchivoLogProceso();
+	EscribirLog(3, czData, czNombreProceso);
 };
 
 void Logger::LoguearDebugging(const char *czData, const char *czNombreProceso) {
-
-	PrepararArchivoLogProceso(czNombreProceso);
-	SetearFechaYHora();
-
-	/*registramos todo en el archivo */
-	arch << czFecha << " " << czNombreProceso << " [" << getpid() << "][" << tid << "] ";
-	arch << "DEBUG: " << czData << endl;
-
-	CerrarArchivoLogProceso();
+	EscribirLog(4, czData, czNombreProceso);
 };
 
