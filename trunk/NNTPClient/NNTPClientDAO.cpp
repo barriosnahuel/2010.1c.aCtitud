@@ -16,6 +16,7 @@ NNTPClientDAO::~NNTPClientDAO() {}
 
 int OpenConnection(const char *hostname, int port)
 {
+    cout << "entre al open connection" << endl;
         int sd;
         struct hostent *host;
         struct sockaddr_in addr;
@@ -32,6 +33,7 @@ int OpenConnection(const char *hostname, int port)
                 perror(hostname);
                 abort();
         }
+        cout << "salgo del open connection" << endl;
         return sd;
 }
 
