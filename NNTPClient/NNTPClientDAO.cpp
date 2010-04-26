@@ -48,7 +48,7 @@ SSL_CTX* InitCTX(void)
         ctx = SSL_CTX_new(method);
         if ( ctx == NULL )
         {
-                cout << "ERROR!! El ctx es nullo" << endl;
+                cout << "ERROR!! El ctx es null" << endl;
                 abort();
         }
         return ctx;
@@ -63,7 +63,7 @@ void NNTPClientDAO::abrirConexion(void)
         cout << "Contexto bien levantado!" << endl;
 
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
-        server = OpenConnection("news.software.ibm.com", 1119);
+        server = OpenConnection("secnews.netscape.com", 1119);
 
 
         ssl = SSL_new(ctx);
