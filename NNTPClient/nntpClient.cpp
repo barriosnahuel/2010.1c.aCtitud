@@ -52,7 +52,7 @@ void* threadInterfazDeUsuario(void* parametro){
 		semConexion.Signal();
 		semUI.Wait();
 
-		cout << (*comando).getRespuestaAlUsuario() << endl;
+		//cout << (*comando).getRespuestaAlUsuario() << endl;
 		cout << "--------------------------------------------" << endl;
 		(*comando).reset();//	Reseteo los atributos antes de iniciar una nueva vuelta asi no queda basura.
 	}
