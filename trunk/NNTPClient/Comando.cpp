@@ -51,7 +51,7 @@ using namespace std;
 	}
 
 	string Comando::getCadenaIngresada(void){
-		return cadenaIngresada;
+		return nombreComando+' '+parametro;
 	}
 
 	void Comando::reset(void){
