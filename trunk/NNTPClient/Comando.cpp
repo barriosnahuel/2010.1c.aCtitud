@@ -120,15 +120,15 @@ using namespace std;
      }
      else
      {
-         /*cout<<*/respuesta="El comando ingresado no existe"<<endl;;
+         /*cout<<*/respuestaAlUsuario="El comando ingresado no existe"<<endl;;
      }
      if(existeParametro==0)
      {
           if(vectorDeParametros[i]== 1 && parametro.empty()!=0)
-            /*cout*<<*/respuesta="El comando debe llevar un parametro"<<endl;
+            /*cout*<<*/respuestaAlUsuario="El comando debe llevar un parametro"<<endl;
           else
             if(vectorDeParametros[i]==0 && parametro.empty()!=1)
-            /*cout<<*/respuesta="El comando no debe llevar parametros"<<endl;
+            /*cout<<*/respuestaAlUsuario="El comando no debe llevar parametros"<<endl;
      }
 
      return(existeComando!=0 && existeParametro!=0 );
