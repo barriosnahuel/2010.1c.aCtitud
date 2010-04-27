@@ -50,8 +50,9 @@ using namespace std;
      * Parsea la cadena, la valida, y finalmente setea los atributos correspondientes
      */
 	void Comando::init(string cadena){
-		cadenaIngresada= cadena;
-		extraerNombreYParametro(cadenaIngresada);
+	    parseaYValida(cadena);
+		/*cadenaIngresada= cadena;
+		extraerNombreYParametro(cadenaIngresada);*/
 	}
 
 	string Comando::getCadenaIngresada(void){
