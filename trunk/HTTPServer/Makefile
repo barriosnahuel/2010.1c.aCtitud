@@ -1,5 +1,5 @@
 HTTPServer: httpServer.o httpServer.cpp
-	gcc -o NNTPClient ./nntpClient.o
+	gcc -o HTTPServer ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 

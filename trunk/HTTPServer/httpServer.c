@@ -75,7 +75,7 @@ int main(void) {
 
 	//	TODO: Me desconecto de la DB.
 
-	//	TODO: Cierro el socket.
+	printf("Nahuel homosesual :)");
 	printf("Estoy por cerrar los sockets");
 	close(ficheroCliente);
 	close(ficheroServer);
