@@ -32,7 +32,7 @@ public:
 	 */
 	void   reset(void);
 
-	void   init(string cadena);
+	int    init(string cadena);
 	string getCadenaIngresada(void);
 
 	void   setNombreComando(string nombre);
