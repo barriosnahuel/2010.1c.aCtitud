@@ -41,20 +41,20 @@ void* threadInterfazDeUsuario(void* parametro){
 
 	semUI.Wait();
 	while(true){//	loop infinito porque necesito que corra todo el tiempo y nunca llegue al final de la funcion.
-
 		//	Aca trabajo con los recursos compartidos.
+
 		cout << "Ingrese un comando:" << endl;
 		string cadenaIngresadaPorElUsuario;
-		getline(cin, cadenaIngresadaPorElUsuario, '\n'); //Ya que cin corta la cadena
+		getline(cin, cadenaIngresadaPorElUsuario, '\n'); //	Ya que cin corta la cadena
 
-		(*comando).init(cadenaIngresadaPorElUsuario);
+		(*comando).init(cadenaIngresadaPorElUsuario);//	Parseo la cadena, la valido, y seteo los atributos correspondientes del Comando.
 
 		semConexion.Signal();
 		semUI.Wait();
 
 		cout << (*comando).getRespuestaAlUsuario() << endl;
 		cout << "--------------------------------------------" << endl;
-		(*comando).reset();
+		(*comando).reset();//	Reseteo los atributos antes de iniciar una nueva vuelta asi no queda basura.
 	}
 
 	pthread_exit(comando);

@@ -45,6 +45,10 @@ using namespace std;
         return parametro;
     }
 
+    /**
+     * Inicializa el Comando en base a la cadena ingresada por el usuario.
+     * Parsea la cadena, la valida, y finalmente setea los atributos correspondientes
+     */
 	void Comando::init(string cadena){
 		cadenaIngresada= cadena;
 		extraerNombreYParametro(cadenaIngresada);
