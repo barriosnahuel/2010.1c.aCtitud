@@ -10,8 +10,8 @@
 #define PORT 15000 /* El puerto que será abierto */
 #define BACKLOG 3 /* El número de conexiones permitidas */
 
-void* gestionarSolicitudDelClienteThread(void* parametro) {
-	if (/*//	TODO: No esta en el cache*/true) {
+//void* gestionarSolicitudDelClienteThread(void* parametro) {
+//	if (/*//	TODO: No esta en el cache*/true) {
 		//	TODO: Lo busco en la DB.
 
 		//	TODO: Guardo en cache.
@@ -21,10 +21,10 @@ void* gestionarSolicitudDelClienteThread(void* parametro) {
 		//	TODO: Devuelvo la respuesta. (Ver como hacer esto, que paremetro es "parametro".. capaz tengo que pasar el socket como parametro para asi poder responderle!!)
 
 		//	TODO: Termino el thread. (Chequear si no hay que hacer algo con el socket, o el medio por el cual devuelvo la rta).
-	}
+//	}
 
-	return parametro;
-}
+//	return parametro;
+//}
 
 void crearSocket(int ficheroServer, int ficheroCliente, struct sockaddr_in server, struct sockaddr_in client, int sin_size) {
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
