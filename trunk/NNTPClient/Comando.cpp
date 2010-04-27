@@ -106,7 +106,6 @@ using namespace std;
       for(i=0;i<=6;i++)
         if(nombreComando == vectorDeComandos[i])
         {
-            cout<<nombreComando<<"=="<<vectorDeComandos[i]<<"?"<<endl;
             existeComando = 1;
             break;
         }
