@@ -49,7 +49,7 @@ int crearSocketYDejarEscuchando(int ficheroServer, int ficheroCliente,
 		exit(-1);
 	}
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
-	fprintf("Si queres probar la conexion abri tu firefox y escribi %s:%d\n", server.sin_addr.s_addr, PORT);
+	fprintf("Si queres probar la conexion abri tu firefox y escribi %s:%d\n", INADDR_ANY, PORT);
 
 	sin_size = sizeof(struct sockaddr_in);
 	if ((ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
