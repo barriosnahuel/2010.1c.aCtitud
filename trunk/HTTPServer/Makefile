@@ -1,10 +1,10 @@
 HTTPServer: httpServer.cpp
-	g++ -o NNTPClient ./nntpClient.o
+	gcc -o NNTPClient ./nntpClient.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
 httpServer.o: httpServer.cpp
-	g++ -c -o httpServer.o httpServer.cpp
+	gcc -c -o httpServer.o httpServer.cpp
 
 
 #	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos
