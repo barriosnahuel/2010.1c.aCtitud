@@ -4,7 +4,7 @@ HTTPServer: httpServer.o httpServer.cpp
 	@echo ''
 
 httpServer.o: httpServer.cpp
-	gcc -o httpServer.o httpServer.cpp
+	gcc -c -o httpServer.o httpServer.cpp
 
 
 #	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos
