@@ -12,21 +12,22 @@
 
 //void* gestionarSolicitudDelClienteThread(void* parametro) {
 //	if (/*//	TODO: No esta en el cache*/true) {
-		//	TODO: Lo busco en la DB.
+//	TODO: Lo busco en la DB.
 
-		//	TODO: Guardo en cache.
+//	TODO: Guardo en cache.
 
-		//	TODO: Formateo la respuesta a HTML.
+//	TODO: Formateo la respuesta a HTML.
 
-		//	TODO: Devuelvo la respuesta. (Ver como hacer esto, que paremetro es "parametro".. capaz tengo que pasar el socket como parametro para asi poder responderle!!)
+//	TODO: Devuelvo la respuesta. (Ver como hacer esto, que paremetro es "parametro".. capaz tengo que pasar el socket como parametro para asi poder responderle!!)
 
-		//	TODO: Termino el thread. (Chequear si no hay que hacer algo con el socket, o el medio por el cual devuelvo la rta).
+//	TODO: Termino el thread. (Chequear si no hay que hacer algo con el socket, o el medio por el cual devuelvo la rta).
 //	}
 
 //	return parametro;
 //}
 
-void crearSocket(int ficheroServer, int ficheroCliente, struct sockaddr_in server, struct sockaddr_in client, int sin_size) {
+void crearSocket(int ficheroServer, struct sockaddr_in server,
+		struct sockaddr_in client, int sin_size) {
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
 		exit(-1);
@@ -37,7 +38,8 @@ void crearSocket(int ficheroServer, int ficheroCliente, struct sockaddr_in serve
 	server.sin_port = htons(PORT); /* htons transforma el short de maquina a short de red */
 	bzero(&(server.sin_zero), 8); /* escribimos ceros en el reto de la estructura*/
 
-	if (bind(ficheroServer, (struct sockaddr *) &server, sizeof(struct sockaddr)) == -1) {
+	if (bind(ficheroServer, (struct sockaddr *) &server,
+			sizeof(struct sockaddr)) == -1) {
 		printf("Error al asociar el puerto al socket.\n");
 		exit(-1);
 	}
@@ -47,13 +49,16 @@ void crearSocket(int ficheroServer, int ficheroCliente, struct sockaddr_in serve
 		exit(-1);
 	}
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
+}
 
+int obtenerConexion(int ficheroServer, int ficheroCliente, int sin_size, struct sockaddr_in client) {
 	sin_size = sizeof(struct sockaddr_in);
 	if ((ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size)) == -1) {
 		printf("Error al aceptar conexión.\n");
 		return -1;
 	}
 	printf("Se obtuvo una conexión desde %s...\n", inet_ntoa(client.sin_addr));
+	return 1;
 }
 
 int main(void) {
@@ -62,15 +67,18 @@ int main(void) {
 	struct sockaddr_in server; /* para la información de la dirección del servidor */
 	struct sockaddr_in client; /* para la información de la dirección del cliente */
 
-	//	TODO: Crear un socket para escuchar las peticiones que van a venir del browser.
-	crearSocket(ficheroServer, ficheroCliente, server, client, sin_size);
+	// Se crea el socket y se lo deja escuchando conexiones.
+	crearSocket(ficheroServer, server, client, sin_size);
+
+	// Se obtiene la conexion.
+	obtenerConexion(ficheroServer, ficheroCliente, sin_size, client);
 
 	//	TODO: Conectarme a la DB openDS.
 
 	//while (true) {//	While true porque tengo que escuchar todo el tiempo conexiones entrantes. En realidad hay que ver como cerrar el programa de una manera "linda".
-		//	TODO: Acepto una conexion nueva.
+	//	TODO: Acepto una conexion nueva.
 
-		//	TODO: Creo un nuevo thread para atender esa conexion. (Seria la funcion: gestionarSolicitudDelClienteThread)
+	//	TODO: Creo un nuevo thread para atender esa conexion. (Seria la funcion: gestionarSolicitudDelClienteThread)
 	//}
 
 	//	TODO: Me desconecto de la DB.
