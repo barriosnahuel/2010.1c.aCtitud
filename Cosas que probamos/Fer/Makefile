@@ -1,1 +1,1 @@
-gcc -lsocket httpServer.c
+gcc\t-lsocket\thttpServer.c
