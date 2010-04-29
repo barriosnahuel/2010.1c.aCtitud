@@ -53,10 +53,7 @@ int main() {
 
 	while (1) {
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
-
-		//	1. Obtengo una conexion que esta pendiente en la cola de entrada, y obtengo un descriptor de fichero de socket nuevo
-		//	exclusivo de esa conexion.
-		//	2. Declaro recien en este momento a ficheroCliente, porque preciso uno por cada conexion. Estaba declarado en el main.
+		
 		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
 				&sin_size);
 		if (ficheroCliente != -1) {
@@ -70,6 +67,9 @@ int main() {
 					(void*) ficheroCliente, 0, threadProcesarRequest) != 0)
 				printf(
 						"No se pudo crear un nuevo thread para procesar el request.\n");
+		}
+		else {
+			printf("Error al aceptar la conexion\n");
 		}
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
