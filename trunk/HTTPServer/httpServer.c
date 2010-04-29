@@ -20,15 +20,13 @@
 //	---------------------------
 //	Declaraciones de funciones.
 
-void* procesarRequestFuncionThread(void* parametro);
-int crearSocketYDejarEscuchando(int ficheroServer,
-		struct sockaddr_in server, int sin_size);
+void*	procesarRequestFuncionThread(void* parametro);
+int		crearSocketYDejarEscuchando(int ficheroServer, struct sockaddr_in server, int sin_size);
 
 //	--------------------------
 //	Definiciones de funciones.
 
-int crearSocketYDejarEscuchando(int ficheroServer,
-		struct sockaddr_in server, struct sockaddr_in client, int sin_size) {
+int crearSocketYDejarEscuchando(int ficheroServer, struct sockaddr_in server, int sin_size) {
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
 		exit(-1);
@@ -77,17 +75,8 @@ int crearSocketYDejarEscuchando(int ficheroServer,
 			//	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo.
 
 			//	En Solaris!!
-			//	NBarrios-TODO: Ver como se usa esta funcion!!
-			//	El formato es:
-//								int thr_create(void *stack_base
-//													, size_t stack_size
-//													, void *(*start_routine) (void *)
-//													, void *arg
-//													, long flags
-//													, thread_t *new_thread
-//												);
-//			thr_create(, , &procesarRequestFuncionThread, , , threadProcesarRequest);
-
+			if(thr_create(0, 0, &procesarRequestFuncionThread, (void*)ficheroCliente, 0, threadProcesarRequest)!=0)
+				printf("No se pudo crear un nuevo thread para procesar el request.");
 
 			//	En Debian seria asi:
 //			pthread_create(&threadProcesarRequest, NULL, &procesarRequestFuncionThread, (void*)ficheroCliente);
@@ -136,9 +125,8 @@ void* procesarRequestFuncionThread(void* parametro){
 
 	close(*ficheroCliente); //	NBarrios-TODO: Chequear si se llama igual en Solaris! (Estoy cerrando el socket).
 
-	//	TODO: Termino el thread.
-
-	return parametro;	//	NBarrios-TODO: Check this!
+	thr_exit(0);//	Termino el thread.
+//	return parametro;	//	NBarrios-TODO: Esto hace falta? o con llamar thr_exit() alcanza?
 }
 
 int main(void) {
