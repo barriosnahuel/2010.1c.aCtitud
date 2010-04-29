@@ -11,10 +11,7 @@ int main() {
 	int ficheroServer; 
 	printf("Acabo de entrar al main\n");
 	
-	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		printf("Error al crear el socket.\n");
-		exit(-1);
-	}
+	socket = socket(AF_INET, SOCK_STREAM, 0)); 
 	printf("Cree el socket bien\n");
 	
 	return 1;
