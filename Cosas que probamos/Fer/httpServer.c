@@ -11,7 +11,7 @@ int main() {
 	int ficheroServer; 
 	printf("Acabo de entrar al main\n");
 	
-	socket = socket(AF_INET, SOCK_STREAM, 0)); 
+	ficheroServer = socket(AF_INET, SOCK_STREAM, 0); 
 	printf("Cree el socket bien\n");
 	
 	return 1;
