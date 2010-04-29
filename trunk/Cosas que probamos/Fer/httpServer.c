@@ -7,12 +7,16 @@
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
-int thr_create(void *stack_base, size_t stack_size, void *(*start_routine) (void *), void *arg, long flags, thread_t *new_thread); 
+int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
+		void *), void *arg, long flags, thread_t *new_thread);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
 	printf(
 			"Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d\n",
 			ficheroCliente);
+	close(*ficheroCliente); //	NBarrios-TODO: Chequear si se llama igual en Solaris! (Estoy cerrando el socket).
+
+	thr_exit(0);//	Termino el thread.
 	return 1;
 }
 
