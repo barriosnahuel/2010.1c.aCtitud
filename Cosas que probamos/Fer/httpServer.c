@@ -11,7 +11,7 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine) (void
 
 int procesarRequestFuncionThread(int ficheroCliente) {
 	printf(
-			"Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d",
+			"Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d\n",
 			ficheroCliente);
 	return 1;
 }
