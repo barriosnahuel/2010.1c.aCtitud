@@ -7,9 +7,15 @@
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
+
+int procesarRequestFuncionThread(int ficheroCliente) {
+	printf("Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d" , ficheroCliente);
+	return 1;
+}
+
 int main() {
 	int ficheroServer; /* los ficheros descriptores */
-	//int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
+	int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 
@@ -36,6 +42,32 @@ int main() {
 	}
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
 
-	printf("Chao chao!\n");
-	return 1;
+	sin_size = sizeof(struct sockaddr_in);
+
+	while (true) {
+		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
+
+		//	1. Obtengo una conexion que esta pendiente en la cola de entrada, y obtengo un descriptor de fichero de socket nuevo
+		//	exclusivo de esa conexion.
+		//	2. Declaro recien en este momento a ficheroCliente, porque preciso uno por cada conexion. Estaba declarado en el main.
+		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
+				&sin_size);
+		if (ficheroCliente != -1) {
+			//	Si no hubo errores aceptando la conexion, entonces la gestiono.
+
+			thread_t threadProcesarRequest;//	Declaro un nuevo thread.
+			//	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo.
+
+			//	En Solaris!!
+			if (thr_create(0, 0, &procesarRequestFuncionThread,
+					(void*) ficheroCliente, 0, threadProcesarRequest) != 0)
+				printf("No se pudo crear un nuevo thread para procesar el request.\n");
+		}
+		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
+				client.sin_addr));
+	}
+}
+
+printf("Chao chao!\n");
+return 1;
 }
