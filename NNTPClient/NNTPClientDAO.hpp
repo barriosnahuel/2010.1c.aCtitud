@@ -1,10 +1,3 @@
-/*
- * NNTPClientDAO.h
- *
- *  Created on: Apr 23, 2010
- *      Author: Barrios, Nahuel.
- */
-
 #ifndef NNTPCLIENTDAO_H_
 #define NNTPCLIENTDAO_H_
 
@@ -22,8 +15,6 @@
 #include <string>
 
 #include <openssl/ssl.h>
-
-
 
 using namespace std;
 

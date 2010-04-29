@@ -1,17 +1,10 @@
-/*
- * NNTPClientDAO.cpp
- *
- *  Created on: Apr 23, 2010
- *      Author: Barrios, Nahuel.
- */
-
 #include "NNTPClientDAO.hpp"
 #include <iostream>
 
-//Constructor.
+//Constructor
 NNTPClientDAO::NNTPClientDAO() {}
 
-//Destructor.
+//Destructor
 NNTPClientDAO::~NNTPClientDAO() {}
 
 int OpenConnection(const char *hostname, int port)
@@ -59,11 +52,10 @@ void NNTPClientDAO::abrirConexion(void)
 {
         cout << "Se iniciará la apertura de la conexión con el servidor" << endl;
 
-        ctx = InitCTX();
+    ctx = InitCTX();
 
         // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
         server = OpenConnection("news.giganews.com", 563);
-
 
         ssl = SSL_new(ctx);
 
@@ -92,20 +84,12 @@ string NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
         cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
 
         // Envío el comando al servidor.
-        SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
+        // SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
 
         // Me responde la cantidad de bytes de la respuesta.
         cantidadBytesDeRespuesta = SSL_read(ssl, buf, sizeof(buf));
 
         return buf;
 
-        //return "Nahuel homosexual";
 }
-
-
-
-//int main() {
-//    cout << "esto anduvo :O" << endl;
-//    return 1;
-//    }
 
