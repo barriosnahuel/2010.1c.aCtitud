@@ -23,10 +23,19 @@ int main() {
 	server.sin_port = htons(PORT); /* htons transforma el short de maquina a short de red */
 	bzero(&(server.sin_zero), 8); /* escribimos ceros en el reto de la estructura*/
 
-	if (bind(ficheroServer, (struct sockaddr *) &server, sizeof(struct sockaddr)) == -1) {
+	if (bind(ficheroServer, (struct sockaddr *) &server,
+			sizeof(struct sockaddr)) == -1) {
 		printf("Error al asociar el puerto al socket.\n");
 		exit(-1);
 	}
+	printf("Pude bindear bien el socket\n");
 
+	if (listen(ficheroServer, BACKLOG) == -1) {
+		printf("Error al escuchar por el puerto.\n");
+		exit(-1);
+	}
+	printf("Escuchando conexiones en el puerto %d.\n", PORT);
+
+	printf("Chao chao!\n");
 	return 1;
 }
