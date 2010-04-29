@@ -8,7 +8,9 @@
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
 int main() {
-	int ficheroServer;
+	int ficheroServer; /* los ficheros descriptores */
+	//int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
+	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -21,8 +23,7 @@ int main() {
 	server.sin_port = htons(PORT); /* htons transforma el short de maquina a short de red */
 	bzero(&(server.sin_zero), 8); /* escribimos ceros en el reto de la estructura*/
 
-	if (bind(ficheroServer, (struct sockaddr *) &server,
-			sizeof(struct sockaddr)) == -1) {
+	if (bind(ficheroServer, (struct sockaddr *) &server, sizeof(struct sockaddr)) == -1) {
 		printf("Error al asociar el puerto al socket.\n");
 		exit(-1);
 	}
