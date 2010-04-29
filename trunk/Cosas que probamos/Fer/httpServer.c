@@ -7,9 +7,10 @@
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
-
 int procesarRequestFuncionThread(int ficheroCliente) {
-	printf("Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d" , ficheroCliente);
+	printf(
+			"Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d",
+			ficheroCliente);
 	return 1;
 }
 
@@ -44,7 +45,7 @@ int main() {
 
 	sin_size = sizeof(struct sockaddr_in);
 
-	while (true) {
+	while (1) {
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
 
 		//	1. Obtengo una conexion que esta pendiente en la cola de entrada, y obtengo un descriptor de fichero de socket nuevo
@@ -61,13 +62,13 @@ int main() {
 			//	En Solaris!!
 			if (thr_create(0, 0, &procesarRequestFuncionThread,
 					(void*) ficheroCliente, 0, threadProcesarRequest) != 0)
-				printf("No se pudo crear un nuevo thread para procesar el request.\n");
+				printf(
+						"No se pudo crear un nuevo thread para procesar el request.\n");
 		}
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
 	}
-}
 
-printf("Chao chao!\n");
-return 1;
+	printf("Chao chao!\n");
+	return 1;
 }
