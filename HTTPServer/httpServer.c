@@ -79,7 +79,7 @@ int main() {
 
 			//	En Solaris!!
 			if (thr_create(0, 0, &procesarRequestFuncionThread,
-					(void*) ficheroCliente, 0, (int)threadProcesarRequest) != 0)
+					(void*) ficheroCliente, 0, threadProcesarRequest) != 0)
 				printf(
 						"No se pudo crear un nuevo thread para procesar el request.\n");
 		}
