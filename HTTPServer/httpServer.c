@@ -25,11 +25,11 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 
 		//	TODO: Devuelvo la respuesta por medio del "send(*ficheroCliente,...)" (Ver si en Solaris se llama igual)
 	
-	//printf("Voy a cerrar la conexion del socket\n");
-	//close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
-	//printf("Cerre el socket\n");
-	//printf("Exit al thread\n");
-	//thr_exit(0);//	Termino el thread.
+	printf("Voy a cerrar la conexion del socket\n");
+	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
+	printf("Cerre el socket\n");
+	printf("Exit al thread\n");
+	thr_exit(0);//	Termino el thread.
 	while(1) ;
 	return 0;
 }
