@@ -1,0 +1,5 @@
+Dentro del archivo Makefile esta el comando para saber como compilar el servidor.
+
+Hay que investigar como se hace para que compile directamente con el make, mientras tanto copien y peguen lo que dice en el makefile para compilar.
+
+Saludos! :)
