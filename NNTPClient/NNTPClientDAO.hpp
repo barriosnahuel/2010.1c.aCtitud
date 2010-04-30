@@ -20,9 +20,9 @@ using namespace std;
 
 class NNTPClientDAO {
 		SSL_CTX *ctx;
-		int sdServer;
-		SSL *ssl;
-		char cBuffer[1024];
+		int     sdServer;
+		SSL     *ssl;
+		char    cBuffer[1024];
 
 		void InitCTX(void);
 		void OpenConnection(const char *hostname, int port);
@@ -31,10 +31,10 @@ class NNTPClientDAO {
         NNTPClientDAO();
         virtual ~NNTPClientDAO();
 
-        void abrirConexion(void);
-        void cerrarConexion(void);
-        void enviarMensaje(string);
-
+        void   abrirConexion(void);
+        void   cerrarConexion(void);
+        void   enviarMensaje(string);
+        string recibirRespuesta(void);
 };
 
 #endif /* NNTPCLIENTDAO_H_ */

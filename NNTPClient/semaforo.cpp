@@ -13,18 +13,18 @@ Semaforo::Semaforo(int intClave) {
 
     //si falla al obtener la clave
     if(kClave < 0)
-        perror("Error al generar la clave para el semáforo.");
+        perror("Error al generar la clave para el semaforo.");
 
 	//obtenemos el semáforo deseado
 	intIdSemaforo = semget( kClave, 0, 0);
 
-    //si no existe o hubo problema, intentamos crearlo con permisos 0666 (rw-rw-rw-)
+    //si no existe o hubo problema, intentamos crearlo
     if(!(intIdSemaforo > 0))
 		intIdSemaforo = CrearSemaforo(kClave,1);
 
 	//si no se pudo crear, se levanta un error
 	if(intIdSemaforo < 0)
-		perror("No se pudo crear el semáforo.");
+		perror("No se pudo crear el semaforo.");
 };
 
 Semaforo::Semaforo(int intClave, int intValor) {
@@ -38,12 +38,13 @@ Semaforo::Semaforo(int intClave, int intValor) {
     //obtenemos el semáforo deseado
 	intIdSemaforo = semget( kClave, 0, 0);
 
-	//si existe lo eliminamos e intentamos crearlo con
-    //persimos 0666 (rw-rw-rw-)
+	//si existe lo eliminamos
     if(intIdSemaforo > 0) {
         semctl(intIdSemaforo, 0, IPC_RMID);
-        intIdSemaforo = CrearSemaforo(kClave,intValor);
     };
+
+    //lo creamos
+    intIdSemaforo = CrearSemaforo(kClave,intValor);
 
 	//si no se pudo crear, se levanta un error
 	if(intIdSemaforo < 0)
@@ -66,6 +67,7 @@ int Semaforo::EliminarSemaforo(void) {
 int Semaforo::CrearSemaforo(key_t kClaveNueva, int intValorInicial) {
 	int intId; //identificador
 
+    //lo creamos con permisos 0666 (rw-rw-rw-)
     intId = semget(kClaveNueva, 1, 0666 | IPC_CREAT);
 
 	//si se pudo crear, lo inicializo con intValorInicial

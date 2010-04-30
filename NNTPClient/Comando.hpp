@@ -14,7 +14,6 @@ class Comando {
     string vectorDeComandos[8];
     int    vectorDeParametros[8];
 
-	int    indicaSalida(void);
     void   inicializarComandos(void);
     string sacaEspaciosIzquierda(string cadena);
     void   extraerNombreYParametro(string comandoEntero);
@@ -29,6 +28,7 @@ public:
 	string cadenaIngresada(void);
 	string respuestaObtenida(void);
 	void   setRespuestaObtenida(string strRespuesta);
+    int    indicaSalida(void);
 };
 
 #endif /* COMANDO_H_ */
