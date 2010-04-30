@@ -12,7 +12,7 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
 
 int procesarRequestFuncionThread(int ficheroCliente) {
 	printf(
-			"Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d\n",
+			"Lalala estoy en la funcion del thread con el fichero del cliente nro: %d\n",
 			ficheroCliente);
 	
 	printf("Voy a cerrar la conexion del socket\n");
