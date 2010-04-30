@@ -18,7 +18,6 @@ class Comando {
     string sacaEspaciosIzquierda(string cadena);
     void   extraerNombreYParametro(string comandoEntero);
     int    consumeEspaciosDesde(int posicion,string cadena);
-    int    validacion(void);
 	void   reset(void);
 public:
 	Comando(void);
@@ -29,6 +28,7 @@ public:
 	string respuestaObtenida(void);
 	void   setRespuestaObtenida(string strRespuesta);
     int    indicaSalida(void);
+    int    validacion(void);
 };
 
 #endif /* COMANDO_H_ */

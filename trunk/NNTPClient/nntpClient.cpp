@@ -25,20 +25,13 @@ void* threadInterfazDeUsuario(void* parametro){
     //Casteo el parametro a Comando* y comparto el recurso entre los hilos
 
 	do {
-        cout << "-----ui 1" << endl;
 		cout << "[C]: ";
 		getline(cin, strCadenaIngresada);
-        cout << "-----ui 2" << endl;
 		(*comando).init(strCadenaIngresada);
-        cout << "-----ui 3" << endl;
 		semConexion.Signal();
-		cout << "-----ui 4" << endl;
         semUI.Wait();
-        cout << "-----ui 5" << endl;
 		cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
-        cout << "-----ui 6  ----- VUELTA UI" << endl;
 	} while ((*comando).indicaSalida() != 0);
-    cout << "-----ui 7 ---- CHAU UI" << endl;
 	pthread_exit(comando);
 }
 
@@ -68,21 +61,15 @@ int main(int argn, char *argv[]){
     //Se pudo crear correctamente el nuevo thread.
 
 	do {
-        cout << "--conex 1" << endl;
 		semaforoConexion.Wait();
-        cout << "--conex 2" << endl;
     	dao.enviarMensaje(comando.cadenaIngresada());
-        cout << "--conex 3" << endl;
 		comando.setRespuestaObtenida(dao.recibirRespuesta());
-        cout << "--conex 4" << endl;
 		semaforoUI.Signal();
-        cout << "--conex 5 ------- VUELTA CONEX" << endl;
 	} while (comando.indicaSalida() != 0);
-    cout << "--conex 6" << endl;
     semaforoUI.Signal();
-    cout << "--conex 7" << endl;
+
+    // espero a que termine el thread de la ui
     pthread_join (threadUI, (void **)&rtaHilo);
-    cout << "--conex 8 --------CHAU CONEX" << endl;
 
 	//Cierro la conexion.
 	dao.cerrarConexion();

@@ -33,8 +33,7 @@ void NNTPClientDAO::InitCTX() {
         SSL_load_error_strings();
         method = SSLv23_client_method();
         ctx = SSL_CTX_new(method);
-        if ( ctx == NULL )
-        {
+        if ( ctx == NULL) {
                 cout << "ERROR!! El ctx es null" << endl;
                 abort();
         }
@@ -76,7 +75,8 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 
 string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos;
-
+       
+        // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
         cBuffer[bytesLeidos] = '\0';
 
