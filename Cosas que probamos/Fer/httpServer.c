@@ -11,16 +11,13 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
 		void *), void *arg, long flags, thread_t *new_thread);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
-	printf(
-			"Lalala estoy en la funcion del thread con el fichero del cliente nro: %d\n",
-			ficheroCliente);
+	printf("---------------- Procesando thread xD -----------------\n");
 	
-	//printf("Voy a cerrar la conexion del socket\n");
-	//close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
-	//printf("Cerre el socket\n");
-	printf("Procesando thread xD \n");
-	//printf("Exit al thread\n");
-	//thr_exit(0);//	Termino el thread.
+	printf("Voy a cerrar la conexion del socket\n");
+	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
+	printf("Cerre el socket\n");
+	printf("Exit al thread\n");
+	thr_exit(0);//	Termino el thread.
 	return 0;
 }
 
