@@ -28,7 +28,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	
 	
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((send(ficheroCliente, "Hola Mundo", len, 0) = bytesEnviados) == -1) {
+	if((bytesEnviados =send(ficheroCliente, "Hola Mundo", len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("Mi amigo el cliente lo recibio joya\n");
