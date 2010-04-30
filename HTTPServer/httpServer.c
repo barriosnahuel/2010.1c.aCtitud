@@ -27,7 +27,6 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 		//	TODO: Formateo la respuesta a HTML.
 	
 	
-	bytes_sent = send(sockfd, msg, len, 0);
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
 	if((send(ficheroCliente, "Hola Mundo", len, 0) = bytesEnviados) == -1) {
 		printf("El send no funco\n");
