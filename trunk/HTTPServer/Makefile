@@ -1,1 +1,1 @@
-gcc -lsocket -lsnl httpServer.c
+gcc -lnsl -lsocket -lresolv httpServer.c
