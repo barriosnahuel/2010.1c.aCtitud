@@ -80,5 +80,6 @@ int main() {
 	}
 
 	printf("Chao chao!\n");
+	close(ficheroCliente);
 	return 1;
 }
