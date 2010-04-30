@@ -28,7 +28,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	
 	
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados =send(ficheroCliente, "Hola Mundo", len, 0)) == -1) {
+	if((bytesEnviados = send(ficheroCliente, "Hola Mundo", len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
@@ -38,7 +38,6 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("Cerre el socket\n");
 	printf("Exit al thread\n");
 	thr_exit(0);//	Termino el thread.
-	while(1) ;
 	return 0;
 }
 
