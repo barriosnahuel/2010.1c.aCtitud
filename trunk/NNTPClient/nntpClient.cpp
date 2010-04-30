@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <stdlib.h>
+#include <string>
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
 #include "semaforo.hpp"
@@ -13,14 +14,12 @@ using namespace std;
 int crearThreadDeUI (Comando* param);
 void* threadInterfazDeUsuario(void* parametro);
 
-
 int crearThreadDeUI (Comando* param) {
 
     pthread_t threadUI;
 
     return pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, (void*)param);
 }
-
 
 /**
  * Función que ejecuta el thread de CLUI.
@@ -33,34 +32,28 @@ void* threadInterfazDeUsuario(void* parametro){
 	Comando* comando = ((Comando*)parametro);
     //Casteo el parametro a Comando* y comparto el recurso entre los hilos
 
-	while(true){
-		
+	do {
 		cout << "[C]: ";
 		getline(cin, strCadenaIngresada);
 
-        semUI.Wait();
 		(*comando).init(strCadenaIngresada);
-        semConexion.Signal();
+		semConexion.Signal();
 
-		semUI.Wait();
+        semUI.Wait();
 		cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
-        (*comando).reset();
-        semConexion.Signal();
-	}
+	} while (!(*comando).indicaSalida());
 
 	pthread_exit(comando);
 }
 
-int main(void){
+int main(int argn, char *argv[]){
 	cout << "* Iniciando NNTPClient v1.0..." << endl;
 
 	Semaforo semaforoConexion('C',0);
-	Semaforo semaforoUI('U',1); //la ui ejecuta primero
-
+	Semaforo semaforoUI('U',0);
 
 	NNTPClientDAO dao;
-	//Abrimos la conexion.
-	dao.abrirConexion();
+	dao.abrirConexion(); //Abrimos la conexion.
 
 	Comando comando;//	Recurso que voy a compartir entre los threads.
 
@@ -75,16 +68,13 @@ int main(void){
 
     //Se pudo crear correctamente el nuevo thread.
 
-	semaforoConexion.Wait();
-	while(comando.getNombreComando().compare("QUIT")!=0){
-
-    	string respuesta= dao.enviarMensaje(comando.getCadenaIngresada());
-
-		comando.setRespuestaAlUsuario(respuesta);
-
-		semaforoUI.Signal(); 
+	do {
 		semaforoConexion.Wait();
-	}
+    	dao.enviarMensaje(comando.cadenaIngresada());
+		comando.setRespuestaObtenida(dao.recibirRespuesta());
+		semaforoUI.Signal(); 
+
+	} while (!comando.indicaSalida())
 
 
 	//Cierro la conexion.

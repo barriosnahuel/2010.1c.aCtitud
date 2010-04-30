@@ -3,52 +3,30 @@
 
 using namespace std;
 
-Comando::Comando(void){
+Comando::Comando(){
     reset();
     inicializarComandos();
 }
 
-Comando::~Comando(void){}
+Comando::~Comando(){}
 
-/*void Comando::setNombreComando(string nombre){
-	nombreComando= nombre;
-}*/
 
-/*string Comando::getNombreComando(void){
-	return nombreComando;
-}*/
-
-/*void Comando::setRespuestaAlUsuario(string respuesta){
-	respuestaAlUsuario= respuesta;
-}*/
-
-string Comando::respuestaObtenida(void){
-	return respuestaAlUsuario;
+string Comando::respuestaObtenida(){
+	return respuesta;
 }
 
-bool Comando::getLlevaParametro(void){
-    return llevaParametro;
+void Comando::setRespuestaObtenida(string strRespuesta) {
+	respuesta = strRespuesta;
 }
 
-string Comando::getParametro(void){
-    return parametro;
-}
-
-string Comando::getCadenaIngresada(void){
+string Comando::cadenaIngresada(){
 	return nombreComando+' '+parametro;
 }
 
-void Comando::reset(void){
-	cadenaIngresada= "";
+void Comando::reset(){
     parametro= "";
     nombreComando= "";
-    respuestaAlUsuario= "";
-    llevaParametro= 0;
-}
-
-int Comando::init(string strCadena) {
-    extraerNombreYParametro(strCadena);
-    return validacion();
+    respuesta= "";
 }
 
 void Comando::inicializarComandos() {
@@ -69,6 +47,12 @@ void Comando::inicializarComandos() {
      vectorDeParametros[5]= 1; //message-id
      vectorDeParametros[6]= 1; //message-id
      vectorDeParametros[7]= 0;
+}
+
+int Comando::init(string strCadena) {
+	reset();
+    extraerNombreYParametro(strCadena);
+    return validacion();
 }
 
 int Comando::validacion() {
@@ -120,7 +104,6 @@ string Comando::sacaEspaciosIzquierda(string cadena){
 
 }
 
-
 int Comando::consumeEspaciosDesde(int posicion,string cadena){
       /* PARA DETECTAR ESPACIOS EXISTE LA FUNCION isspace(char*), PARA PODER PASARLE UN CARACTER DE LA CADENA
        * DEBO HACER (cadena.c_str())[posicion]
@@ -154,3 +137,6 @@ void Comando::extraerNombreYParametro(string comandoEntero){
         nombreComando=transform(nombreComando.begin(), nombreComando.end(), nombreComando.begin(), toupper);
 }
 
+int indicaSalida() {
+	return nombreComando.compare("QUIT");
+}
