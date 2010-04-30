@@ -7,8 +7,8 @@
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
-//int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
-//		void *), void *arg, long flags, thread_t *new_thread);
+int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
+		void *), void *arg, long flags, thread_t *new_thread);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("---------------- Procesando thread xD -----------------\n");
@@ -79,7 +79,7 @@ int main() {
 
 			//	En Solaris!!
 			if (thr_create(0, 0, &procesarRequestFuncionThread,
-					(void*) ficheroCliente, 0, threadProcesarRequest) != 0)
+					(void*) ficheroCliente, 0, (int)threadProcesarRequest) != 0)
 				printf(
 						"No se pudo crear un nuevo thread para procesar el request.\n");
 		}
