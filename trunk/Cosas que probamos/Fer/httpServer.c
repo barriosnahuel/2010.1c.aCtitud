@@ -14,7 +14,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	printf(
 			"Lalala, estoy en la funcion del thread con el fichero del cliente nro: %d\n",
 			ficheroCliente);
-	//close(*ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
+	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
 
 	thr_exit(0);//	Termino el thread.
 	return 0;
