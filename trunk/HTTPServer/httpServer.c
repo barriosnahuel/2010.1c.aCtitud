@@ -31,7 +31,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	if((bytesEnviados =send(ficheroCliente, "Hola Mundo", len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
-	printf("Mi amigo el cliente lo recibio joya\n");
+	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
 	printf("Voy a cerrar la conexion del socket\n");
 	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
