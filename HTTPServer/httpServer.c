@@ -11,6 +11,9 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
 		void *), void *arg, long flags, thread_t *new_thread);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
+	char *msg = "Hola mundo!";
+	int len, bytesEnviados;
+	len = strlen(msg);
 	printf("---------------- Procesando thread xD -----------------\n");
 	
 	//	if (/*//	TODO: No esta en el cache*/) {
@@ -22,8 +25,14 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 		//	Para este momento ya tengo el response seteado.
 
 		//	TODO: Formateo la respuesta a HTML.
-
-		//	TODO: Devuelvo la respuesta por medio del "send(*ficheroCliente,...)" (Ver si en Solaris se llama igual)
+	
+	
+	bytes_sent = send(sockfd, msg, len, 0);
+	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
+	if((send(ficheroCliente, "Hola Mundo", len, 0) = bytesEnviados) == -1) {
+		printf("El send no funco\n");
+	}
+	printf("Mi amigo el cliente lo recibio joya\n");
 	
 	printf("Voy a cerrar la conexion del socket\n");
 	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
