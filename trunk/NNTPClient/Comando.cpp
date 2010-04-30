@@ -1,5 +1,8 @@
 #include "Comando.hpp"
 #include <iostream>
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 using namespace std;
 
@@ -16,11 +19,19 @@ string Comando::respuestaObtenida(){
 }
 
 void Comando::setRespuestaObtenida(string strRespuesta) {
-	respuesta = strRespuesta;
+    cout << "--- set rta obtenida entra " << strRespuesta << endl;
+    respuesta = strRespuesta;
+    cout << "--- set rta obtenida sale! --" << endl;
 }
 
 string Comando::cadenaIngresada(){
-	return nombreComando+' '+parametro;
+
+    string strCadenaIngresada = nombreComando;
+
+    if(parametro.length())
+       strCadenaIngresada += ' '+parametro;
+
+    return strCadenaIngresada;
 }
 
 void Comando::reset(){
@@ -134,9 +145,9 @@ void Comando::extraerNombreYParametro(string comandoEntero){
         }
 
         // convierto a mayúsculas
-        nombreComando=transform(nombreComando.begin(), nombreComando.end(), nombreComando.begin(), toupper);
+        std::transform(nombreComando.begin(), nombreComando.end(), nombreComando.begin(), (int(*)(int)) toupper);
 }
 
-int indicaSalida() {
+int Comando::indicaSalida() {
 	return nombreComando.compare("QUIT");
 }

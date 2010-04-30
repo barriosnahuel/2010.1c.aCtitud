@@ -16,7 +16,7 @@ void NNTPClientDAO::OpenConnection(const char *hostname, int port) {
         addr.sin_family = AF_INET;
         addr.sin_port = htons(port);
         addr.sin_addr.s_addr = *(long*)(host->h_addr);
-        if (!connect(sdServer,(const sockaddr*) &addr, sizeof(addr))) {
+        if (connect(sdServer,(const sockaddr*) &addr, sizeof(addr))!=0) {
                 cout << "Fallo en el connect del socket al servidor NNTP" << endl;
                 close(sdServer);
                 perror(hostname);
@@ -78,7 +78,7 @@ string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos;
 
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
-        cBuffer[bytesLeidos] = '\0'
+        cBuffer[bytesLeidos] = '\0';
 
         return cBuffer;
 }

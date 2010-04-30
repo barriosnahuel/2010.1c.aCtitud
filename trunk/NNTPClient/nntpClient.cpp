@@ -11,15 +11,7 @@
 
 using namespace std;
 
-int crearThreadDeUI (Comando* param);
 void* threadInterfazDeUsuario(void* parametro);
-
-int crearThreadDeUI (Comando* param) {
-
-    pthread_t threadUI;
-
-    return pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, (void*)param);
-}
 
 /**
  * Función que ejecuta el thread de CLUI.
@@ -33,23 +25,30 @@ void* threadInterfazDeUsuario(void* parametro){
     //Casteo el parametro a Comando* y comparto el recurso entre los hilos
 
 	do {
+        cout << "-----ui 1" << endl;
 		cout << "[C]: ";
 		getline(cin, strCadenaIngresada);
-
+        cout << "-----ui 2" << endl;
 		(*comando).init(strCadenaIngresada);
+        cout << "-----ui 3" << endl;
 		semConexion.Signal();
-
+		cout << "-----ui 4" << endl;
         semUI.Wait();
+        cout << "-----ui 5" << endl;
 		cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
-	} while (!(*comando).indicaSalida());
-
+        cout << "-----ui 6  ----- VUELTA UI" << endl;
+	} while ((*comando).indicaSalida() != 0);
+    cout << "-----ui 7 ---- CHAU UI" << endl;
 	pthread_exit(comando);
 }
 
 int main(int argn, char *argv[]){
 	cout << "* Iniciando NNTPClient v1.0..." << endl;
 
-	Semaforo semaforoConexion('C',0);
+    pthread_t threadUI;
+    char *rtaHilo = NULL;
+
+    Semaforo semaforoConexion('C',0);
 	Semaforo semaforoUI('U',0);
 
 	NNTPClientDAO dao;
@@ -57,9 +56,9 @@ int main(int argn, char *argv[]){
 
 	Comando comando;//	Recurso que voy a compartir entre los threads.
 
-    if(!crearThreadDeUI(&comando)) {
+    if(pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, (void*) &comando) != 0) {
         // No se pudo crear el thread
-        LogError("No se pudo crear el thread de UI.");
+        //LogError("No se pudo crear el thread de UI.");
         perror("No se pudo crear el thread de UI.");
     	semaforoConexion.EliminarSemaforo();
     	semaforoUI.EliminarSemaforo();
@@ -69,13 +68,21 @@ int main(int argn, char *argv[]){
     //Se pudo crear correctamente el nuevo thread.
 
 	do {
+        cout << "--conex 1" << endl;
 		semaforoConexion.Wait();
+        cout << "--conex 2" << endl;
     	dao.enviarMensaje(comando.cadenaIngresada());
+        cout << "--conex 3" << endl;
 		comando.setRespuestaObtenida(dao.recibirRespuesta());
-		semaforoUI.Signal(); 
-
-	} while (!comando.indicaSalida())
-
+        cout << "--conex 4" << endl;
+		semaforoUI.Signal();
+        cout << "--conex 5 ------- VUELTA CONEX" << endl;
+	} while (comando.indicaSalida() != 0);
+    cout << "--conex 6" << endl;
+    semaforoUI.Signal();
+    cout << "--conex 7" << endl;
+    pthread_join (threadUI, (void **)&rtaHilo);
+    cout << "--conex 8 --------CHAU CONEX" << endl;
 
 	//Cierro la conexion.
 	dao.cerrarConexion();

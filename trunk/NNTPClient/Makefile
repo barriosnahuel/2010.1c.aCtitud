@@ -4,8 +4,6 @@ NNTPClient: semaforo.o Comando.o NNTPClientDAO.o nntpClient.o
 	@echo ''
 
 	
-	semaforo.cpp Comando.cpp NNTPClientDAO.cpp nntpClient.cpp
-	
 semaforo.o: semaforo.cpp semaforo.hpp
 	g++ -c -o semaforo.o semaforo.cpp
 
