@@ -8,40 +8,27 @@ using namespace std;
 
 class Comando {
 	//	Lo privado
-	string cadenaIngresada;
     string parametro;
     string nombreComando;
-    string respuestaAlUsuario;
-
-    bool   llevaParametro;
-
+    string respuesta;
     string vectorDeComandos[8];
     int    vectorDeParametros[8];
 
-public:
-	Comando(void);
-	~Comando(void);
-
-	void   reset(void);
-	int    init(string cadena);
+	int    indicaSalida(void);
     void   inicializarComandos(void);
-
-//    string getCadenaIngresada(void);
-	
-//  void   setNombreComando(string nombre);
-//	string getNombreComando(void);
-	
-//    void   setRespuestaAlUsuario(string respuesta);
-	string respuestaObtenida(void);
-	
-//    bool   getLlevaParametro(void);
-	
-//    string getParametro(void);
-
     string sacaEspaciosIzquierda(string cadena);
     void   extraerNombreYParametro(string comandoEntero);
     int    consumeEspaciosDesde(int posicion,string cadena);
     int    validacion(void);
+	void   reset(void);
+public:
+	Comando(void);
+	~Comando(void);
+
+	int    init(string strCadena);
+	string cadenaIngresada(void);
+	string respuestaObtenida(void);
+	void   setRespuestaObtenida(string strRespuesta);
 };
 
 #endif /* COMANDO_H_ */
