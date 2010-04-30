@@ -13,6 +13,18 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
 int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("---------------- Procesando thread xD -----------------\n");
 	
+	//	if (/*//	TODO: No esta en el cache*/) {
+			//	TODO: Lo busco en la DB.
+
+			//	TODO: Guardo en cache.
+	//	}
+
+		//	Para este momento ya tengo el response seteado.
+
+		//	TODO: Formateo la respuesta a HTML.
+
+		//	TODO: Devuelvo la respuesta por medio del "send(*ficheroCliente,...)" (Ver si en Solaris se llama igual)
+	
 	printf("Voy a cerrar la conexion del socket\n");
 	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
 	printf("Cerre el socket\n");
@@ -26,6 +38,8 @@ int main() {
 	int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
+	
+	//	FGuerra - TODO: Conectarme a la DB openDS.
 
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
@@ -78,5 +92,8 @@ int main() {
 
 	printf("Chao chao!\n");
 	close(ficheroServer);
+	
+	//	FGuerra - TODO: Me desconecto de la DB.
+	//	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida.
 	return 1;
 }
