@@ -34,7 +34,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
 	printf("Voy a cerrar la conexion del socket\n");
-	close(ficheroCliente);
+	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
 	printf("Cerre el socket\n");
 	printf("Exit al thread\n");
 	thr_exit(0);//	Termino el thread.
