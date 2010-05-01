@@ -43,7 +43,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 
 int main() {
 	int ficheroServer; /* los ficheros descriptores */
-	//int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
+	int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 	
@@ -72,10 +72,10 @@ int main() {
 	}
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
 
-	//sin_size = sizeof(struct sockaddr_in);
+	sin_size = sizeof(struct sockaddr_in);
 
 	while (1) {
-		int sin_size = sizeof(struct sockaddr_in);
+		
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
 		
 		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
