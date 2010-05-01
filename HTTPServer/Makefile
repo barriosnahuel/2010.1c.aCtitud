@@ -6,11 +6,6 @@ HTTPServer: httpServer.o
 nntpClient.o: httpServer.c
 	gcc -c -o httpServer.o httpServer.c
 
-	
-#	-------------------------------------------------------	
-#	Nota:	Para levantar el openDS cada vez (cada vez que iniciamos sesion) podemos ejecutar "make OpenDS-Start".
-OpenDS-Start:
-	/export/home/osol/OpenDS-2.0.0/bin/./start-ds
 
 #	-------------------------------------------------------
 #	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos

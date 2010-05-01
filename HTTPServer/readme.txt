@@ -17,13 +17,17 @@ Otra opcion:
 Ejecutar:
 	./HTTPServer
 
------------ OpenDS -----------
-
-Levantar openDS (asegurandonos que no hay otra instancia corriendo):
-	make OpenDS-Start
-	
-Nota: Esto todavia no esta terminado, pero anda. Sin embargo hay que hacer mas cosas despues.
-
-
 ----------- Memcached -----------
 ?
+
+
+----------- OpenDS -----------
+
+Levantar OpenDS
+	sh openDS.sh start
+
+Detener OpenDS
+	sh openDS.sh stop
+	
+Reiniciar OpenDS
+	sh openDS.sh restart
