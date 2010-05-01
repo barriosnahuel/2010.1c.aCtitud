@@ -1,4 +1,4 @@
-HTTPServer: httpServer.o
+HTTPServer: ldapwrapper.o httpServer.o
 	gcc -lsocket -lnsl -o HTTPServer ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
