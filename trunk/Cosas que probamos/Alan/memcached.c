@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<memcached.h>
 int main()
 {
   //The example below shows how to set up a libmemcached client which communicates with the server via UDP
