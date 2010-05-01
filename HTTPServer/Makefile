@@ -2,15 +2,15 @@ OPTFLAGS=-g
 CFLAGS=-ansi
 
 HTTPServer: LdapWrapper.o httpServer.o
-	gcc $(CFLAGS) -lsocket -lnsl -o HTTPServer ./LdapWrapper.o ./httpServer.o
+	gcc -L/usr/local/lib -lldap -llber -lsocket -lnsl -o HTTPServer ./LdapWrapper.o ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
-LdapWrapper.o: LdapWrapper.c
-	gcc $(CFLAGS) -c -o LdapWrapper.o LdapWrapper.c
+LdapWrapper.o: LdapWrapper.c LdapWrapper.h
+	gcc -c -o LdapWrapper.o LdapWrapper.c
 
 httpServer.o: httpServer.c 
-	gcc $(CFLAGS) -c -o httpServer.o httpServer.c
+	gcc -c -o httpServer.o httpServer.c
 
 
 #	-------------------------------------------------------
