@@ -1,10 +1,16 @@
-HTTPServer: httpServer.o
-	gcc -lsocket -lnsl -o HTTPServer ./httpServer.o
+OPTFLAGS=-g
+CFLAGS=-ansi
+
+HTTPServer: LdapWrapper.o httpServer.o
+	gcc $(CFLAGS) -lsocket -lnsl -o HTTPServer ./LdapWrapper.o ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
-httpServer.o: httpServer.c
-	gcc -c -o httpServer.o httpServer.c
+LdapWrapper.o: LdapWrapper.c
+	gcc $(CFLAGS) -c -o LdapWrapper.o LdapWrapper.c
+
+httpServer.o: httpServer.c 
+	gcc $(CFLAGS) -c -o httpServer.o httpServer.c
 
 
 #	-------------------------------------------------------
@@ -14,4 +20,4 @@ clean:
 	rm *.o
 	@echo '* Se borraron todos los archivos ".o" (object).'
 	@echo ''
-	
+		
