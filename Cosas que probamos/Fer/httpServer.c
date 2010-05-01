@@ -55,8 +55,8 @@ int main() {
 	printf("Acabo de entrar al main\n");
 	
 	//Inicializamos el contexto.
-	ctxOp->initialize(context, "ldap://192.168.1.3:1389");
-	session = ctxOp->newSession(context, "cn=Directory Manager", "mipassword");
+	ctxOp->initialize(context, "ldap://192.168.229.129:4444");
+	session = ctxOp->newSession(context, "cn=Directory Manager", "password");
 	//se inicia la session. Se establece la	conexión con el servidor LDAP.
 	sessionOp->startSession(session);
 
