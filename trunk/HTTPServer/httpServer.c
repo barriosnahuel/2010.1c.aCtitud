@@ -7,9 +7,17 @@
 #include "LdapWrapper.h"
 
 #define PORT 15000 /* El puerto que serï¿½ abierto */
-#define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
-int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
-		void *), void *arg, long flags, thread_t *new_thread);
+#define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
+#define OPENDS_LOCATION "ldap://192.168.0.107:4444"	/*	TODO: Esto (la ip, el puerto no) tiene que modificarla cada uno para probar en su VM, hasta que tengamos los archivos de configuracion*/
+
+int thr_create(void *stack_base
+					, size_t stack_size
+					, void *(*start_routine)(void *)
+					, void *arg
+					, long flags
+					, thread_t *new_thread
+				);
+
 
 int procesarRequestFuncionThread(int ficheroCliente) {
 	char *msg = "Hola mundo!";
@@ -17,15 +25,18 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	len = strlen(msg);
 	printf("---------------- Procesando thread xD -----------------\n");
 	
-	//	if (/*//	TODO: No esta en el cache*/) {
-			//	TODO: Lo busco en la DB.
+/*
+	if (TODO: Si no esta en el cache) {
+		TODO: Lo busco en la DB.
 
-			//	TODO: Guardo en cache.
-	//	}
+		TODO: Guardo en cache.
+	}
+	Para este momento ya tengo el response seteado.
 
-		//	Para este momento ya tengo el response seteado.
+	TODO: Formateo la respuesta a HTML.
+*/
 
-		//	TODO: Formateo la respuesta a HTML.
+
 	
 	
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
@@ -35,29 +46,29 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
 	printf("Voy a cerrar la conexion del socket\n");
-	close(ficheroCliente); //	¿COMO CHOTA SE CIERRA UN SOCKET?
+	close(ficheroCliente); /*	ï¿½COMO CHOTA SE CIERRA UN SOCKET? */
 	printf("Cerre el socket\n");
 	printf("Exit al thread\n");
-	thr_exit(0);//	Termino el thread.
+	thr_exit(0);/*	Termino el thread.*/
 	return 0;
 }
 
 int main() {
-	//Datos para el LDAPWrapper.	
+	/* Datos para el LDAPWrapper. */
 	PLDAP_SESSION session;
 	PLDAP_CONTEXT context = newLDAPContext();
 	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();
 	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
 	
 	int ficheroServer; /* los ficheros descriptores */
-	//int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
+	/* int sin_size; TODO: Esto hace falta declararlo aca? Que es? */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 	
-	//Inicializamos el contexto. VER DONDE ESTA LA BASE DE DATOS!!
-	ctxOp->initialize(context, "ldap://192.168.229.129:4444");
+	/* Inicializamos el contexto. VER DONDE ESTA LA BASE DE DATOS!! */
+	ctxOp->initialize(context, OPENDS_LOCATION);
 	session = ctxOp->newSession(context, "cn=Directory Manager", "password");
-	//se inicia la session. Se establece la	conexión con el servidor LDAP.
+	/* se inicia la session. Se establece la	conexiï¿½n con el servidor LDAP. */
 	sessionOp->startSession(session);
 
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -83,7 +94,7 @@ int main() {
 	}
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
 
-	//sin_size = sizeof(struct sockaddr_in);
+	/* sin_size = sizeof(struct sockaddr_in); */
 
 	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
@@ -92,14 +103,14 @@ int main() {
 		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
 				&sin_size);
 		if (ficheroCliente != -1) {
-			//	Si no hubo errores aceptando la conexion, entonces la gestiono.
+			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
-			thread_t threadProcesarRequest;//	Declaro un nuevo thread.
-			//	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo.
+			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
+			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
 
-			//	En Solaris!!
-			if (thr_create(0, 0, &procesarRequestFuncionThread,
-					(void*) ficheroCliente, 0, threadProcesarRequest) != 0)
+			/*	En Solaris!! */
+			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread,
+					(void*) ficheroCliente, 0, (void *)threadProcesarRequest) != 0)
 				printf(
 						"No se pudo crear un nuevo thread para procesar el request.\n");
 		}
@@ -119,6 +130,6 @@ int main() {
 	freeLDAPContextOperations(ctxOp);
 	freeLDAPSessionOperations(sessionOp);
 	
-	//	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida.
+	/*	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
