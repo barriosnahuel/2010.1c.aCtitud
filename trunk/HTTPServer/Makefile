@@ -3,7 +3,7 @@ HTTPServer: httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
-nntpClient.o: httpServer.c
+httpServer.o: httpServer.c
 	gcc -c -o httpServer.o httpServer.c
 
 
