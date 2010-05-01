@@ -1,16 +1,22 @@
-HTTPServer: httpServer.o
-	gcc -lsocket -lnsl -o HTTPServer ./httpServer.o
-	@echo '* Finished building target: $@'
-	@echo ''
+LDAPLIB=-lldap -llber 
 
-nntpClient.o: httpServer.c
-	gcc -c -o httpServer.o httpServer.c
+LIBDIR=/usr/local/lib
+LIBS=-L$(LIBDIR) $(LDAPLIB) $(EXTRALDFLAGS)
+
+OPTFLAGS=-g
+CFLAGS=$(OPTFLAGS) -ansi 
+
+CC=gcc
+
+PROGS=wrapp
 
 
-#	-------------------------------------------------------
-#	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos
-#			nuevamente cuando nos dice ya estan compilados con la ultima version.
-clean:
+all:$(PROGS)
 	rm *.o
-	@echo '* Se borraron todos los archivos ".o" (object).'
-	@echo ''
+wrapp:Ldap.c
+	$(CC) $(CFLAGS) -c  LdapWrapper.c -o LdapWrapper.o
+	$(CC) $(CFLAGS) -c  Ldap.c -o Ldap.o
+	$(CC)  Ldap.o LdapWrapper.o $(LIBS) -o Ldap
+clean:
+	rm $($PROG) *.o
+
