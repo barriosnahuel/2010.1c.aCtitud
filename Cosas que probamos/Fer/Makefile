@@ -6,7 +6,7 @@ HTTPServer: LdapWrapper.o httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
-LdapWrapper.o: LdapWrapper.c
+LdapWrapper.o: LdapWrapper.c LdapWrapper.h
 	gcc $(CFLAGS) -c -o LdapWrapper.o LdapWrapper.c
 
 httpServer.o: httpServer.c 
