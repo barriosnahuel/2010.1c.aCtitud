@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
+#include "LdapWrapper.h"
 
 #define PORT 15000 /* El puerto que serï¿½ abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
@@ -42,12 +43,22 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 }
 
 int main() {
+	//Datos para el LDAPWrapper.	
+	PLDAP_SESSION session;
+	PLDAP_CONTEXT context = newLDAPContext();
+	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();
+	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
+	
 	int ficheroServer; /* los ficheros descriptores */
 	//int sin_size;//	TODO: Esto hace falta declararlo aca? Que es?
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 	
-	//	FGuerra - TODO: Conectarme a la DB openDS.
+	//Inicializamos el contexto.
+	ctxOp->initialize(context, "ldap://192.168.1.3:1389");
+	session = ctxOp->newSession(context, "cn=Directory Manager", "mipassword");
+	//se inicia la session. Se establece la	conexión con el servidor LDAP.
+	sessionOp->startSession(session);
 
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
@@ -102,7 +113,12 @@ int main() {
 	printf("Chao chao!\n");
 	close(ficheroServer);
 	
-	//	FGuerra - TODO: Me desconecto de la DB.
+	sessionOp->endSession(session);
+	freeLDAPSession(session);
+	freeLDAPContext(context);
+	freeLDAPContextOperations(ctxOp);
+	freeLDAPSessionOperations(sessionOp);
+	
 	//	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida.
 	return 1;
 }
