@@ -8,7 +8,7 @@
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
-#define OPENDS_LOCATION "ldap://192.168.0.107:4444"	/*	TODO: Esto (la ip, el puerto no) tiene que modificarla cada uno para probar en su VM, hasta que tengamos los archivos de configuracion*/
+#define OPENDS_LOCATION "ldap://localhost:4444"	/*	TODO: Esto vamos a tener que pasarlo por archivo de configuracion */
 
 int thr_create(void *stack_base
 					, size_t stack_size
@@ -36,9 +36,6 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	TODO: Formateo la respuesta a HTML.
 */
 
-
-	
-	
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
 	if((bytesEnviados = send(ficheroCliente, msg, len, 0)) == -1) {
 		printf("El send no funco\n");
