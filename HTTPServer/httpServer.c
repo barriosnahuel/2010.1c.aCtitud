@@ -12,6 +12,7 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
 		void *), void *arg, long flags, thread_t *new_thread);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
+	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
 	printf("---------------- Procesando thread xD -----------------\n");
@@ -28,7 +29,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	
 	
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados = send(ficheroCliente, "Hola Mundo", len, 0)) == -1) {
+	if((bytesEnviados = send(ficheroCliente, msg, len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
