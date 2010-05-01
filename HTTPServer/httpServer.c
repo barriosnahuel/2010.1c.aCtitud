@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
+#include "LdapWrapper.h"
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
@@ -11,7 +12,6 @@ int thr_create(void *stack_base, size_t stack_size, void *(*start_routine)(
 		void *), void *arg, long flags, thread_t *new_thread);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
-	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
 	printf("---------------- Procesando thread xD -----------------\n");
