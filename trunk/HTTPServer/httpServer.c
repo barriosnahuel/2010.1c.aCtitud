@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
-#include "LdapWrapper.h"
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas */ //	TODO: Aca no tendriamos que poner por lo menos 20?
