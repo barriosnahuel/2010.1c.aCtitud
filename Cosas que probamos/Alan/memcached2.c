@@ -1,5 +1,5 @@
 #include<stdio.h>
-#include"libmemcached/memcached.h"
+#include"memcached.h"
 int main()
 {
   $memc = memcached_create();
