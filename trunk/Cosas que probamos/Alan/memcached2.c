@@ -2,6 +2,10 @@
 #include"libmemcached/memcached.h"
 int main()
 {
+  $memc = memcached_create();
+  memcached_server_add($memc,"localhost",11211 );
+  return 0;
+    /*
   memcached_server_st *servers;
   memcached_st *memc= memcached_create(NULL);
   char servername[]= "0.example.com";
@@ -18,4 +22,4 @@ int main()
   //rc = memcached_server_push(memc, servers);
   memcached_server_free(servers);
   memcached_free(memc);
-}
+*/}
