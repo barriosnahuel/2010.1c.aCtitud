@@ -15,7 +15,7 @@ int main()
     snprintf(buffer, SMALL_STRING_LEN, "%u.example.com", 400+x);
     servers= memcached_server_list_append(servers, buffer, 401, &rc);
   }
-  rc= memcached_server_push(memc, servers);
+  //rc = memcached_server_push(memc, servers);
   memcached_server_free(servers);
   memcached_free(memc);
 }
