@@ -1,5 +1,5 @@
-#ifndef _CONFIGURATION.H
-#define _CONFIGURATION.H
+#ifndef _CONFIGURATION_H
+#define _CONFIGURATION_H
 
 /* estructura que guarda la configuración
  * se debe modificar acorde a los datos
