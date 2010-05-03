@@ -1,10 +1,16 @@
+#include<memcached.h>
 #include<stdio.h>
-#include"memcached.h"
 int main()
 {
-  $memc = memcached_create();
-  memcached_server_add($memc,"localhost",11211 );
-  return 0;
+        memcached_st *memc;
+        memc = memcached_create(NULL);
+        memcached_server_add(memc,"localhost",11211);
+        printf("Se conecta al demon y sale \n");
+        return 0;
+
+
+
+
     /*
   memcached_server_st *servers;
   memcached_st *memc= memcached_create(NULL);
