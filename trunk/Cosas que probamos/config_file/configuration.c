@@ -63,6 +63,8 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 
 	fclose(pfsArchConfig);
 
+	/* ------ modificar de acá para abajo los valores que se quieren guardar --------*/
+
 	// cargo el puerto
 	stConf->uiPuerto = atoi(GetVal("PORT=", pszAux));
 	if((stConf->uiPuerto) < 1 || (stConf->uiPuerto) > 65535 ) {
