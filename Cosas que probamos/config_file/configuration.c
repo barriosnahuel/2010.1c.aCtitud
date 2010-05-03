@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "configuration.h"
+
 char *GetVal(const char *sValBuff, const char *sBuff){
     char *sVal;
     char *sVal2;
@@ -12,6 +17,7 @@ char *GetVal(const char *sValBuff, const char *sBuff){
     sVal = strtok(sVal, "=");
     if(!sVal) return sVal2;
     sVal = strtok(NULL, "\n");
+    sVal[strlen(sVal)-1] = '\0';
     return sVal;
 }
 
@@ -42,7 +48,7 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	pszAux = (char *)malloc(1000); // se va a guardar todo el archivo
 
 	if((pfsArchConfig = fopen(pszNombreArchivo,"rt")) == NULL) {
-	        printf("No se pudo abrir el archivo de configuracion.");
+	        printf("No se pudo abrir el archivo de configuracion %s.\n",pszNombreArchivo);
 		return 0;
 	}
 	pszAux[0] = '\0';
@@ -55,22 +61,23 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 		strcat(pszAux, szLinea);
 	}
 
-	// cargo la IP
+	fclose(pfsArchConfig);
+
+	// cargo el puerto
+	stConf->uiPuerto = atoi(GetVal("PORT=", pszAux));
+	if((stConf->uiPuerto) < 1 || (stConf->uiPuerto) > 65535 ) {
+	    printf("Puerto invalido.");
+		return 0;
+	}
+
+    // cargo la IP
 	strcpy(stConf->czServer,GetVal("SERVER=", pszAux));
 	// valido la IP
 	if(!Valida_IP(stConf->czServer)) {
-	        printf("IP inválida.");
+        printf("IP invalida.");
 		return 0;
-	}
+    };
 
-	// cargo el puerto
-	stConf->uiPuerto = atoi(GetVal("PUERTO=", pszAux));
-	if((stConf->uiPuerto) < 0 || (stConf->uiPuerto) > 65535 ) {
-	        printf("Puerto inválido.");
-		return 0;
-	}
-
-	fclose(pfsArchConfig);
 	free(szLinea);
 	free(pszAux);
 	return 1;
