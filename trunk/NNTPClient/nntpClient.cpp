@@ -1,15 +1,22 @@
-#include <iostream>
 #include <pthread.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string>
+#include "Configuracion.hpp"
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
-#include "semaforo.hpp"
 
 #define EXIT_OK 1
 #define EXIT_ERROR 0
 
 using namespace std;
+
+/* semáforos globales para ui y dao */
+pthread_mutex_t semUI = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t semConexion = PTHREAD_MUTEX_INITIALIZER;
+
+/* nombre del proceso */
+char czNombreProceso[20];
 
 void* threadInterfazDeUsuario(void* parametro);
 
@@ -17,68 +24,96 @@ void* threadInterfazDeUsuario(void* parametro);
  * Función que ejecuta el thread de CLUI.
  */
 void* threadInterfazDeUsuario(void* parametro){
-	Semaforo semConexion('C');
-	Semaforo semUI('U');
     string strCadenaIngresada;
 
-	Comando* comando = ((Comando*)parametro);
     //Casteo el parametro a Comando* y comparto el recurso entre los hilos
+    Comando* comando = ((Comando*)parametro);
 
-	do {
-		cout << "[C]: ";
-		getline(cin, strCadenaIngresada);
-		(*comando).init(strCadenaIngresada);
-		semConexion.Signal();
-        semUI.Wait();
-		cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
-	} while ((*comando).indicaSalida() != 0);
-	pthread_exit(comando);
+    do {
+        cout << "[C]: ";
+        getline(cin, strCadenaIngresada);
+        (*comando).init(strCadenaIngresada);
+        pthread_mutex_unlock(&semConexion);
+        pthread_mutex_lock(&semUI);
+        cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
+    } while ((*comando).indicaSalida() != 0);
+    pthread_exit(comando);
 }
 
 int main(int argn, char *argv[]){
-	cout << "* Iniciando NNTPClient v1.0..." << endl;
+
+    memset(czNombreProceso, 0, 20);
+    strcpy(czNombreProceso, "NNTP_Client\0");
+    strcpy(argv[0], czNombreProceso);
 
     pthread_t threadUI;
     char *rtaHilo = NULL;
 
-    Semaforo semaforoConexion('C',0);
-	Semaforo semaforoUI('U',0);
+    Configuracion confCliente;
 
-	NNTPClientDAO dao;
-	dao.abrirConexion(); //Abrimos la conexion.
+    cout << "* Iniciando NNTPClient v1.0..." << endl;
 
-	Comando comando;//	Recurso que voy a compartir entre los threads.
+    switch(argn) {
+        case 1: // no se indicó archivo, se carga archivo por defecto (czNombreProceso)
+            if(confCliente.cargarDefault() == 0) {
+                printf("Archivo de configuración no válido.\n");
+                return EXIT_FAILURE;
+            }
+            break;
+        case 2: // único parámetro: nombre de archivo de configuración
+            if(confCliente.cargarDesdeArchivo(argv[1]) == 0) {
+                printf("Archivo de configuración no válido.\n");
+                return EXIT_FAILURE;
+            }
+            break;
+        case 3: // se pasaron los valores por parámetro
+            if(confCliente.cargarDesdeParametros(argv[1],atoi(argv[2])) == 0) {
+                printf("Parámetros no válidos.\n");
+                return EXIT_FAILURE;
+            }
+            break;
+        default:
+            printf("Parámetros no válidos.\n");
+            return EXIT_FAILURE;
+            break;
+    };
+    
+    NNTPClientDAO dao;
+    dao.abrirConexion(confCliente.getServidor(), confCliente.getPuerto()); // Abrimos la conexion
+
+    Comando comando; // Recurso que voy a compartir entre los threads.
+
+    pthread_mutex_lock(&semConexion);
+    pthread_mutex_lock(&semUI);
 
     if(pthread_create(&threadUI, NULL, &threadInterfazDeUsuario, (void*) &comando) != 0) {
         // No se pudo crear el thread
-        //LogError("No se pudo crear el thread de UI.");
         perror("No se pudo crear el thread de UI.");
-    	semaforoConexion.EliminarSemaforo();
-    	semaforoUI.EliminarSemaforo();
-	    return EXIT_FAILURE;
+        pthread_mutex_unlock(&semConexion);
+        pthread_mutex_unlock(&semUI);
+        return EXIT_FAILURE;
     }
 
     //Se pudo crear correctamente el nuevo thread.
 
-	do {
-		semaforoConexion.Wait();
-    	dao.enviarMensaje(comando.cadenaIngresada());
-		comando.setRespuestaObtenida(dao.recibirRespuesta());
-		semaforoUI.Signal();
-	} while (comando.indicaSalida() != 0);
-    semaforoUI.Signal();
+    do {
+        pthread_mutex_lock(&semConexion);
+        dao.enviarMensaje(comando.cadenaIngresada());
+        comando.setRespuestaObtenida(dao.recibirRespuesta());
+        pthread_mutex_unlock(&semUI);
+    } while (comando.indicaSalida() != 0);
 
     // espero a que termine el thread de la ui
     pthread_join (threadUI, (void **)&rtaHilo);
 
-	//Cierro la conexion.
-	dao.cerrarConexion();
+    //Cierro la conexion.
+    dao.cerrarConexion();
 
-	cout << "\n-------------------------------" << endl;
-	cout << "-- Gracias por usar NNTPClient." << endl;
+    cout << "\n-------------------------------" << endl;
+    cout << "-- Gracias por usar NNTPClient." << endl;
 
-    semaforoConexion.EliminarSemaforo();
-	semaforoUI.EliminarSemaforo();
-	return EXIT_SUCCESS;
+    pthread_mutex_unlock(&semConexion);
+    pthread_mutex_unlock(&semUI);
+    return EXIT_SUCCESS;
 }
 

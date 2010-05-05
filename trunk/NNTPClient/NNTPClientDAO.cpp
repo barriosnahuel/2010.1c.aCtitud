@@ -39,17 +39,18 @@ void NNTPClientDAO::InitCTX() {
         }
 }
 
-void NNTPClientDAO::abrirConexion(void) {
+void NNTPClientDAO::abrirConexion(const char *hostname, int port) {
     InitCTX();
+	cout << endl << hostname << ":" << port << endl;
 
     // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
-    OpenConnection("news.giganews.com", 563);
+    OpenConnection(hostname, port);
 
     ssl = SSL_new(ctx);
 
     /* "Bindeo" el socket con la conexión SSL.
-		Si no quiero enviar mensajes por SSL usaré sdServer.send().
-		Caso contrario usaré ssl. */
+        Si no quiero enviar mensajes por SSL usaré sdServer.send().
+        Caso contrario usaré ssl. */
         SSL_set_fd(ssl, sdServer);
 
         if ( SSL_connect(ssl) == -1 ) {
@@ -69,8 +70,8 @@ void NNTPClientDAO::cerrarConexion(void) {
 }
 
 void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
-	cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
-	SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
+    cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
+    SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
 }
 
 string NNTPClientDAO::recibirRespuesta() {
