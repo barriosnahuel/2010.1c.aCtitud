@@ -31,7 +31,7 @@ class NNTPClientDAO {
         NNTPClientDAO();
         virtual ~NNTPClientDAO();
 
-        void   abrirConexion(void);
+        void   abrirConexion(const char *hostname, int port);
         void   cerrarConexion(void);
         void   enviarMensaje(string);
         string recibirRespuesta(void);

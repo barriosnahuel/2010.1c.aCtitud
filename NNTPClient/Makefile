@@ -1,11 +1,10 @@
-NNTPClient: semaforo.o Comando.o NNTPClientDAO.o nntpClient.o
-	g++ -lpthread -lssl -o NNTPClient ./semaforo.o ./Comando.o ./NNTPClientDAO.o ./nntpClient.o
+NNTPClient: Configuracion.o Comando.o NNTPClientDAO.o nntpClient.o
+	g++ -lpthread -lssl -o NNTPClient ./Configuracion.o ./Comando.o ./NNTPClientDAO.o ./nntpClient.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
-	
-semaforo.o: semaforo.cpp semaforo.hpp
-	g++ -c -o semaforo.o semaforo.cpp
+Configuracion.o: Configuracion.cpp Configuracion.hpp
+	g++ -c -o Configuracion.o Configuracion.cpp
 
 Comando.o: Comando.cpp Comando.hpp
 	g++ -c -o Comando.o Comando.cpp
