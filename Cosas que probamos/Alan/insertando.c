@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <sstring.h>
+#include <string.h>
 #include <unistd.h>
 #include <libmemcached/memcached.h>
 
