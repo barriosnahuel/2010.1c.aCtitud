@@ -113,7 +113,7 @@ int main() {
 	field->name;*/
 	/*printf("El resultset es: %s", resultSet);*/
 	entry = (PLDAP_ENTRY)createEntry();
-	entry->dn = "utnurlID=00009,ou=so,dc=utn,dc=edu";
+	entry->dn = "utnArticleID=1111,ou=so,dn=utn,dn=edu";
 	addAttribute(entry, (PLDAP_ATTRIBUTE_OP)createAttribute("objectclass", 2, "top", "utnUrl"));
 	sessionOp->addEntry(session, entry);
 	printf("Cree el entry!!\n");
