@@ -25,6 +25,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	len = strlen(msg);
 	printf("---------------- Procesando thread xD -----------------\n");
 
+    PLDAP_SESSION session;
 	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
 	PLDAP_RESULT_SET resultSet = sessionOp->searchEntry(session, "ou=so,dc=utn,dc=edu","utnurlKeywords=*");
 /*
@@ -100,7 +101,7 @@ int main() {
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
 
 		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
-				&sin_size);
+			&sin_size);
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
