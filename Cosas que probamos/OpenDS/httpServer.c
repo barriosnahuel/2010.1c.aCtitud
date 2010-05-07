@@ -70,26 +70,26 @@ int main() {
 	else
 		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
 
-	int sin_size = sizeof(struct sockaddr_in);
+	/*int sin_size = sizeof(struct sockaddr_in);
 	while (1) {
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 		
-		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
+	/*	int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
 		printf("Acepte una conexion y ficheroCliente vale: %d.\n", ficheroCliente);
 		/*	Despues de este printf es cuando me tira el segmentation fault	*/
-		printf("1- Imprimo algo para ver si anda\n");
+	/*	printf("1- Imprimo algo para ver si anda\n");
 		printf("2- Imprimo algo para ver si anda\n");
 		printf("3- Imprimo algo para ver si anda\n");
 		printf("4- Imprimo algo para ver si anda\n");
 		printf("5- Imprimo algo para ver si anda\n");
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
-			printf("1- Entre al if\n");
+	/*		printf("1- Entre al if\n");
 			printf("Voy a declarar el neuvo thread");
 			thread_t threadProcesarRequest;	/*	Declaro un nuevo thread. */
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
 
-			printf("Ahora llamo al thr_create");
+	/*		printf("Ahora llamo al thr_create");
 			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread, (void*) ficheroCliente, 0, (void *)threadProcesarRequest) != 0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
@@ -97,7 +97,15 @@ int main() {
 			printf("Error al aceptar la conexion\n");
 
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-	}
+	}*/
+	printf("Voy a buscar un entry.\n")
+	PLDAP_RESULT_SET resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");
+	resultSet->iterator;
+	iterator->hasNext(resultSet);
+	PLDAP_RECORD record = iterator->next(resultSet);
+	PLDAP_FIELD field = recordOp->nextField(record);
+	field->name;
+	printf("El field es: %s", field);
 
 	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, session, context, ctxOp, sessionOp);
@@ -158,6 +166,7 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
 	(*sessionOp)->startSession(*session);
+	printf("Inicie la sesion de OpenDS joya\n");
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
 
