@@ -26,8 +26,15 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("---------------- Procesando thread xD -----------------\n");
 
     PLDAP_SESSION session;
-	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
+	//PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
 	PLDAP_RESULT_SET resultSet = sessionOp->searchEntry(session, "ou=so,dc=utn,dc=edu","utnurlKeywords=*");
+    resultSet->iterator
+    iterator->hasNext(resultSet);
+    PLDAP_RECORD record = iterator->next(resultSet);
+    PLDAP_FIELD field = recordOp->nextField(record);
+    field->name;
+    field->valuesSize;
+
 /*
 	if (TODO: Si no esta en el cache) {
 		TODO: Lo busco en la DB.
