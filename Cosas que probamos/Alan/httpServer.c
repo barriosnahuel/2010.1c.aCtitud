@@ -24,7 +24,9 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	int len, bytesEnviados;
 	len = strlen(msg);
 	printf("---------------- Procesando thread xD -----------------\n");
-	
+
+	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
+	PLDAP_RESULT_SET resultSet = sessionOp->searchEntry(session, "ou=so,dc=utn,dc=edu","utnurlKeywords=*");
 /*
 	if (TODO: Si no esta en el cache) {
 		TODO: Lo busco en la DB.
@@ -41,7 +43,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
-	
+
 	printf("Voy a cerrar la conexion del socket\n");
 	close(ficheroCliente); /*	�COMO CHOTA SE CIERRA UN SOCKET? */
 	printf("Cerre el socket\n");
@@ -56,12 +58,12 @@ int main() {
 	PLDAP_CONTEXT context = newLDAPContext();
 	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();
 	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
-	
+
 	int ficheroServer; /* los ficheros descriptores */
 	/* int sin_size; TODO: Esto hace falta declararlo aca? Que es? */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
-	
+
 	/* Inicializamos el contexto. VER DONDE ESTA LA BASE DE DATOS!! */
 	ctxOp->initialize(context, OPENDS_LOCATION);
 	session = ctxOp->newSession(context, "cn=Directory Manager", "password");
@@ -96,7 +98,7 @@ int main() {
 	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
-		
+
 		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
 				&sin_size);
 		if (ficheroCliente != -1) {
@@ -120,13 +122,13 @@ int main() {
 
 	printf("Chao chao!\n");
 	close(ficheroServer);
-	
+
 	sessionOp->endSession(session);
 	freeLDAPSession(session);
 	freeLDAPContext(context);
 	freeLDAPContextOperations(ctxOp);
 	freeLDAPSessionOperations(sessionOp);
-	
+
 	/*	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
