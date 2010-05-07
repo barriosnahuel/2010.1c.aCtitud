@@ -57,6 +57,7 @@ int main() {
 	PLDAP_RESULT_SET resultSet;
 	LDAP_ITERATOR iterator;
 	LDAP_RECORD_OP recordOp;
+	PLDAP_ENTRY entry;
 	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
@@ -102,13 +103,18 @@ int main() {
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 	}*/
 	printf("Voy a buscar un entry.\n");
-	resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");
+	/*resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");*/
 	/*resultSet->iterator;
 	iterator->hasNext(resultSet);
 	PLDAP_RECORD record = iterator->next(resultSet);
 	PLDAP_FIELD field = recordOp->nextField(record);
 	field->name;*/
 	/*printf("El resultset es: %s", resultSet);*/
+	entry = entryOp->createEntry();
+	entry->dn = "utnurlID=00009,ou=so,dc=utn,dc=edu";
+	entryOp->addAttribute(entry, attribOp->createAttribute("objectclass", 2, "top", "utnUrl"));
+	sessionOp->addEntry(session, entry);
+	printf("Cree el entry!!\n");
 
 	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, session, context, ctxOp, sessionOp);
