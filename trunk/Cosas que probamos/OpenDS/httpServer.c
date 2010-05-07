@@ -108,7 +108,7 @@ int main() {
 	PLDAP_RECORD record = iterator->next(resultSet);
 	PLDAP_FIELD field = recordOp->nextField(record);
 	field->name;*/
-	printf("El resultset es: %s", resultSet);
+	//printf("El resultset es: %s", resultSet);
 
 	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, session, context, ctxOp, sessionOp);
