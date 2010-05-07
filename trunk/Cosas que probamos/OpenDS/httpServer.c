@@ -58,6 +58,7 @@ int main() {
 	LDAP_ITERATOR iterator;
 	LDAP_RECORD_OP recordOp;
 	PLDAP_ENTRY entry;
+	LDAP_ENTRY_OP entryOp;
 	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
