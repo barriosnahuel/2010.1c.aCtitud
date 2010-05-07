@@ -5,19 +5,19 @@
 #include <thread.h>
 #include <stdio.h>
 #include "configuration.h"
-#include "LdapWrapper.h"
+#include "LdapWrapperHandler.h"
 
-/* #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
-/*#define OPENDS_LOCATION "ldap://localhost:4444"		TODO: Esto vamos a tener que pasarlo por archivo de configuracion */
 
-/*Esto tiene que estar?????int thr_create(void *stack_base
+/*			Header de la funcion que crea un nuevo thread.
+	int thr_create(void *stack_base
 					, size_t stack_size
 					, void *(*start_routine)(void *)
 					, void *arg
 					, long flags
 					, thread_t *new_thread
-				);*/
+				);
+*/
 int procesarRequestFuncionThread(int ficheroCliente);
 int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_SESSION* 	session
@@ -32,6 +32,7 @@ void liberarRecursos( int 				ficheroServer
 					, PLDAP_CONTEXT		context
 					, PLDAP_CONTEXT_OP	ctxOp
 					, PLDAP_SESSION_OP	sessionOp);
+
 
 int main() {
 	/*	Cargo el archivo de configuracion	*/
@@ -52,50 +53,66 @@ int main() {
 	/* Conecto a OpenDS por medio del LDAP Wrapper*/
 	PLDAP_SESSION session;
 	PLDAP_CONTEXT context = newLDAPContext();
-	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();
-	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
-	PLDAP_RESULT_SET resultSet;
-	LDAP_ITERATOR iterator;
-	LDAP_RECORD_OP recordOp;
-	PLDAP_ENTRY entry;
-	LDAP_ENTRY_OP entryOp;
-	LDAP_ATTRIBUTE_OP attribOp;
+	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
+	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
 	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
 	}
 	else
 		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer, stConf.uiBDPuerto);
+	/*	Si pude conectarme, entonces instancio el resto de las variables.	*/
 
+	PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
+	PLDAP_ATTRIBUTE_OP attribOp=	newLDAPAttributeOperations();
+
+/********************************************************************************
+ *	A partir de aca es de prueba												*
+ ********************************************************************************/
+	stArticle article;
+	article.sBody= "body probando hibernate!";
+	article.sHead= "head probando hibernate!";
+	article.sNewsgroup= "blablabla.com";
+	article.uiArticleID= 6969;
+
+	selectEntries(session, sessionOp, entryOp, attribOp);
+	insertEntry(session, sessionOp, entryOp, attribOp, article);
+	selectEntries(session, sessionOp, entryOp, attribOp);
+
+	article.sBody= "cambie el body para probar hibernate";
+	updateEntry(session, sessionOp, entryOp, attribOp, article);
+	selectEntries(session, sessionOp, entryOp, attribOp);
+
+	deleteEntry(session, sessionOp, entryOp, attribOp, article.uiArticleID);
+	selectEntries(session, sessionOp, entryOp, attribOp);
+/********************************************************************************
+ *	Hasta aca es la prueba														*
+ *******************************************************************************/
 
 	/*	Creo la conexion con el socket que va a estar escuchando conexiones entrantes	*/
 	int ficheroServer;			/* los ficheros descriptores */
-	struct sockaddr_in server;	/* para la informacion de la direccion del servidor */
-	if(!crearConexionConSocket(&stConf, &ficheroServer, &server))
+/*	struct sockaddr_in server;	/* para la informacion de la direccion del servidor */
+/*	if(!crearConexionConSocket(&stConf, &ficheroServer, &server))
 		return -1;
 	else
 		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
 
-	/*int sin_size = sizeof(struct sockaddr_in);
+	/*	Itero de manera infinita, para atender todas las conexiones entrantes.	*/
+/*	int sin_size = sizeof(struct sockaddr_in);
 	while (1) {
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 		
-	/*	int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
+/*		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
 		printf("Acepte una conexion y ficheroCliente vale: %d.\n", ficheroCliente);
-		/*	Despues de este printf es cuando me tira el segmentation fault	*/
-	/*	printf("1- Imprimo algo para ver si anda\n");
-		printf("2- Imprimo algo para ver si anda\n");
-		printf("3- Imprimo algo para ver si anda\n");
-		printf("4- Imprimo algo para ver si anda\n");
-		printf("5- Imprimo algo para ver si anda\n");
+		printf("1- Imprimo algo para ver si anda\n");
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
-	/*		printf("1- Entre al if\n");
+/*			printf("1- Entre al if.\tLa ultima vez tiro despues de este printf el segmentation fault. Me parece que es aleatorio:S.\n");
 			printf("Voy a declarar el neuvo thread");
 			thread_t threadProcesarRequest;	/*	Declaro un nuevo thread. */
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
 
-	/*		printf("Ahora llamo al thr_create");
+/*			printf("Ahora llamo al thr_create");
 			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread, (void*) ficheroCliente, 0, (void *)threadProcesarRequest) != 0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
@@ -103,13 +120,8 @@ int main() {
 			printf("Error al aceptar la conexion\n");
 
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-	}*/
-	printf("Voy a agregar un entry.\n");
-	entry = (PLDAP_ENTRY)createEntry();
-	entry->dn = "utnArticleID=1111,ou=so,dn=utn,dn=edu";
-	addAttribute(entry, (PLDAP_ATTRIBUTE_OP)createAttribute("objectclass", 2, "top", "utnUrl"));
-	sessionOp->addEntry(session, entry);
-	printf("Cree el entry!!\n");
+	}
+*/
 
 	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, session, context, ctxOp, sessionOp);
@@ -170,7 +182,6 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
 	(*sessionOp)->startSession(*session);
-	printf("Inicie la sesion de OpenDS joya\n");
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
 
@@ -221,7 +232,7 @@ void liberarRecursos(int 				ficheroServer
 					, PLDAP_SESSION_OP	sessionOp){
 
 	/*	Cierro el socket	*/
-	close(ficheroServer);
+/*	close(ficheroServer);	/*	TODO Descomentar esto, cuando se descomente y se trate la parte de los sockets.*/
 
 	/*	Cierro/Libero lo relacionado a la BD (OpenDS)	*/
 	sessionOp->endSession(session);
@@ -230,3 +241,8 @@ void liberarRecursos(int 				ficheroServer
 	freeLDAPContextOperations(ctxOp);
 	freeLDAPSessionOperations(sessionOp);
 }
+
+
+
+
+

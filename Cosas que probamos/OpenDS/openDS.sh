@@ -6,19 +6,19 @@ export INSTANCE_ROOT
 case "${1}" in
 	start)
 		echo "Iniciando server OpenDS..."
-		"${INSTANCE_ROOT}/bin/start-ds" --quiet
+		"${INSTANCE_ROOT}/bin/start-ds"
 		exit ${?}
 		;;
 	  
 	stop)
 		echo "Deteniendo server..."
-		"${INSTANCE_ROOT}/bin/stop-ds" --quiet
+		"${INSTANCE_ROOT}/bin/stop-ds"
 		exit ${?}
 		;;
 	  
 	restart)
 		echo "Reiniciando server..."
-		"${INSTANCE_ROOT}/bin/stop-ds" --restart --quiet
+		"${INSTANCE_ROOT}/bin/stop-ds" --restart
 		exit ${?}
 		;;
 	  

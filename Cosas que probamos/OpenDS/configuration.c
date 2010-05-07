@@ -3,6 +3,11 @@
 #include <string.h>
 #include "configuration.h"
 
+/*	Estas constantes son las que mapeo con el archivo de configuracion.	*/
+#define APP_PORT "AppPort="
+#define OPENDS_SERVER "OpenDSServer="
+#define OPENDS_PORT "OpenDSPort="
+
 char *GetVal(const char *sValBuff, const char *sBuff){
     char *sVal;
     char *sVal2;
