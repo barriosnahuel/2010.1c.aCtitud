@@ -26,7 +26,7 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 	printf("---------------- Procesando thread xD -----------------\n");
 
     PLDAP_SESSION session;
-	//PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
+	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
 	PLDAP_RESULT_SET resultSet = sessionOp->searchEntry(session, "ou=so,dc=utn,dc=edu","utnurlKeywords=*");
     resultSet->iterator
     iterator->hasNext(resultSet);
