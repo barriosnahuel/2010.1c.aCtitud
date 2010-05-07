@@ -103,12 +103,12 @@ int main() {
 	}*/
 	printf("Voy a buscar un entry.\n");
 	resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");
-	resultSet->iterator;
+	/*resultSet->iterator;
 	iterator->hasNext(resultSet);
 	PLDAP_RECORD record = iterator->next(resultSet);
 	PLDAP_FIELD field = recordOp->nextField(record);
-	field->name;
-	printf("El field es: %s", field);
+	field->name;*/
+	printf("El resultset es: %s", resultSet);
 
 	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, session, context, ctxOp, sessionOp);
