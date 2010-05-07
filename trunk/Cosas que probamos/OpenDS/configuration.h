@@ -1,11 +1,6 @@
 #ifndef _CONFIGURATION_H
 #define _CONFIGURATION_H
 
-/*	Estas constantes son las que mapeo con el archivo de configuracion.	*/
-#define APP_PORT "AppPort="
-#define OPENDS_SERVER "OpenDSServer="
-#define OPENDS_PORT "OpenDSPort="
-
 
 /* estructura que guarda la configuracion
  * se debe modificar acorde a los datos
