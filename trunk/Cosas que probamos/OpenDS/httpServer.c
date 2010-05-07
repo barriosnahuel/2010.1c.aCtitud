@@ -54,6 +54,9 @@ int main() {
 	PLDAP_CONTEXT context = newLDAPContext();
 	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();
 	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
+	PLDAP_RESULT_SET resultSet;
+	LDAP_ITERATOR iterator;
+	LDAP_RECORD_OP recordOp;
 	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
@@ -98,8 +101,8 @@ int main() {
 
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 	}*/
-	printf("Voy a buscar un entry.\n")
-	PLDAP_RESULT_SET resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");
+	printf("Voy a buscar un entry.\n");
+	resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");
 	resultSet->iterator;
 	iterator->hasNext(resultSet);
 	PLDAP_RECORD record = iterator->next(resultSet);
