@@ -104,14 +104,7 @@ int main() {
 
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 	}*/
-	printf("Voy a buscar un entry.\n");
-	/*resultSet = sessionOp->searchEntry(session, "ou=so,dn=utn,dn=edu",	"utnArticleID=*");*/
-	/*resultSet->iterator;
-	iterator->hasNext(resultSet);
-	PLDAP_RECORD record = iterator->next(resultSet);
-	PLDAP_FIELD field = recordOp->nextField(record);
-	field->name;*/
-	/*printf("El resultset es: %s", resultSet);*/
+	printf("Voy a agregar un entry.\n");
 	entry = (PLDAP_ENTRY)createEntry();
 	entry->dn = "utnArticleID=1111,ou=so,dn=utn,dn=edu";
 	addAttribute(entry, (PLDAP_ATTRIBUTE_OP)createAttribute("objectclass", 2, "top", "utnUrl"));
