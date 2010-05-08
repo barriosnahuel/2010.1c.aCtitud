@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
   size_t value_length[3];
   unsigned int x;
   uint32_t flags;
-
+  size_t tamanioID;
+  size_t tamanioArticle;
   char return_key[MEMCACHED_MAX_KEY];
   size_t return_key_length;
   char *return_value;
