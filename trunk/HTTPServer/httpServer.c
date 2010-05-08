@@ -25,10 +25,9 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_SESSION_OP* sessionOp);
 
 void* procesarRequestFuncionThread(void* parametro) {
-	printf("Entro a la f del nuevo thread\n");
-	int* ficheroCliente= ((int*)parametro);
-printf("1\n");
-printf("ficheroclientenuevo vale: %d\n", (*ficheroCliente));
+	printf("Bienvenido a la funcion del nuevo thread\n");
+	int* ficheroCliente= (int*)parametro;
+printf("ficheroclientenuevo vale: %d\n", *ficheroCliente);
 	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
@@ -149,7 +148,7 @@ int main() {
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
 
 
-	while (1) {
+/*	while (1) {*/
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
 
@@ -175,7 +174,7 @@ int main() {
 		}
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
-	}
+/*	}*/
 
 	printf("Chao chao!\n");
 	close(ficheroServer);
