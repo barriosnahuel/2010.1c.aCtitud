@@ -16,7 +16,7 @@
 					, void *(*start_routine)(void *)
 					, void *arg
 					, long flags
-					, thread_t *new_thread
+					, thread_t* new_thread
 				);*/
 int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_SESSION* 	session
@@ -25,9 +25,10 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_SESSION_OP* sessionOp);
 
 void* procesarRequestFuncionThread(void* parametro) {
+	printf("Entro a la f del nuevo thread\n");
 	int* ficheroCliente= (int*)parametro;
 
-	printf("Entro a la f del nuevo thread\n");
+
 	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
@@ -171,7 +172,7 @@ int main() {
 							, (void*)&procesarRequestFuncionThread
 							, (void*)ficheroCliente
 							, 0
-							, (void *)threadProcesarRequest)
+							, &threadProcesarRequest)
 								!=0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
