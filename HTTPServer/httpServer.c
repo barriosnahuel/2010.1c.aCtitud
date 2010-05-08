@@ -11,13 +11,13 @@
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define OPENDS_LOCATION "ldap://localhost:4444"	/*	TODO: Esto vamos a tener que pasarlo por archivo de configuracion */
 
-int thr_create(void *stack_base
+/*int thr_create(void *stack_base
 					, size_t stack_size
 					, void *(*start_routine)(void *)
 					, void *arg
 					, long flags
 					, thread_t *new_thread
-				);
+				);*/
 int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_SESSION* 	session
 					, PLDAP_CONTEXT*	context
