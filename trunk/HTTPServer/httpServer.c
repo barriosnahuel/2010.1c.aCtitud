@@ -24,7 +24,7 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_CONTEXT_OP* ctxOp
 					, PLDAP_SESSION_OP* sessionOp);
 
-int procesarRequestFuncionThread(int ficheroCliente) {
+void* procesarRequestFuncionThread(void* ficheroCliente) {
 	printf("Entro a la f del nuevo thread\n");
 	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
@@ -43,13 +43,13 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 */
 
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados = send(ficheroCliente, msg, len, 0)) == -1) {
+	if((bytesEnviados = send(*ficheroCliente, msg, len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
 	printf("Voy a cerrar la conexion del socket\n");
-	close(ficheroCliente); /*	�COMO CHOTA SE CIERRA UN SOCKET? */
+	close(*ficheroCliente); /*	�COMO CHOTA SE CIERRA UN SOCKET? */
 	printf("Cerre el socket\n");
 	printf("Exit al thread\n");
 	thr_exit(0);/*	Termino el thread.*/
@@ -154,17 +154,15 @@ int main() {
 
 	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
-	printf("1\n");
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
-	printf("2\n");
+
 		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
-	printf("3\n");
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
-	printf("4\n");
+
 			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
-	printf("5\n");
+	printf("Despues de esto rompe!!\n");
 			/*	En Solaris!! */
 			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread,
 					(void*) ficheroCliente, 0, (void *)threadProcesarRequest) != 0)
