@@ -175,7 +175,7 @@ int main() {
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
 /*	}*/
-
+sleep(5);
 	printf("Chao chao!\n");
 	close(ficheroServer);
 	
