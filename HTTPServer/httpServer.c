@@ -44,9 +44,11 @@ void* procesarRequestFuncionThread(void* parametro) {
 
 	TODO: Formateo la respuesta a HTML.
 */
-
+	printf("ficheroCliente vale: %d\n", *ficheroCliente);
+	printf("msg vale: %s\n", msg);
+	printf("len vale: %d\n", len);
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados = send(*ficheroCliente, msg, len, 0)) == -1) {
+	if((bytesEnviados = send((*ficheroCliente), msg, len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
@@ -79,11 +81,11 @@ int main() {
 	/********************************************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper									*
 	 *******************************************************************************/
-/*	PLDAP_SESSION session;
+	PLDAP_SESSION session;
 	PLDAP_CONTEXT context = newLDAPContext();
 	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
-/*	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
-/*	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
+	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
+	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
 	}
@@ -92,11 +94,11 @@ int main() {
 
 	PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
 	PLDAP_ATTRIBUTE_OP attribOp=	newLDAPAttributeOperations();
-*/
+
 					/********************************************************************************
 					 *	A partir de aca es de prueba de OpenDS										*
 					 ********************************************************************************/
-					/*	stArticle article;
+						stArticle article;
 						article.sBody= "body probando hibernate!";
 						article.sHead= "head probando hibernate!";
 						article.sNewsgroup= "blablabla.com";
@@ -111,7 +113,7 @@ int main() {
 						selectEntries(session, sessionOp, entryOp, attribOp);
 
 						deleteEntry(session, sessionOp, entryOp, attribOp, article.uiArticleID);
-						selectEntries(session, sessionOp, entryOp, attribOp);*/
+						selectEntries(session, sessionOp, entryOp, attribOp);
 					/********************************************************************************
 					 *	Hasta aca es la prueba														*
 					 *******************************************************************************/
@@ -124,12 +126,6 @@ int main() {
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 	
-	/* Inicializamos el contexto. VER DONDE ESTA LA BASE DE DATOS!! */
-/*	ctxOp->initialize(context, OPENDS_LOCATION);
-/*	session = ctxOp->newSession(context, "cn=Directory Manager", "password");
-	/* se inicia la session. Se establece la	conexi�n con el servidor LDAP. */
-/*	sessionOp->startSession(session);*/
-
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
 		exit(-1);
@@ -153,7 +149,6 @@ int main() {
 	}
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
 
-	/* sin_size = sizeof(struct sockaddr_in); */
 
 	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
@@ -186,11 +181,11 @@ int main() {
 	printf("Chao chao!\n");
 	close(ficheroServer);
 	
-	/*sessionOp->endSession(session);
+	sessionOp->endSession(session);
 	freeLDAPSession(session);
 	freeLDAPContext(context);
 	freeLDAPContextOperations(ctxOp);
-	freeLDAPSessionOperations(sessionOp);*/
+	freeLDAPSessionOperations(sessionOp);
 	
 	/*	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
