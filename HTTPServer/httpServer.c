@@ -48,13 +48,13 @@ printf("ficheroclientenuevo vale: %d\n", ficheroCliente);
 	printf("msg vale: %s\n", msg);
 	printf("len vale: %d\n", len);
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados = send((*ficheroCliente), msg, len, 0)) == -1) {
+	if((bytesEnviados = send(ficheroCliente, msg, len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
 	printf("Voy a cerrar la conexion del socket\n");
-	close(*ficheroCliente); /*	�COMO CHOTA SE CIERRA UN SOCKET? */
+	close(ficheroCliente); /*	�COMO CHOTA SE CIERRA UN SOCKET? */
 	printf("Cerre el socket\n");
 	printf("Exit al thread\n");
 	thr_exit(0);/*	Termino el thread.*/
