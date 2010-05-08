@@ -25,6 +25,7 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_SESSION_OP* sessionOp);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
+	printf("Entro a la f del nuevo thread\n");
 	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
@@ -153,21 +154,21 @@ int main() {
 
 	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
+	printf("1\n");
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
-		
-		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
-				&sin_size);
+	printf("2\n");
+		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
+	printf("3\n");
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
-
+	printf("4\n");
 			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
-
+	printf("5\n");
 			/*	En Solaris!! */
 			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread,
 					(void*) ficheroCliente, 0, (void *)threadProcesarRequest) != 0)
-				printf(
-						"No se pudo crear un nuevo thread para procesar el request.\n");
+				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
 		else {
 			printf("Error al aceptar la conexion\n");
