@@ -21,15 +21,34 @@ int main(int argc, char *argv[])
   size_t return_value_length;
 
   memc= memcached_create(NULL);
-
   servers= memcached_server_list_append(servers, "localhost", 11211, &rc);
   rc= memcached_server_push(memc, servers);
 
+  stArticle article;
+  article.sBody= "body probando hibernate!";
+  article.sHead= "head probando hibernate!";
+  article.sNewsgroup= "blablabla.com";
+  article.uiArticleID= 6969;
+  
   if (rc == MEMCACHED_SUCCESS)
-    fprintf(stderr,"Added server successfully\n");
+    fprintf(stderr,"Se agrego el servidor correctamente\n");
   else
-    fprintf(stderr,"Couldn't add server: %s\n",memcached_strerror(memc, rc));
-
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
+	
+  /*If( Si esta en la cache )
+	 devuelve el resultado
+	else
+	  consulto en openDS
+	  e inserto en la cache:
+  */ 
+	  tamañoID		 = srtlen(article.uiArticleID);
+	  tamañoArticle = sizeof(article);
+	  rc =memcache_set(memc,article.uiArticleID,tamañoID,article,tamañoArticle,(time_t)0,(uint32_t)0);
+	  if (rc=MEMCACHED_SUCESS)
+		printf("El articulo se inserto correctamente");
+	  else
+	    printf("No se logro insertar el articulo");
+/*
   for(x= 0; x < 3; x++)
     {
       key_length[x] = strlen(keys[x]);
@@ -56,6 +75,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-
+*/
   return 0;
 }
