@@ -75,11 +75,11 @@ int main() {
 	/********************************************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper									*
 	 *******************************************************************************/
-	PLDAP_SESSION session;
+/*	PLDAP_SESSION session;
 	PLDAP_CONTEXT context = newLDAPContext();
 	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
-	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
-	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
+/*	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
+/*	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
 	}
@@ -88,11 +88,11 @@ int main() {
 
 	PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
 	PLDAP_ATTRIBUTE_OP attribOp=	newLDAPAttributeOperations();
-
+*/
 					/********************************************************************************
 					 *	A partir de aca es de prueba de OpenDS										*
 					 ********************************************************************************/
-						stArticle article;
+					/*	stArticle article;
 						article.sBody= "body probando hibernate!";
 						article.sHead= "head probando hibernate!";
 						article.sNewsgroup= "blablabla.com";
@@ -107,7 +107,7 @@ int main() {
 						selectEntries(session, sessionOp, entryOp, attribOp);
 
 						deleteEntry(session, sessionOp, entryOp, attribOp, article.uiArticleID);
-						selectEntries(session, sessionOp, entryOp, attribOp);
+						selectEntries(session, sessionOp, entryOp, attribOp);*/
 					/********************************************************************************
 					 *	Hasta aca es la prueba														*
 					 *******************************************************************************/
