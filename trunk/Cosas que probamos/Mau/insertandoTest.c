@@ -14,9 +14,10 @@ int main(int argc, char *argv[])
   unArtic.sNewsgroup = "www.blabla.com";
   unArtic.sHead = "Esto es un encabezado";
   unArtic.sBody = "Este es el cuerpo de la noticia";
-  char* keys = "huey";
-  size_t key_length[1];
-  size_t value_length[1];
+  char *keys[]= {"huey", "dewey", "louie"};
+  size_t key_length[3];
+  char *values[]= {unArtic.sHead, unArtic.sBody, "green"};
+  size_t value_length[3];
   unsigned int x;
   uint32_t flags;
 
@@ -35,17 +36,20 @@ int main(int argc, char *argv[])
   else
     fprintf(stderr,"Couldn't add server: %s\n",memcached_strerror(memc, rc));
 
+  for(x= 0; x < 3; x++)
+    {
+      key_length[x] = strlen(keys[x]);
+      value_length[x] = strlen(values[x]);
 
-
-      rc= memcached_set(memc, keys, sizeof(keys), unArtic,
-                        sizeof(unArtic), (time_t)0, (uint32_t)0);
+      rc= memcached_set(memc, keys[x], key_length[x], values[x],
+                        value_length[x], (time_t)0, (uint32_t)0);
       if (rc == MEMCACHED_SUCCESS)
-        fprintf(stderr,"Key %s stored successfully\n",keys);
+        fprintf(stderr,"Key %s stored successfully\n",keys[x]);
       else
         fprintf(stderr,"Couldn't store key: %s\n",memcached_strerror(memc, rc));
+    }
 
-
-  rc= memcached_mget(memc, keys, key_length, 1);
+  rc= memcached_mget(memc, keys, key_length, 3);
 
   if (rc == MEMCACHED_SUCCESS)
     {
@@ -54,7 +58,7 @@ int main(int argc, char *argv[])
         {
           if (rc == MEMCACHED_SUCCESS)
             {
-              fprintf(stderr,"Key %s returned %s\n",return_key, return_value.sHead);
+              fprintf(stderr,"Key %s returned %s\n",return_key, return_value);
             }
         }
     }
