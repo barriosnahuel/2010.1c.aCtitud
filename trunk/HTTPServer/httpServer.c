@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
+#include "configuration.h"
 #include "LdapWrapperHandler.h"
 
 #define PORT 15000 /* El puerto que ser� abierto */
