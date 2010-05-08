@@ -2,7 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <libmemcached/memcached.h>
-
+#include "Article.h"
 int main(int argc, char *argv[])
 {
   memcached_server_st *servers = NULL;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 	  tamañoID		 = srtlen(article.uiArticleID);
 	  tamañoArticle = sizeof(article);
 	  rc =memcache_set(memc,article.uiArticleID,tamañoID,article,tamañoArticle,(time_t)0,(uint32_t)0);
-	  if (rc=MEMCACHED_SUCESS)
+	  if (rc == MEMCACHED_SUCCESS)
 		printf("El articulo se inserto correctamente");
 	  else
 	    printf("No se logro insertar el articulo");
