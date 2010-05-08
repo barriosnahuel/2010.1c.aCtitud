@@ -4,7 +4,7 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
-#include "LdapWrapper.h"
+#include "LdapWrapperHandler.h"
 
 #define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
@@ -17,7 +17,11 @@ int thr_create(void *stack_base
 					, long flags
 					, thread_t *new_thread
 				);
-
+int conectarAOpenDS(  stConfiguracion*	stConf
+					, PLDAP_SESSION* 	session
+					, PLDAP_CONTEXT*	context
+					, PLDAP_CONTEXT_OP* ctxOp
+					, PLDAP_SESSION_OP* sessionOp);
 
 int procesarRequestFuncionThread(int ficheroCliente) {
 	char *msg = "Hola mundo!";
@@ -51,22 +55,75 @@ int procesarRequestFuncionThread(int ficheroCliente) {
 }
 
 int main() {
-	/* Datos para el LDAPWrapper. */
+	/********************************************************************************
+	 *	Cargo el archivo de configuracion											*
+	 *******************************************************************************/
+	stConfiguracion stConf;
+
+	if(!CargaConfiguracion("config.conf\0", &stConf)) {
+		printf("Archivo de configuracion no valido.\n");
+		return -1;
+	}
+	else{
+		printf("Archivo de configuracion cargado correctamente:\n");
+		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
+		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
+		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
+	}
+
+	/********************************************************************************
+	 *	Conecto a OpenDS por medio del LDAP Wrapper									*
+	 *******************************************************************************/
 	PLDAP_SESSION session;
 	PLDAP_CONTEXT context = newLDAPContext();
-	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();
-	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();
-	
+	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
+	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
+	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
+		printf("No se pudo conectar a OpenDS.");
+		return -1;
+	}
+	else
+		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer, stConf.uiBDPuerto);
+
+	PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
+	PLDAP_ATTRIBUTE_OP attribOp=	newLDAPAttributeOperations();
+
+					/********************************************************************************
+					 *	A partir de aca es de prueba de OpenDS										*
+					 ********************************************************************************/
+						stArticle article;
+						article.sBody= "body probando hibernate!";
+						article.sHead= "head probando hibernate!";
+						article.sNewsgroup= "blablabla.com";
+						article.uiArticleID= 6969;
+
+						selectEntries(session, sessionOp, entryOp, attribOp);
+						insertEntry(session, sessionOp, entryOp, attribOp, article);
+						selectEntries(session, sessionOp, entryOp, attribOp);
+
+						article.sBody= "cambie el body para probar hibernate";
+						updateEntry(session, sessionOp, entryOp, attribOp, article);
+						selectEntries(session, sessionOp, entryOp, attribOp);
+
+						deleteEntry(session, sessionOp, entryOp, attribOp, article.uiArticleID);
+						selectEntries(session, sessionOp, entryOp, attribOp);
+					/********************************************************************************
+					 *	Hasta aca es la prueba														*
+					 *******************************************************************************/
+
+	/********************************************************************************
+	 *	Creo la conexion con el socket y lo dejo listo								*
+	 *******************************************************************************/
 	int ficheroServer; /* los ficheros descriptores */
 	/* int sin_size; TODO: Esto hace falta declararlo aca? Que es? */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	printf("Acabo de entrar al main\n");
 	
 	/* Inicializamos el contexto. VER DONDE ESTA LA BASE DE DATOS!! */
-	ctxOp->initialize(context, OPENDS_LOCATION);
-	session = ctxOp->newSession(context, "cn=Directory Manager", "password");
+/*	ctxOp->initialize(context, OPENDS_LOCATION);
+/*	session = ctxOp->newSession(context, "cn=Directory Manager", "password");
 	/* se inicia la session. Se establece la	conexi�n con el servidor LDAP. */
-	sessionOp->startSession(session);
+/*	sessionOp->startSession(session);*/
 
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
@@ -128,5 +185,31 @@ int main() {
 	freeLDAPSessionOperations(sessionOp);
 	
 	/*	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida. */
+	return 1;
+}
+
+/**
+ * Se conecta a OpenDS y deja establecida la conexion para usarla con el LDAPWrapper
+ */
+int conectarAOpenDS(  stConfiguracion*	stConf
+					, PLDAP_SESSION* 	session
+					, PLDAP_CONTEXT*	context
+					, PLDAP_CONTEXT_OP* ctxOp
+					, PLDAP_SESSION_OP* sessionOp){
+
+
+	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
+	char *sOpenDSLocation;
+	asprintf(&sOpenDSLocation, "ldap://%s:%d", (*stConf).czBDServer, (*stConf).uiBDPuerto);
+
+	/* Inicializamos el contexto. */
+	(*ctxOp)->initialize(*context, sOpenDSLocation);
+	(*session)= (*ctxOp)->newSession(*context, "cn=Directory Manager", "password");
+
+	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
+	(*sessionOp)->startSession(*session);
+
+	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
+
 	return 1;
 }
