@@ -27,12 +27,19 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 void* procesarRequestFuncionThread(void* parametro) {
 	printf("Bienvenido a la funcion del nuevo thread\n");
 	int* ficheroCliente= (int*)parametro;
-printf("ficheroclientenuevo vale: %d\n", *ficheroCliente);
-	char *msg = "Hola mundo!";
+
+	char* msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
+
+
 	printf("---------------- Procesando thread xD -----------------\n");
-	
+
+
+
+
+
+
 /*
 	if (TODO: Si no esta en el cache) {
 		TODO: Lo busco en la DB.
@@ -43,19 +50,19 @@ printf("ficheroclientenuevo vale: %d\n", *ficheroCliente);
 
 	TODO: Formateo la respuesta a HTML.
 */
-	printf("msg vale: %s\n", msg);
-	printf("len vale: %d\n", len);
+
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados = send((*ficheroCliente), msg, len, 0)) == -1) {
+	if((bytesEnviados = send(*ficheroCliente, msg, len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
-	printf("Voy a cerrar la conexion del socket\n");
-	close((*ficheroCliente)); /*	�COMO CHOTA SE CIERRA UN SOCKET? */
-	printf("Cerre el socket\n");
-	printf("Exit al thread\n");
+	printf("Voy a cerrar la conexion con el cliente\n");
+	close(*ficheroCliente);
+
+	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
 	thr_exit(0);/*	Termino el thread.*/
+
 	return 0;
 }
 
@@ -175,6 +182,7 @@ int main() {
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
 /*	}*/
+printf("Tenes 10 segundos para ir al browser y pegarle al server antes que cierre todo... ;)\n");
 sleep(5);
 	printf("Chao chao!\n");
 	close(ficheroServer);
