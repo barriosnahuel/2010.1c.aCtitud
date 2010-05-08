@@ -45,7 +45,6 @@ printf("ficheroclientenuevo vale: %d\n", ficheroCliente);
 
 	TODO: Formateo la respuesta a HTML.
 */
-	printf("ficheroCliente vale: %d\n", *ficheroCliente);
 	printf("msg vale: %s\n", msg);
 	printf("len vale: %d\n", len);
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
