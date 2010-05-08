@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
 	  consulto en openDS
 	  e inserto en la cache:
   */ 
-	  tamañoID		 = srtlen(article.uiArticleID);
-	  tamañoArticle = sizeof(article);
+	  tamanioID		 = srtlen(article.uiArticleID);
+	  tamanioArticle = sizeof(article);
 	  rc =memcache_set(memc,article.uiArticleID,tamañoID,article,tamañoArticle,(time_t)0,(uint32_t)0);
 	  if (rc == MEMCACHED_SUCCESS)
 		printf("El articulo se inserto correctamente");
