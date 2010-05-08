@@ -27,7 +27,6 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 void* procesarRequestFuncionThread(void* parametro) {
 	printf("Entro a la f del nuevo thread\n");
 	int* asd= ((int*)parametro);
-printf("asd vlae: %d\n", *asd);
 	int ficheroCliente= *asd;
 printf("ficheroclientenuevo vale: %d\n", ficheroCliente);
 	char *msg = "Hola mundo!";
