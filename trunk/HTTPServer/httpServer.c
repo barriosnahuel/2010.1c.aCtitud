@@ -182,8 +182,8 @@ int main() {
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
 /*	}*/
-printf("Tenes 10 segundos para ir al browser y pegarle al server antes que cierre todo... ;)\n");
-sleep(5);
+printf("Tenes 20 segundos para ir al browser y pegarle al server antes que cierre todo... ;)\n");
+sleep(20);
 	printf("Chao chao!\n");
 	close(ficheroServer);
 	
