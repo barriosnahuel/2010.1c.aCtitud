@@ -14,7 +14,10 @@ int main(int argc, char *argv[])
   unArtic.sNewsgroup = "www.blabla.com";
   unArtic.sHead = "Esto es un encabezado";
   unArtic.sBody = "Este es el cuerpo de la noticia";
-  char *keys[]= {"huey"};
+  
+fprintf(stderr,"Key %s returned %s\n",unArtic.sHead, unArtic.sBody);
+
+/*  char *keys[]= {"huey"};
   size_t key_length[1];
   stArticle *values[]= {unArtic};
   size_t value_length[1];
@@ -61,6 +64,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-
+*/
   return 0;
 }
