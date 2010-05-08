@@ -179,11 +179,11 @@ int main() {
 	printf("Chao chao!\n");
 	close(ficheroServer);
 	
-	sessionOp->endSession(session);
+	/*sessionOp->endSession(session);
 	freeLDAPSession(session);
 	freeLDAPContext(context);
 	freeLDAPContextOperations(ctxOp);
-	freeLDAPSessionOperations(sessionOp);
+	freeLDAPSessionOperations(sessionOp);*/
 	
 	/*	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
