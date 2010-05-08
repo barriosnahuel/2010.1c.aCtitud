@@ -24,7 +24,9 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_CONTEXT_OP* ctxOp
 					, PLDAP_SESSION_OP* sessionOp);
 
-void* procesarRequestFuncionThread(void* ficheroCliente) {
+void* procesarRequestFuncionThread(void* parametro) {
+	int* ficheroCliente= (int*)parametro;
+
 	printf("Entro a la f del nuevo thread\n");
 	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
@@ -163,9 +165,14 @@ int main() {
 			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
 	printf("Despues de esto rompe!!\n");
-			/*	En Solaris!! */
-			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread,
-					(void*) ficheroCliente, 0, (void *)threadProcesarRequest) != 0)
+
+			if (thr_create(	  0
+							, 0
+							, (void*)&procesarRequestFuncionThread
+							, (void*)ficheroCliente
+							, 0
+							, (void *)threadProcesarRequest)
+								!=0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
 		else {
