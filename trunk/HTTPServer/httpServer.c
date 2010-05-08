@@ -161,10 +161,10 @@ int main() {
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
 	printf("Despues de esto rompe!!\n");
 
-			if (thr_create(	  0
+			if (thr_create(0
 							, 0
 							, (void*)&procesarRequestFuncionThread
-							, (void*)ficheroCliente
+							, (void*)&ficheroCliente
 							, 0
 							, &threadProcesarRequest)
 								!=0)
