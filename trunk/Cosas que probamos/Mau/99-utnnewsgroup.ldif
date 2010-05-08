@@ -1,0 +1,10 @@
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+cn: schema
+attributeTypes: ( utnArticleGroupName-oid NAME 'utnArticleGroupName' DESC 'Article Group Name' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE USAGE userApplications )
+attributeTypes: ( utnArticleID-oid NAME 'utnArticleID' DESC 'Article MessageID' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE USAGE userApplications )
+attributeTypes: ( utnArticleHead-oid NAME 'utnArticleHead' DESC 'Article subject' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE USAGE userApplications )
+attributeTypes: ( utnArticleBody-oid NAME 'utnArticleBody' DESC 'Article Content' EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE USAGE userApplications )
+objectClasses: ( utnArticle-oid NAME 'utnArticle' DESC 'Structure of an article' SUP top STRUCTURAL MUST ( objectClass $ utnArticleID $ utnArticleGroupName $ utnArticleHead $ utnArticleBody ) X-ORIGIN 'UTN university' )
