@@ -155,7 +155,7 @@ int main() {
 	printf("Escuchando conexiones en el puerto %d.\n", PORT);
 
 
-/*	while (1) {*/
+/*	while (1) {			Comento el while para poder hacer el close del socket. Hay que ver la forma de poder bajar el server*/
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
 
