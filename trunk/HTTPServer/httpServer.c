@@ -26,9 +26,10 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 
 void* procesarRequestFuncionThread(void* parametro) {
 	printf("Entro a la f del nuevo thread\n");
-	int* ficheroCliente= (int*)parametro;
-
-
+	int* asd= ((int*)parametro);
+printf("asd vlae: %d\n", *asd);
+	int ficheroCliente= *asd;
+printf("ficheroclientenuevo vale: %d\n", ficheroCliente);
 	char *msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
@@ -44,7 +45,7 @@ void* procesarRequestFuncionThread(void* parametro) {
 
 	TODO: Formateo la respuesta a HTML.
 */
-	printf("ficheroCliente vale: %d\n", (*ficheroCliente));
+	printf("ficheroCliente vale: %d\n", *ficheroCliente);
 	printf("msg vale: %s\n", msg);
 	printf("len vale: %d\n", len);
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
