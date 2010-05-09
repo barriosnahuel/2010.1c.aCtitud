@@ -7,11 +7,10 @@
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 
-#define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
-#define OPENDS_LOCATION "ldap://localhost:4444"	/*	TODO: Esto vamos a tener que pasarlo por archivo de configuracion */
 
-/*int thr_create(void *stack_base
+/*	Esta es la cabecera de thr_create para Solaris. La pongo aca solo para saber como es. No tiene que estar comentado.
+int thr_create(void *stack_base
 					, size_t stack_size
 					, void *(*start_routine)(void *)
 					, void *arg
@@ -26,9 +25,6 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 int crearConexionConSocket(	  stConfiguracion*		stConf
 							, int*					ficheroServer
 							, struct sockaddr_in*	server);
-void liberarRecursos( int 				ficheroServer
-					, PLDAP_CONTEXT		context
-					, PLDAP_CONTEXT_OP	ctxOp);
 
 /**
  * Estructura que contiene los parametros para cada nuevo thread.
@@ -37,9 +33,9 @@ typedef struct stThreadParameters {
     int				 	ficheroCliente;				/*	el file descriptor de la conexion con el nuevo cliente.	*/
 
     /*	OpenDS/LDAP	*/
-    PLDAP_CONTEXT*		pstPLDAPContext;			/*	El contexto de OpenDS/LDAP para poder crear una nueva sesion
+/*    PLDAP_CONTEXT*		pstPLDAPContext;			/*	El contexto de OpenDS/LDAP para poder crear una nueva sesion
 														si es necesario. Es decir, cuando no se encuentre la inf. en cache.	*/
-    PLDAP_CONTEXT_OP*	pstPLDAPContextOperations;	/*	Permite realizar operaciones sobre el contexto, ej, crear nuevas sesiones	*/
+/*    PLDAP_CONTEXT_OP*	pstPLDAPContextOperations;	/*	Permite realizar operaciones sobre el contexto, ej, crear nuevas sesiones	*/
 
 } stThreadParameters;
 
@@ -51,10 +47,8 @@ typedef struct stThreadParameters {
 void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("Bienvenido a la funcion del nuevo thread\n");
 
-	stThreadParameters* pstParametros= (stThreadParameters*)threadParameters;
-		stThreadParameters stParametros= *pstParametros;
+	stThreadParameters stParametros= *((stThreadParameters*)threadParameters);
 	printf("%d\n", stParametros.ficheroCliente);
-	/*int* ficheroCliente= (int*)parametro;*/
 
 	char* msg = "Hola mundo!";
 	int len, bytesEnviados;
@@ -146,42 +140,15 @@ int main() {
 					 *	Hasta aca es la prueba														*
 					 *******************************************************************************/
 
-						/********************************************************************************
-						 *	Creo la conexion con el socket y lo dejo listo								*
-						 *******************************************************************************/
-						int ficheroServer;			/* los ficheros descriptores */
-						struct sockaddr_in server;	/* para la informacion de la direccion del servidor */
-						if(!crearConexionConSocket(&stConf, &ficheroServer, &server))
-							return -1;
-						else
-							printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
-/*	int ficheroServer; /* los ficheros descriptores */
-	/* int sin_size; TODO: Esto hace falta declararlo aca? Que es? */
-/*	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
-/*	printf("Acabo de entrar al main\n");
-	
-	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		printf("Error al crear el socket.\n");
-		exit(-1);
-	}
-	printf("Cree el socket bien\n");
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INADDR_ANY; /* INADDR_ANY coloca nuestra direcci�n IP autom�ticamente */
-/*	server.sin_port = htons(PORT); /* htons transforma el short de maquina a short de red */
-/*	bzero(&(server.sin_zero), 8); /* escribimos ceros en el reto de la estructura*/
-
-/*	if (bind(ficheroServer, (struct sockaddr *) &server,
-			sizeof(struct sockaddr)) == -1) {
-		printf("Error al asociar el puerto al socket.\n");
-		exit(-1);
-	}
-	printf("Pude bindear bien el socket\n");
-
-	if (listen(ficheroServer, BACKLOG) == -1) {
-		printf("Error al escuchar por el puerto.\n");
-		exit(-1);
-	}
-	printf("Escuchando conexiones en el puerto %d.\n", PORT);
+	/********************************************************************************
+	 *	Creo la conexion con el socket y lo dejo listo								*
+	 *******************************************************************************/
+	int ficheroServer;			/* los ficheros descriptores */
+	struct sockaddr_in server;	/* para la informacion de la direccion del servidor */
+	if(!crearConexionConSocket(&stConf, &ficheroServer, &server))
+		return -1;
+	else
+		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
 
 
 /*	while (1) {			Comento el while para poder hacer el close del socket. Hay que ver la forma de poder bajar el server*/
@@ -281,20 +248,4 @@ int crearConexionConSocket(	  stConfiguracion*		stConf
 	}
 
 	return 1;
-}
-
-/**
- * 1. Cierra el socket.
- * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
- */
-void liberarRecursos(int 				ficheroServer
-					, PLDAP_CONTEXT		context
-					, PLDAP_CONTEXT_OP	ctxOp){
-
-	/*	Cierro el socket	*/
-	close(ficheroServer);	/*	TODO Descomentar esto, cuando se descomente y se trate la parte de los sockets.*/
-
-	/*	Cierro/Libero lo relacionado a la BD (OpenDS)	*/
-	freeLDAPContext(context);
-	freeLDAPContextOperations(ctxOp);
 }
