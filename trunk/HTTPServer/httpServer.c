@@ -46,17 +46,13 @@ typedef struct stThreadParameters {
 
 void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("Bienvenido a la funcion del nuevo thread\n");
-
 	stThreadParameters stParametros= *((stThreadParameters*)threadParameters);
-	printf("%d\n", stParametros.ficheroCliente);
 
 	char* msg = "Hola mundo!";
 	int len, bytesEnviados;
 	len = strlen(msg);
 
-
 	printf("---------------- Procesando thread xD -----------------\n");
-
 /*
 	if (TODO: Si no esta en el cache) {
 		TODO: Lo busco en la DB.
