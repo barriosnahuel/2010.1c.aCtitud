@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
   printf("Se creara el servidor 1 \n");
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor correctamente\n");
-  else
+  elsenn
+  
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
   
   tamanioID		 = sizeof(ptrArticulo->uiArticleID);
@@ -46,6 +47,21 @@ int main(int argc, char *argv[])
 	printf("El articulo se inserto correctamente =) \n");
   else
     printf("No se logro insertar el articulo =( \n");
+	
+ respuesta = memcached_get(memc,(char*)&ptrArticulo->uiArticleID,tamanioID,&tamanioArticle,&$
+ (stArticle *) respuesta;
+  if(rc == MEMCACHED_SUCCESS)
+   printf("Levanta bien el articulo buscado \n");
+  else
+   printf("No levanta el articulo buscado \n");
+
+  printf("Respuesta: %s \n",(stArticle *)&respuesta->sBody);
+  int i;
+  for(i=0; i<tamanioArticle;i++)
+    printf("respuesta[%2d]: %4d \n",i,respuesta[i]);
+
+	
+	
 	
 /*
   for(x= 0; x < 3; x++)
