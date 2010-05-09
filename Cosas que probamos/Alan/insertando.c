@@ -30,18 +30,23 @@ int main(int argc, char *argv[])
   article.sNewsgroup= "blablabla.com";
   article.uiArticleID= 6969;
   
+  stArticle * ptrArticulo = &article;
+  printf("Se creara el servidor 1 \n");
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor correctamente\n");
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-	
-  tamanioID		 = (size_t)(srtlen(article.uiArticleID));
-  tamanioArticle = (size_t)(sizeof(article));
-  rc =memcached_set(memc,article.uiArticleID,tamanioID,article,tamanioArticle,(time_t)0,(uint32_t)0);
+  
+  tamanioID		 = sizeof(ptrArticulo->uiArtcileID);
+  tamanioArticle = sizeof(article);
+  printf("Tamanio ID : %d",tamanioID);
+  printf("Tamanio articulo entero:",tamanioArticle);
+  rc =memcached_set(memc,(char*)&ptrArticlo->uiArticleID,tamanioID,(char*)&article,tamanioArticle,(time_t)0,(uint32_t)0);
   if (rc == MEMCACHED_SUCCESS)
-	printf("El articulo se inserto correctamente");
+	printf("El articulo se inserto correctamente =) \n");
   else
-    printf("No se logro insertar el articulo");
+    printf("No se logro insertar el articulo =( \n");
+	
 /*
   for(x= 0; x < 3; x++)
     {
