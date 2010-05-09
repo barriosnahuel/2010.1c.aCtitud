@@ -1,7 +1,9 @@
 #include <pthread.h>
 #include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <fstream>
 #include "Configuracion.hpp"
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
@@ -35,7 +37,10 @@ void* threadInterfazDeUsuario(void* parametro){
         (*comando).init(strCadenaIngresada);
         pthread_mutex_unlock(&semConexion);
         pthread_mutex_lock(&semUI);
-        cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
+        if((*comando).validacion())
+            cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
+        else
+            cout << "Comando inválido." << endl;
     } while ((*comando).indicaSalida() != 0);
     pthread_exit(comando);
 }
@@ -56,24 +61,24 @@ int main(int argn, char *argv[]){
     switch(argn) {
         case 1: // no se indicó archivo, se carga archivo por defecto (czNombreProceso)
             if(confCliente.cargarDefault() == 0) {
-                printf("Archivo de configuración no válido.\n");
+                cerr << "Archivo de configuración no válido.\n";
                 return EXIT_FAILURE;
             }
             break;
         case 2: // único parámetro: nombre de archivo de configuración
             if(confCliente.cargarDesdeArchivo(argv[1]) == 0) {
-                printf("Archivo de configuración no válido.\n");
+                cerr << "Archivo de configuración no válido.\n";
                 return EXIT_FAILURE;
             }
             break;
         case 3: // se pasaron los valores por parámetro
             if(confCliente.cargarDesdeParametros(argv[1],atoi(argv[2])) == 0) {
-                printf("Parámetros no válidos.\n");
+                cerr << "Parámetros no válidos.\n";
                 return EXIT_FAILURE;
             }
             break;
         default:
-            printf("Parámetros no válidos.\n");
+            cerr << "Parámetros no válidos.\n";
             return EXIT_FAILURE;
             break;
     };
@@ -98,8 +103,10 @@ int main(int argn, char *argv[]){
 
     do {
         pthread_mutex_lock(&semConexion);
-        dao.enviarMensaje(comando.cadenaIngresada());
-        comando.setRespuestaObtenida(dao.recibirRespuesta());
+        if(comando.validacion()) {
+            dao.enviarMensaje(comando.cadenaIngresada());
+            comando.setRespuestaObtenida(dao.recibirRespuesta());
+        };
         pthread_mutex_unlock(&semUI);
     } while (comando.indicaSalida() != 0);
 

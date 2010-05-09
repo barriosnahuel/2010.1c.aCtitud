@@ -14,17 +14,15 @@ Comando::Comando(){
 Comando::~Comando(){}
 
 
-string Comando::respuestaObtenida(){
+string Comando::respuestaObtenida() {
 	return respuesta;
 }
 
 void Comando::setRespuestaObtenida(string strRespuesta) {
-    cout << "--- set rta obtenida entra " << strRespuesta << endl;
     respuesta = strRespuesta;
-    cout << "--- set rta obtenida sale! --" << endl;
 }
 
-string Comando::cadenaIngresada(){
+string Comando::cadenaIngresada() {
 
     string strCadenaIngresada = nombreComando;
 
@@ -34,7 +32,7 @@ string Comando::cadenaIngresada(){
     return strCadenaIngresada;
 }
 
-void Comando::reset(){
+void Comando::reset() {
     parametro= "";
     nombreComando= "";
     respuesta= "";
@@ -68,9 +66,6 @@ int Comando::init(string strCadena) {
 
 int Comando::validacion() {
 
-/*      cout<<"NombreComando:"<<nombreComando<<endl;
-      cout<<"Parametro:"<<parametro<<endl;*/
-
       int i ;
       int comandoOk = 0;
       int parametroOk = 0;
@@ -82,30 +77,21 @@ int Comando::validacion() {
         }
 
      if(comandoOk) {
-        if(vectorDeParametros[i] && !parametro.empty())
+        if(vectorDeParametros[i]==1 && parametro.empty()!=1)
             parametroOk = 1;
         else
-            if(!vectorDeParametros[i] && parametro.empty())
+            if(vectorDeParametros[i]==0 && parametro.empty()==1)
             parametroOk = 1;
-     }
-     else {
-         cout<<"El comando ingresado no existe"<<endl;;
-     }
-
-/*     if(!parametroOk) {
-          if(vectorDeParametros[i]== 1 && parametro.empty()!=0)
-            cout<<"El comando debe llevar un parametro"<<endl;
-          else
-            if(vectorDeParametros[i]==0 && parametro.empty()!=1)
-            cout<<"El comando no debe llevar parametros"<<endl;
-     }
-*/
-     return(comandoOk && parametroOk);
+     };
+     
+     if(comandoOk + parametroOk == 2)
+        return 1;
+     else
+        return 0;
 }
 
 
-
-string Comando::sacaEspaciosIzquierda(string cadena){
+string Comando::sacaEspaciosIzquierda(string cadena) {
        string cadenaTransformada;
        int desde = 0;
        desde = consumeEspaciosDesde(desde,cadena);

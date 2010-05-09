@@ -70,13 +70,20 @@ void NNTPClientDAO::cerrarConexion(void) {
 }
 
 void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
+    int bytesEscritos;
+    
     cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
-    SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
+    
+    bytesEscritos = SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
+    if (bytesEscritos > 0)
+        cout << "-------- ok" << endl;
+    else
+        cout << "-------- MAL!!!" << endl;
 }
 
 string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos;
-       
+
         // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
         cBuffer[bytesLeidos] = '\0';
