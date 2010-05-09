@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
   tamanioID		 = sizeof(ptrArticulo->uiArticleID);
   tamanioArticle = sizeof(article);
   printf("Tamanio ID : %d",tamanioID);
-  printf("Tamanio articulo entero:",tamanioArticle);
-  rc =memcached_set(memc,(char*)&ptrArticulo->uiArticleID,tamanioID,(char*)&article,tamanioArticle,(time_t)0,(uint32_t)0);
+  printf("Tamanio articulo entero: %d",tamanioArticle);
+  rc =memcached_set(memc,(char*)&ptrArticulo->uiArticleID,tamanioID,(char*)&ptrArticulo,tamanioArticle,(time_t)0,(uint32_t)0);
   if (rc == MEMCACHED_SUCCESS)
 	printf("El articulo se inserto correctamente =) \n");
   else
