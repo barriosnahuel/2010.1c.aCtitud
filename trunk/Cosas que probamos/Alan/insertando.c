@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   servers= memcached_server_list_append(servers, "localhost", 11211, &rc);
   rc= memcached_server_push(memc, servers);
 
-  stArticle * article;
+  stArticle article;
   article.sBody= "body probando hibernate!";
   article.sHead= "head probando hibernate!";
   article.sNewsgroup= "blablabla.com";
