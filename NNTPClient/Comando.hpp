@@ -17,7 +17,7 @@ class Comando {
     void   inicializarComandos(void);
     string sacaEspaciosIzquierda(string cadena);
     void   extraerNombreYParametro(string comandoEntero);
-    int    consumeEspaciosDesde(int posicion,string cadena);
+    int    consumeEspaciosDesde(int posicion, string cadena);
 	void   reset(void);
 public:
 	Comando(void);
