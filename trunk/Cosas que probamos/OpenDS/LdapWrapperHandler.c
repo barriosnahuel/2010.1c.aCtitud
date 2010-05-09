@@ -46,7 +46,11 @@ VOID updateEntry(PLDAP_SESSION			session
 	sessionOp->editEntry(session, entry);
 }
 
-VOID insertEntry(PLDAP_SESSION session, PLDAP_SESSION_OP sessionOp, PLDAP_ENTRY_OP entryOp, PLDAP_ATTRIBUTE_OP attribOp, stArticle article){
+VOID insertEntry(PLDAP_SESSION 			session
+				, PLDAP_SESSION_OP 		sessionOp
+				, PLDAP_ENTRY_OP 		entryOp
+				, PLDAP_ATTRIBUTE_OP 	attribOp
+				, stArticle 			article){
 
 	/* Creo una nueva entry. */
 	PLDAP_ENTRY entry = entryOp->createEntry();
@@ -63,7 +67,11 @@ VOID insertEntry(PLDAP_SESSION session, PLDAP_SESSION_OP sessionOp, PLDAP_ENTRY_
 	sessionOp->addEntry(session, entry);
 }
 
-VOID deleteEntry(PLDAP_SESSION session, PLDAP_SESSION_OP sessionOp, PLDAP_ENTRY_OP entryOp, PLDAP_ATTRIBUTE_OP attribOp, unsigned int uiArticleID) {
+VOID deleteEntry(PLDAP_SESSION 			session
+				, PLDAP_SESSION_OP 		sessionOp
+				, PLDAP_ENTRY_OP 		entryOp
+				, unsigned int 			uiArticleID) {
+
 	/* creo una nueva entry.
 	le agrego los parametros correspondientes */
 	PLDAP_ENTRY entry = entryOp->createEntry();
@@ -82,7 +90,8 @@ VOID deleteEntry(PLDAP_SESSION session, PLDAP_SESSION_OP sessionOp, PLDAP_ENTRY_
  * Se realiza una consulta al directorio en una determinada rama. Para iterar sobre los resultados se utiliza un
  * patron Iterator que recorre cada una de las entries
  */
-VOID selectEntries(PLDAP_SESSION session, PLDAP_SESSION_OP sessionOp, PLDAP_ENTRY_OP entryOp, PLDAP_ATTRIBUTE_OP attribOp) {
+VOID selectEntries(	  PLDAP_SESSION 		session
+					, PLDAP_SESSION_OP 		sessionOp){
 
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
 
