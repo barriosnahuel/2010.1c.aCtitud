@@ -10,8 +10,7 @@ int main(int argc, char *argv[])
   memcached_return rc;
   char *keys[]= {"huey", "dewey", "louie"};
   size_t key_length[3];
-  char *values[]= {"red", "blue", "green"};
-  size_t value_length[3];
+  char *values[]= {"red", "blue", "green"}; 
   unsigned int x;
   uint32_t flags;
   size_t tamanioID;
@@ -25,7 +24,7 @@ int main(int argc, char *argv[])
   servers= memcached_server_list_append(servers, "localhost", 11211, &rc);
   rc= memcached_server_push(memc, servers);
 
-  stArticle article;
+  stArticle * article;
   article.sBody= "body probando hibernate!";
   article.sHead= "head probando hibernate!";
   article.sNewsgroup= "blablabla.com";
@@ -36,19 +35,13 @@ int main(int argc, char *argv[])
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 	
-  /*If( Si esta en la cache )
-	 devuelve el resultado
-	else
-	  consulto en openDS
-	  e inserto en la cache:
-  */ 
-	  tamanioID		 = srtlen(article.uiArticleID);
-	  tamanioArticle = sizeof(article);
-	  rc =memcache_set(memc,article.uiArticleID,tamañoID,article,tamañoArticle,(time_t)0,(uint32_t)0);
-	  if (rc == MEMCACHED_SUCCESS)
-		printf("El articulo se inserto correctamente");
-	  else
-	    printf("No se logro insertar el articulo");
+  tamanioID		 = (size_t)(srtlen(article.uiArticleID));
+  tamanioArticle = (size_t)(sizeof(article));
+  rc =memcached_set(memc,article.uiArticleID,tamanioID,article,tamanioArticle,(time_t)0,(uint32_t)0);
+  if (rc == MEMCACHED_SUCCESS)
+	printf("El articulo se inserto correctamente");
+  else
+    printf("No se logro insertar el articulo");
 /*
   for(x= 0; x < 3; x++)
     {
