@@ -7,24 +7,30 @@
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 
+#define PORT 15000 /* El puerto que ser� abierto */
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
+#define OPENDS_LOCATION "ldap://localhost:4444"	/*	TODO: Esto vamos a tener que pasarlo por archivo de configuracion */
 
-/*	Esta es la cabecera de thr_create para Solaris. La pongo aca solo para saber como es. No tiene que estar comentado.
-int thr_create(void *stack_base
+/*int thr_create(void *stack_base
 					, size_t stack_size
 					, void *(*start_routine)(void *)
 					, void *arg
 					, long flags
 					, thread_t* new_thread
 				);*/
-int conectarAOpenDS(  stConfiguracion*	stConf
-					, PLDAP_SESSION* 	session
-					, PLDAP_CONTEXT*	context
-					, PLDAP_CONTEXT_OP* ctxOp
-					, PLDAP_SESSION_OP* sessionOp);
+int crearContextoPLDAP(  stConfiguracion*	stConf
+					, PLDAP_CONTEXT*	pstPLDAPContext
+					, PLDAP_CONTEXT_OP* pstPLDAPContextOperations);
+int crearSesionPLDAP( PLDAP_SESSION*	pstPLDAPSession
+					, PLDAP_CONTEXT*	pstPLDAPContext
+					, PLDAP_CONTEXT_OP*	pstPLDAPContextOperations);
 int crearConexionConSocket(	  stConfiguracion*		stConf
 							, int*					ficheroServer
 							, struct sockaddr_in*	server);
+void* procesarRequestFuncionThread(void* parametro);
+void liberarRecursos( int 				ficheroServer
+					, PLDAP_CONTEXT		context
+					, PLDAP_CONTEXT_OP	ctxOp);
 
 /**
  * Estructura que contiene los parametros para cada nuevo thread.
@@ -33,9 +39,9 @@ typedef struct stThreadParameters {
     int				 	ficheroCliente;				/*	el file descriptor de la conexion con el nuevo cliente.	*/
 
     /*	OpenDS/LDAP	*/
-/*    PLDAP_CONTEXT*		pstPLDAPContext;			/*	El contexto de OpenDS/LDAP para poder crear una nueva sesion
-														si es necesario. Es decir, cuando no se encuentre la inf. en cache.	*/
-/*    PLDAP_CONTEXT_OP*	pstPLDAPContextOperations;	/*	Permite realizar operaciones sobre el contexto, ej, crear nuevas sesiones	*/
+    PLDAP_CONTEXT*		pstPLDAPContext;			/*	El contexto de OpenDS/LDAP para poder crear una nueva sesion
+													si es necesario. Es decir, cuando no se encuentre la inf. en cache.	*/
+    PLDAP_CONTEXT_OP*	pstPLDAPContextOperations;	/*	Permite realizar operaciones sobre el contexto, ej, crear nuevas sesiones	*/
 
 } stThreadParameters;
 
@@ -53,6 +59,45 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	len = strlen(msg);
 
 	printf("---------------- Procesando thread xD -----------------\n");
+
+					/********************************************************************************
+					 *	A partir de aca es de prueba de OpenDS										*
+					 ********************************************************************************/
+						PLDAP_SESSION stPLDAPSession;
+						if(!crearSesionPLDAP(&stPLDAPSession, stParametros.pstPLDAPContext, stParametros.pstPLDAPContextOperations))
+							printf("No se pudo crear una sesion con PLDAP\n");
+						printf("Se creo la sesion con PLDAP\n");
+						PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations();	/*	Me permite operar sobre una sesion	*/
+
+						/*	Estos dos, son exclusivos para algunas operaciones	*/
+						PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
+						PLDAP_ATTRIBUTE_OP attribOp=	newLDAPAttributeOperations();
+
+						stArticle article;
+						article.sBody= "body probando hibernate!";
+						article.sHead= "head probando hibernate!";
+						article.sNewsgroup= "blablabla.com";
+						article.uiArticleID= 6969;
+
+						selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+						insertEntry(stPLDAPSession, stPLDAPSessionOperations, entryOp, attribOp, article);
+						selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+
+						article.sBody= "cambie el body para probar hibernate";
+						updateEntry(stPLDAPSession, stPLDAPSessionOperations, entryOp, attribOp, article);
+						selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+
+						deleteEntry(stPLDAPSession, stPLDAPSessionOperations, entryOp, article.uiArticleID);
+						selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+
+						/*	Libero recursos.	*/
+						stPLDAPSessionOperations->endSession(stPLDAPSession);
+						freeLDAPSessionOperations(stPLDAPSessionOperations);
+						freeLDAPSession(stPLDAPSession);
+					/********************************************************************************
+					 *	Hasta aca es la prueba														*
+					 *******************************************************************************/
+
 /*
 	if (TODO: Si no esta en el cache) {
 		TODO: Lo busco en la DB.
@@ -99,42 +144,15 @@ int main() {
 	/********************************************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper									*
 	 *******************************************************************************/
-	PLDAP_SESSION session;
-	PLDAP_CONTEXT context = newLDAPContext();
-	PLDAP_CONTEXT_OP ctxOp = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
-	PLDAP_SESSION_OP sessionOp = newLDAPSessionOperations();/*	Me permite operar sobre una sesion	*/
-	if(!conectarAOpenDS(&stConf, &session, &context, &ctxOp, &sessionOp)){
+	PLDAP_CONTEXT 		stPLDAPContext = newLDAPContext();
+	PLDAP_CONTEXT_OP	stPLDAPContextOperations = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
+	if(!crearContextoPLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
 	}
 	else
 		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer, stConf.uiBDPuerto);
 
-	PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
-	PLDAP_ATTRIBUTE_OP attribOp=	newLDAPAttributeOperations();
-
-					/********************************************************************************
-					 *	A partir de aca es de prueba de OpenDS										*
-					 ********************************************************************************/
-						stArticle article;
-						article.sBody= "body probando hibernate!";
-						article.sHead= "head probando hibernate!";
-						article.sNewsgroup= "blablabla.com";
-						article.uiArticleID= 6969;
-
-						selectEntries(session, sessionOp, entryOp, attribOp);
-						insertEntry(session, sessionOp, entryOp, attribOp, article);
-						selectEntries(session, sessionOp, entryOp, attribOp);
-
-						article.sBody= "cambie el body para probar hibernate";
-						updateEntry(session, sessionOp, entryOp, attribOp, article);
-						selectEntries(session, sessionOp, entryOp, attribOp);
-
-						deleteEntry(session, sessionOp, entryOp, attribOp, article.uiArticleID);
-						selectEntries(session, sessionOp, entryOp, attribOp);
-					/********************************************************************************
-					 *	Hasta aca es la prueba														*
-					 *******************************************************************************/
 
 	/********************************************************************************
 	 *	Creo la conexion con el socket y lo dejo listo								*
@@ -146,8 +164,10 @@ int main() {
 	else
 		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
 
-
-/*	while (1) {			Comento el while para poder hacer el close del socket. Hay que ver la forma de poder bajar el server*/
+	/********************************************************************************
+	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
+	 *******************************************************************************/
+/*	while (1) {*/
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informaci�n de la direcci�n del cliente */
 
@@ -156,45 +176,39 @@ int main() {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
 			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
-			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
-	printf("Despues de esto rompe!!\n");
 
-	/*	Le seteo los parametros al nuevo thread. ME PARECE QUE HAY QUE CREAR UNA SESION POR CADA THREAD!!	*/
-	stThreadParameters stParameters;
-	stParameters.ficheroCliente= ficheroCliente;
+			/*	Le seteo los parametros al nuevo thread. ME PARECE QUE HAY QUE CREAR UNA SESION POR CADA THREAD!!	*/
+			stThreadParameters stParameters;
+			stParameters.ficheroCliente= ficheroCliente;
+			stParameters.pstPLDAPContext= &stPLDAPContext;
+			stParameters.pstPLDAPContextOperations= &stPLDAPContextOperations;
 
 			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread, (void*)&stParameters, 0, &threadProcesarRequest) != 0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
-		else {
+		else
 			printf("Error al aceptar la conexion\n");
-		}
-		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
-				client.sin_addr));
+		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 /*	}*/
-printf("Le estoy dando al thread 20 segundos para responderle al cliente, despues de eso, cierro todo ;)\n");
-sleep(20);
-	printf("Chao chao!\n");
-	close(ficheroServer);
+
+printf("Le doy al thread 10 segundos para responderle al cliente antes que cierre todo... ;)\n");
+sleep(10);
 	
-	sessionOp->endSession(session);
-	freeLDAPSession(session);
-	freeLDAPContext(context);
-	freeLDAPContextOperations(ctxOp);
-	freeLDAPSessionOperations(sessionOp);
-	
-	/*	TODO: Libero la lo ultimo que pueda llegar a quedar de memoria pedida. */
+
+
+printf("Ahora cierro socket, db, etc...\n");
+	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations);
+
+	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
 
 /**
  * Se conecta a OpenDS y deja establecida la conexion para usarla con el LDAPWrapper
  */
-int conectarAOpenDS(  stConfiguracion*	stConf
-					, PLDAP_SESSION* 	session
-					, PLDAP_CONTEXT*	context
-					, PLDAP_CONTEXT_OP* ctxOp
-					, PLDAP_SESSION_OP* sessionOp){
+int crearContextoPLDAP(  stConfiguracion*	stConf
+					, PLDAP_CONTEXT*	pstPLDAPContext
+					, PLDAP_CONTEXT_OP* pstPLDAPContextOperations){
 
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
@@ -202,11 +216,11 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 	asprintf(&sOpenDSLocation, "ldap://%s:%d", (*stConf).czBDServer, (*stConf).uiBDPuerto);
 
 	/* Inicializamos el contexto. */
-	(*ctxOp)->initialize(*context, sOpenDSLocation);
-	(*session)= (*ctxOp)->newSession(*context, "cn=Directory Manager", "password");
+	(*pstPLDAPContextOperations)->initialize(*pstPLDAPContext, sOpenDSLocation);
+/*	(*session)= (*ctxOp)->newSession(*context, "cn=Directory Manager", "password");
 
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
-	(*sessionOp)->startSession(*session);
+/*	(*sessionOp)->startSession(*session);
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
 
@@ -243,5 +257,37 @@ int crearConexionConSocket(	  stConfiguracion*		stConf
 		exit(-1);
 	}
 
+	return 1;
+}
+
+/**
+ * 1. Cierra el socket.
+ * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
+ */
+void liberarRecursos(int 				ficheroServer
+					, PLDAP_CONTEXT		context
+					, PLDAP_CONTEXT_OP	ctxOp){
+
+	/*	Cierro el socket	*/
+	close(ficheroServer);	/*	TODO Descomentar esto, cuando se descomente y se trate la parte de los sockets.*/
+
+	/*	Cierro/Libero lo relacionado a la BD (OpenDS)	*/
+	freeLDAPContext(context);
+	freeLDAPContextOperations(ctxOp);
+}
+
+int crearSesionPLDAP( PLDAP_SESSION*	pstPLDAPSession
+					, PLDAP_CONTEXT*	pstPLDAPContext
+					, PLDAP_CONTEXT_OP*	pstPLDAPContextOperations){
+
+	/*	Creo una nueva sesion */
+	*pstPLDAPSession= (*pstPLDAPContextOperations)->newSession(*pstPLDAPContext, "cn=Directory Manager", "password");
+
+	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
+	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations();	/*	Me permite operar sobre una sesion	*/
+	stPLDAPSessionOperations->startSession(*pstPLDAPSession);
+	freeLDAPSessionOperations(stPLDAPSessionOperations);
+
+	/*	TODO: Ver la forma de retornar false.	*/
 	return 1;
 }
