@@ -23,10 +23,38 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 					, PLDAP_CONTEXT*	context
 					, PLDAP_CONTEXT_OP* ctxOp
 					, PLDAP_SESSION_OP* sessionOp);
+int crearConexionConSocket(	  stConfiguracion*		stConf
+							, int*					ficheroServer
+							, struct sockaddr_in*	server);
+void liberarRecursos( int 				ficheroServer
+					, PLDAP_CONTEXT		context
+					, PLDAP_CONTEXT_OP	ctxOp);
 
-void* procesarRequestFuncionThread(void* parametro) {
+/**
+ * Estructura que contiene los parametros para cada nuevo thread.
+ */
+typedef struct stThreadParameters {
+    int				 	ficheroCliente;				/*	el file descriptor de la conexion con el nuevo cliente.	*/
+
+    /*	OpenDS/LDAP	*/
+    PLDAP_CONTEXT*		pstPLDAPContext;			/*	El contexto de OpenDS/LDAP para poder crear una nueva sesion
+														si es necesario. Es decir, cuando no se encuentre la inf. en cache.	*/
+    PLDAP_CONTEXT_OP*	pstPLDAPContextOperations;	/*	Permite realizar operaciones sobre el contexto, ej, crear nuevas sesiones	*/
+
+} stThreadParameters;
+
+
+/********************************************************************************
+ *	Aca comienzan las definiciones de las funciones								*
+ *******************************************************************************/
+
+void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("Bienvenido a la funcion del nuevo thread\n");
-	int* ficheroCliente= (int*)parametro;
+
+	stThreadParameters* pstParametros= (stThreadParameters*)threadParameters;
+		stThreadParameters stParametros= *pstParametros;
+	printf("%d\n", stParametros.ficheroCliente);
+	/*int* ficheroCliente= (int*)parametro;*/
 
 	char* msg = "Hola mundo!";
 	int len, bytesEnviados;
@@ -34,11 +62,6 @@ void* procesarRequestFuncionThread(void* parametro) {
 
 
 	printf("---------------- Procesando thread xD -----------------\n");
-
-
-
-
-
 
 /*
 	if (TODO: Si no esta en el cache) {
@@ -52,13 +75,13 @@ void* procesarRequestFuncionThread(void* parametro) {
 */
 
 	printf("Pruebo enviarle algo a mi amigo el cliente... \n");
-	if((bytesEnviados = send(*ficheroCliente, msg, len, 0)) == -1) {
+	if((bytesEnviados = send(stParametros.ficheroCliente, msg, len, 0)) == -1) {
 		printf("El send no funco\n");
 	}
 	printf("El cliente recibio %d bytes\n", bytesEnviados);
 	
 	printf("Voy a cerrar la conexion con el cliente\n");
-	close(*ficheroCliente);
+	close(stParametros.ficheroCliente);
 
 	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
 	thr_exit(0);/*	Termino el thread.*/
@@ -123,9 +146,15 @@ int main() {
 					 *	Hasta aca es la prueba														*
 					 *******************************************************************************/
 
-	/********************************************************************************
-	 *	Creo la conexion con el socket y lo dejo listo								*
-	 *******************************************************************************/
+						/********************************************************************************
+						 *	Creo la conexion con el socket y lo dejo listo								*
+						 *******************************************************************************/
+						int ficheroServer;			/* los ficheros descriptores */
+						struct sockaddr_in server;	/* para la informacion de la direccion del servidor */
+						if(!crearConexionConSocket(&stConf, &ficheroServer, &server))
+							return -1;
+						else
+							printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
 	int ficheroServer; /* los ficheros descriptores */
 	/* int sin_size; TODO: Esto hace falta declararlo aca? Que es? */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
@@ -167,13 +196,11 @@ int main() {
 			/*	NBarrios-TODO: Seteo todo lo que tenga que setearle al thread, si es que hay que setearle algo. */
 	printf("Despues de esto rompe!!\n");
 
-			if (thr_create(0
-							, 0
-							, (void*)&procesarRequestFuncionThread
-							, (void*)&ficheroCliente
-							, 0
-							, &threadProcesarRequest)
-								!=0)
+	/*	Le seteo los parametros al nuevo thread. ME PARECE QUE HAY QUE CREAR UNA SESION POR CADA THREAD!!	*/
+	stThreadParameters stParameters;
+	stParameters.ficheroCliente= ficheroCliente;
+
+			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread, (void*)&stParameters, 0, &threadProcesarRequest) != 0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
 		}
 		else {
@@ -221,4 +248,53 @@ int conectarAOpenDS(  stConfiguracion*	stConf
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
 
 	return 1;
+}
+
+/**
+ * Crea el socket, lo bindea, y lo deja listo para escuchar conexiones entrantes.
+ */
+int crearConexionConSocket(	  stConfiguracion*		stConf
+							, int*					ficheroServer
+							, struct sockaddr_in*	server){
+
+	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		printf("Error al crear el socket.\n");
+		exit(-1);
+	}
+	printf("Cree el socket bien\n");
+
+	(*server).sin_family = AF_INET;
+	(*server).sin_addr.s_addr = INADDR_ANY; 			/* INADDR_ANY coloca nuestra direccion IP automaticamente */
+	(*server).sin_port = htons((*stConf).uiAppPuerto);	/* htons transforma el short de maquina a short de red */
+	bzero(&((*server).sin_zero), 8); 					/* Escribimos ceros en el resto de la estructura*/
+
+	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
+			sizeof(struct sockaddr)) == -1) {
+		printf("Error al asociar el puerto al socket.\n");
+		exit(-1);
+	}
+	printf("Pude bindear bien el socket\n");
+
+	if (listen(*ficheroServer, BACKLOG) == -1) {
+		printf("Error al escuchar por el puerto.\n");
+		exit(-1);
+	}
+
+	return 1;
+}
+
+/**
+ * 1. Cierra el socket.
+ * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
+ */
+void liberarRecursos(int 				ficheroServer
+					, PLDAP_CONTEXT		context
+					, PLDAP_CONTEXT_OP	ctxOp){
+
+	/*	Cierro el socket	*/
+	close(ficheroServer);	/*	TODO Descomentar esto, cuando se descomente y se trate la parte de los sockets.*/
+
+	/*	Cierro/Libero lo relacionado a la BD (OpenDS)	*/
+	freeLDAPContext(context);
+	freeLDAPContextOperations(ctxOp);
 }
