@@ -37,11 +37,11 @@ int main(int argc, char *argv[])
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
   
-  tamanioID		 = sizeof(ptrArticulo->uiArtcileID);
+  tamanioID		 = sizeof(ptrArticulo->uiArticleID);
   tamanioArticle = sizeof(article);
   printf("Tamanio ID : %d",tamanioID);
   printf("Tamanio articulo entero:",tamanioArticle);
-  rc =memcached_set(memc,(char*)&ptrArticlo->uiArticleID,tamanioID,(char*)&article,tamanioArticle,(time_t)0,(uint32_t)0);
+  rc =memcached_set(memc,(char*)&ptrArticulo->uiArticleID,tamanioID,(char*)&article,tamanioArticle,(time_t)0,(uint32_t)0);
   if (rc == MEMCACHED_SUCCESS)
 	printf("El articulo se inserto correctamente =) \n");
   else
