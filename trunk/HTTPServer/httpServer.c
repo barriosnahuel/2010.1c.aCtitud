@@ -155,10 +155,10 @@ int main() {
 							return -1;
 						else
 							printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", "ver como obtener esta ip!!", stConf.uiAppPuerto);
-	int ficheroServer; /* los ficheros descriptores */
+/*	int ficheroServer; /* los ficheros descriptores */
 	/* int sin_size; TODO: Esto hace falta declararlo aca? Que es? */
-	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
-	printf("Acabo de entrar al main\n");
+/*	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
+/*	printf("Acabo de entrar al main\n");
 	
 	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
@@ -167,10 +167,10 @@ int main() {
 	printf("Cree el socket bien\n");
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = INADDR_ANY; /* INADDR_ANY coloca nuestra direcci�n IP autom�ticamente */
-	server.sin_port = htons(PORT); /* htons transforma el short de maquina a short de red */
-	bzero(&(server.sin_zero), 8); /* escribimos ceros en el reto de la estructura*/
+/*	server.sin_port = htons(PORT); /* htons transforma el short de maquina a short de red */
+/*	bzero(&(server.sin_zero), 8); /* escribimos ceros en el reto de la estructura*/
 
-	if (bind(ficheroServer, (struct sockaddr *) &server,
+/*	if (bind(ficheroServer, (struct sockaddr *) &server,
 			sizeof(struct sockaddr)) == -1) {
 		printf("Error al asociar el puerto al socket.\n");
 		exit(-1);
