@@ -1,4 +1,93 @@
-#include <stdio.h>
+#include<string.h>
+#include<stdio.h>
+#include <unistd.h>
+#include<stdlib.h>
+#include <libmemcached/memcached.h>
+#include "Article.h"
+typedef struct _largoArticulo{
+   int largoHead;
+   int largoBody;
+}t_news_largos;
+
+typedef struct _articuloCache{
+   t_news_largos datos;
+   char *head;
+   char *body;
+}t_news;
+
+int main(int argc, char *argv[])
+{
+  memcached_server_st *servers = NULL;
+  memcached_st *memc;
+  memcached_return rc;
+  uint32_t flags;
+  size_t tamanioArticle;
+  size_t tamanioID;
+  size_t return_key_length;
+  char *return_value;
+  size_t return_value_length;
+
+  memc = memcached_create(NULL);
+  servers= memcached_server_list_append(servers, "localhost", 11211, &rc);
+  rc= memcached_server_push(memc, servers);
+
+  stArticle article;
+  stArticle * articleRespuesta;
+  article.sBody= "body";
+  article.sHead= "head!";
+  article.uiArticleID= 6969;
+  char probando[]="1111";
+
+  stArticle * ptrArticulo = &article ;//memcached necesita ptros
+  printf("Se creara  el servidor 1 \n");
+
+  if (rc == MEMCACHED_SUCCESS)
+    fprintf(stderr,"Se agrego el servidor correctamente\n");
+  else
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(me$
+
+  //  tamanioID=sizeof(article.uiArticleID)+1;
+//  char ID[ tamanioID + 1];
+//  sprintf(ID,"%d",ptrArticulo->uiArticleID);
+//  printf("Convirtio el ID a un char* : %s ? \n",ID);
+
+ // char ID[1000]; //= malloc(sizeof(article.uiArticleID)+1);
+ // sprintf(ID,"%s",article.uiArticleID);
+ //  printf("El ID quedon con: %s",article.uiArticleID);
+
+  t_news * articuloCache         = malloc(sizeof(t_news));
+  articuloCache->datos.largoHead = strlen(article.sHead);
+  printf("largo head %d \n",articuloCache->datos.largoHead);
+  articuloCache->datos.largoBody = strlen(article.sBody);
+  printf("largo body  %d \n",articuloCache->datos.largoBody);
+  articuloCache->head            =malloc(articuloCache->datos.largoHead);
+  articuloCache->body         =malloc(articuloCache->datos.largoBody);
+  strcpy(articuloCache->head,article.sHead);
+  strcpy(articuloCache->body,article.sBody);
+
+  char * articuloEnBytes;
+  int  articuloEnBytesLargo;
+  articuloEnBytesLargo=sizeof(t_news_largos)+articuloCache->datos.largoHead+articuloCache->datos.largoBody;
+  printf("Largo estructura(t_news_largos): %d \n",sizeof(t_news_largos));
+  articuloEnBytes = malloc(articuloEnBytesLargo);
+
+memcpy(articuloEnBytes,&articuloCache->datos,sizeof(t_news_largos)); //MMM PUEDE SER POR ESTO QUE NO ANDE POR EL &articuloCache
+memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
+memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
+rc=memcached_set(memc,probando,strlen(probando),articuloEnBytes,articuloEnBytesLargo,0,0);
+
+  if(rc=MEMCACHED_SUCCESS)
+   printf("Se inserto correctamente \n");
+  else
+   printf("No se pudo insertar \n");
+
+return 0;
+}
+
+  
+
+
+/*#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <libmemcached/memcached.h>
@@ -60,7 +149,7 @@ int main(int argc, char *argv[])
   for(i=0; i<tamanioArticle;i++)
     printf("respuesta[%2d]: %4d \n",i,respuesta[i]);
 
-	
+	*/
 	
 	
 /*
