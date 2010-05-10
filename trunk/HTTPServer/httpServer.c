@@ -94,11 +94,6 @@ void guardarNoticiaEnCache(stArticle stArticulo);
  */
 char* formatearArticuloAHTML(stArticle stArticulo);
 /**
- * Cuando no se encuentra una noticia ni en cache, ni en la BD, generamos un msj de error indicando
- * que no se encontraron resultados para el criterio de busqueda especificado.
- */
-stArticle crearNoticiaDeError(stArticle*	pstArticulo);
-/**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
 void* procesarRequestFuncionThread(void* threadParameters);
@@ -384,10 +379,6 @@ char* formatearArticuloAHTML(stArticle stArticulo){
 	return response;
 }
 
-stArticle crearNoticiaDeError(stArticle*	pstArticulo){
-
-}
-
 char* processRequestTypeNews( char*					sCriterio
 							, stThreadParameters*	pstParametros){
 	stArticle stArticulo;
@@ -398,10 +389,9 @@ char* processRequestTypeNews( char*					sCriterio
 
 	if(!buscarNoticiaEnCache(&stArticulo, sCriterio)){
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
-		if(!buscarNoticiaEnBD(&stArticulo, sCriterio, (*pstParametros).pstPLDAPContext, (*pstParametros).pstPLDAPContextOperations))
-			crearNoticiaDeError(&stArticulo);	/*	Como no encontre una notica que cumpla el criterio de busqueda	*/
+		buscarNoticiaEnBD(&stArticulo, sCriterio, (*pstParametros).pstPLDAPContext, (*pstParametros).pstPLDAPContextOperations);
 
-		/*	Como no la encontre en cache, ahora la guardo.	*/
+		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
