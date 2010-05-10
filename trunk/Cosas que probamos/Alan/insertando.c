@@ -11,8 +11,8 @@ typedef struct _largoArticulo{
 
 typedef struct _articuloCache{
    t_news_largos datos;
-   char *head;
-   char *body;
+   char *head = NULL;
+   char *body = NULL;
 }t_news;
 
 int main(int argc, char *argv[])
