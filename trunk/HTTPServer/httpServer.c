@@ -330,6 +330,7 @@ int buscarNoticiaEnBD(stArticle*			pstArticulo
 
 
 	PLDAP_SESSION stPLDAPSession;
+	printf("Cree la sesion del LDAP.\n");
 	if(!crearSesionPLDAP(&stPLDAPSession, pstPLDAPContext, pstPLDAPContextOperations))
 		printf("No se pudo crear una sesion con PLDAP\n");
 	printf("Se creo la sesion con PLDAP\n");
