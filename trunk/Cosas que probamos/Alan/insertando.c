@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor correctamente\n");
   else
-    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(me$
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 
   //  tamanioID=sizeof(article.uiArticleID)+1;
 //  char ID[ tamanioID + 1];
