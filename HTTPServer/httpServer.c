@@ -169,7 +169,7 @@ int main() {
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 /*	}*/
 
-printf("Le doy al thread 15 segundos para responderle al cliente antes que cierre todo... ;)\n");
+printf("Le doy al thread 15 segundos (una eternidad) para responderle al cliente antes que cierre todo... ;)\n");
 sleep(15);
 	
 printf("Ahora cierro socket, db, etc...\n");
