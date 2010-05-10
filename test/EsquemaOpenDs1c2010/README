@@ -1,0 +1,79 @@
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Schema usado:
+Definido en 99-utnnewsgroup.ldif
+
+Objetos:
+utnNewsServer:
+->utnNewsServerName	: Nombre del servidor NNTP en cuestion
+
+
+Atributos de un article
+
+utnArticle		
+->utnArticleID          (obligatorio)
+->utnArticleHead        (obligatorio)
+->utnArticleBody        (obligatorio)
+->utnArticleGroupName   (obligatorio)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Instalación del schema.
+
+0. Copiar el archivo provisto por la cátedra "99-utnnewsgroup.ldif" al directorio openDS/config/schema
+
+1. Ir al directorio openDS/bin y ejecutar ./start-ds   (esperar que levante el servicio).
+
+2. Ejecutar el siguiente comando (tener en cuenta "--hostname", "--port" y "--bindPassword" ó "-w" según la configuración de cada usuario):
+
+./dsconfig set-backend-prop --backend-name userRoot --add base-dn:ou=so,dn=utn,dn=edu --hostname localhost --port 4444 --bindDN cn="Directory\ Manager" --bindPassword password --trustAll --noPropertiesFile --no-prompt
+
+3. El comando anterior creo el BaseDN en el cual vamos a trabajar. Si no arrojó ningún error se debe ejecutar
+el siguiente comando para crear el root entry:
+
+./ldapmodify -h localhost -p 1389 --defaultAdd -D "cn=Directory Manager" --bindPassword password
+dn: ou=so,dn=utn,dn=edu
+objectClass: top
+objectClass: organizationalUnit
+ou: so
+
+Al escribir esto presionar ctrl+D en LINUX ó ctrl+Z en Windows para que el servidor acepte el comando.
+Debe aparecer el siguiente mensaje:
+
+Processing ADD request for ou=so,dn=utn,dn=edu
+ADD operation successful for DN ou=so,dn=utn,dn=edu
+
+4. Listo, el directorio ya está preparado para aceptar entries. Probamos insertar una por consola con el siguiente
+comando:
+
+./ldapmodify -h localhost -p 1389 -D "cn=Directory Manager" -w password -a
+dn: utnArticleID=12345,ou=so,dn=utn,dn=edu
+objectClass: top
+objectClass: utnArticle
+utnArticleID: 12345
+utnArticleBody: esto es un body por el amor de dios
+utnArticleHead: el head del article
+utnArticleGroupName: un group name
+
+(presionar ctrl+D en LINUX ó ctrl+Z en Windows)
+
+Debemos ver:
+
+Processing ADD request for utnArticleID=12345,ou=so,dn=utn,dn=edu
+ADD operation successful for DN utnArticleID=12345,ou=so,dn=utn,dn=edu
+
+5. Realizamos una búsqueda: 
+./ldapsearch -h localhost -p 1389 -b ou=so,dn=utn,dn=edu "(utnArticleID=*)"
+
+6. Eliminamos el articule recién creado para que no joda:
+
+./ldapdelete -h localhost -p 1389 -D "cn=Directory Manager" -w password "utnArticleID=12345,ou=so,dn=utn,dn=edu"
+
+Debemos ver:
+Processing DELETE request for utnArticleID=12345,ou=so,dn=utn,dn=edu
+DELETE operation successful for DN utnArticleID=12345,ou=so,dn=utn,dn=edu
+
+7. Ahora ya estamos listos para probar el ejemplo del openLDAP Wrapper. (Si no funciona estoy a 8000 km, suerte!)
+
+8. Para probar el openLDAP Wrapper, copiar y reemplazar el archivo fuente Ldap.c de este paquete con el que
+   ya existe en la VM.
+
+
