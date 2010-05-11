@@ -28,10 +28,9 @@ typedef struct stThreadParameters {
     int				 	ficheroCliente;				/*	el file descriptor de la conexion con el nuevo cliente.	*/
 
     /*	OpenDS/LDAP	*/
-    PLDAP_CONTEXT*		pstPLDAPContext;			/*	El contexto de OpenDS/LDAP para poder crear una nueva sesion
-														si es necesario. Es decir, cuando no se encuentre la inf. en cache.	*/
-    PLDAP_CONTEXT_OP*	pstPLDAPContextOperations;	/*	Permite realizar operaciones sobre el contexto, ej, crear nuevas sesiones	*/
-
+    PLDAP_SESSION*		pstPLDAPSession;			/*	La sesion de OpenDS/LDAP */
+    PLDAP_SESSION_OP*	pstPLDAPSessionOperations;	/*	Permite realizar operaciones sobre la sesino, ej,
+														insertar/modificar/eliminar entries		*/
 } stThreadParameters;
 
 
@@ -41,49 +40,57 @@ typedef struct stThreadParameters {
 /**
  * Se conecta a OpenDS/PLDAP y deja establecida la conexion para usarla con el LDAPWrapper
  */
-int crearContextoPLDAP(  stConfiguracion*	stConf
-					, PLDAP_CONTEXT*	pstPLDAPContext
-					, PLDAP_CONTEXT_OP* pstPLDAPContextOperations);
-int crearSesionPLDAP( PLDAP_SESSION*	pstPLDAPSession
-					, PLDAP_CONTEXT*	pstPLDAPContext
-					, PLDAP_CONTEXT_OP*	pstPLDAPContextOperations);
+int crearConexionLDAP( stConfiguracion*		stConf
+					 , PLDAP_CONTEXT*		pstPLDAPContext
+					 , PLDAP_CONTEXT_OP* 	pstPLDAPContextOperations
+					 , PLDAP_SESSION*		pstPLDAPSession
+					 , PLDAP_SESSION_OP*	pstPLDAPSessionOperations);
+/**
+ * Crea el socket y lo deja listo para escuchar conexiones entrantes.
+ */
 int crearConexionConSocket(	  stConfiguracion*		stConf
 							, int*					ficheroServer
 							, struct sockaddr_in*	server);
+/**
+ * Esta funcion es la funcion principal desde la que "arranca" cada nuevo
+ * thread encargado de procesar una conexion entrante.
+ */
 void* procesarRequestFuncionThread(void* parametro);
 void liberarRecursos( int 				ficheroServer
-					, PLDAP_CONTEXT		context
-					, PLDAP_CONTEXT_OP	ctxOp);
+					, PLDAP_CONTEXT		stPLDAPContext
+					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
+					, PLDAP_SESSION		stPLDAPSession
+					, PLDAP_SESSION_OP	stPLDAPSessionOperations);
 /**
  * Procesa un request del tipo newsgroup. Es decir, el listado de newsgroup disponibles
  * y devuelve un response en formato HTML.
  */
-char* processRequestTypeNewsgroup(char* sCriterio
+char* processRequestTypeNewsgroup(char* sRecursoPedido
 								, stThreadParameters*	pstParametros);
 /**
  * Procesa un request del tipo news list. Es decir, busca las noticias pertenecientes a un newsgroup en particular
  * y devuelve un response en formato HTML.
  */
-char* processRequestTypeNewsList( char* parentNewsGroup
+char* processRequestTypeNewsList( char* sRecursoPedido
 								, stThreadParameters*	pstParametros);
 /**
  * Procesa un request del tipo news. Es decir, busca una noticia en particular en base al sCriterio
  * y devuelve un response en formato HTML.
  */
-char* processRequestTypeNews( char* sCriterio
+char* processRequestTypeNews( char* sRecursoPedido
 							, stThreadParameters*	pstParametros);
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnCache(stArticle*	pstArticulo
-						, char* 		sCriterio);
+						, char* 		sURL);
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnBD(stArticle*			pstArticulo
-					 , char*				sCriterio
-					 , PLDAP_CONTEXT*		pstPLDAPContext
-					 , PLDAP_CONTEXT_OP*	pstPLDAPContextOperations);
+					 , char*				sURL
+					 , PLDAP_SESSION*		pstPLDAPSession
+					 , PLDAP_SESSION_OP*	pstPLDAPSessionOperations);
 /**
  * Guarda la noticia que se le pasa como parametro en cache.
  */
@@ -124,7 +131,9 @@ int main() {
 	 ****************************************************/
 	PLDAP_CONTEXT 		stPLDAPContext = newLDAPContext();
 	PLDAP_CONTEXT_OP	stPLDAPContextOperations = newLDAPContextOperations();	/*	Me permite operar sobre un contexto	*/
-	if(!crearContextoPLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations)){
+	PLDAP_SESSION		stPLDAPSession;
+	PLDAP_SESSION_OP	stPLDAPSessionOperations= newLDAPSessionOperations();	/*	Me permite operar sobre una sesion	*/
+	if(!crearConexionLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations, &stPLDAPSession, &stPLDAPSessionOperations)){
 		printf("No se pudo conectar a OpenDS.");
 		return -1;
 	}
@@ -145,7 +154,7 @@ int main() {
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	while (1) {
+	while(1) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
@@ -158,8 +167,8 @@ int main() {
 			/*	Le seteo los parametros al nuevo thread.	*/
 			stThreadParameters stParameters;
 			stParameters.ficheroCliente= ficheroCliente;
-			stParameters.pstPLDAPContext= &stPLDAPContext;
-			stParameters.pstPLDAPContextOperations= &stPLDAPContextOperations;
+			stParameters.pstPLDAPSession= &stPLDAPSession;
+			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 
 			if (thr_create(0, 0, (void*)&procesarRequestFuncionThread, (void*)&stParameters, 0, &threadProcesarRequest) != 0)
 				printf("No se pudo crear un nuevo thread para procesar el request.\n");
@@ -169,41 +178,41 @@ int main() {
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 	}
 
-printf("Le doy al thread 15 segundos (una eternidad) para responderle al cliente antes que cierre todo... ;)\n");
+printf("Le doy al thread 15 segundos para responderle al cliente antes que cierre todo... ;)\n");
 sleep(15);
 	
 printf("Ahora cierro socket, db, etc...\n");
-	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations);
+	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations, stPLDAPSession, stPLDAPSessionOperations);
 
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
 
 void* procesarRequestFuncionThread(void* threadParameters) {
-	printf("Bienvenido a la funcion del nuevo thread\n");
 	stThreadParameters stParametros= *((stThreadParameters*)threadParameters);
-
 	printf("---------------- Procesando thread xD -----------------\n");
+
 	char* sResponse;
 
-	char* sCriterio;/*	TODO: Esto todavia no lo estamos usando. Hay que ver como obtenerlo desde la URL!!	*/
+	char* sRecursoPedido;/*	TODO: esto seria toda la url me parece, y en cada
+						funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
 	unsigned int uiOperation= REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
 		case REQUEST_TYPE_NEWSGROUP:
 			printf("Proceso la obtencion del listado de newsgroup.\n");
-			sResponse= processRequestTypeNewsgroup(sCriterio, &stParametros);
+			sResponse= processRequestTypeNewsgroup(sRecursoPedido, &stParametros);
 			break;
 		case REQUEST_TYPE_NEWS_LIST:
 			printf("Proceso la obtencion del listado de noticias para un newsgroup.\n");
-			sResponse= processRequestTypeNewsList(sCriterio, &stParametros);
+			sResponse= processRequestTypeNewsList(sRecursoPedido, &stParametros);
 			break;
 		case REQUEST_TYPE_NEWS:
 			printf("Proceso la obtencion de una noticia en particular.\n");
-			sResponse= processRequestTypeNews(sCriterio, &stParametros);
+			sResponse= processRequestTypeNews(sRecursoPedido, &stParametros);
 			break;
 		default:
 			printf("Por default proceso la obtencion del listado de newsgroup.\n");
-			sResponse= processRequestTypeNewsgroup(sCriterio, &stParametros);
+			sResponse= processRequestTypeNewsgroup(sRecursoPedido, &stParametros);
 			break;
 	}
 
@@ -226,9 +235,11 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	return 0;
 }
 
-int crearContextoPLDAP(stConfiguracion*		stConf
+int crearConexionLDAP(stConfiguracion*		stConf
 					 , PLDAP_CONTEXT*		pstPLDAPContext
-					 , PLDAP_CONTEXT_OP*	pstPLDAPContextOperations){
+					 , PLDAP_CONTEXT_OP*	pstPLDAPContextOperations
+					 , PLDAP_SESSION*		pstPLDAPSession
+					 , PLDAP_SESSION_OP*	pstPLDAPSessionOperations){
 
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
@@ -237,10 +248,10 @@ int crearContextoPLDAP(stConfiguracion*		stConf
 
 	/* Inicializamos el contexto. */
 	(*pstPLDAPContextOperations)->initialize(*pstPLDAPContext, sOpenDSLocation);
-/*	(*session)= (*ctxOp)->newSession(*context, "cn=Directory Manager", "password");
+	(*pstPLDAPSession)= (*pstPLDAPContextOperations)->newSession(*pstPLDAPContext, "cn=Directory Manager", "password");
 
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
-/*	(*sessionOp)->startSession(*session);
+	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
 
@@ -285,56 +296,37 @@ int crearConexionConSocket(	  stConfiguracion*		stConf
  * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
  */
 void liberarRecursos(int 				ficheroServer
-					, PLDAP_CONTEXT		context
-					, PLDAP_CONTEXT_OP	ctxOp){
+					, PLDAP_CONTEXT		stPLDAPContext
+					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
+					, PLDAP_SESSION		stPLDAPSession
+					, PLDAP_SESSION_OP	stPLDAPSessionOperations){
 printf("Entro a liberar recursos\n");
 
 /*	Cierro/Libero lo relacionado a la BD	*/
-	freeLDAPContext(context);
-printf("Libere el contexto\n");
-	freeLDAPContextOperations(ctxOp);
-printf("Libere las operaciones\n");
+	stPLDAPSessionOperations->endSession(stPLDAPSession);
+	freeLDAPSessionOperations(stPLDAPSessionOperations);
+	freeLDAPSession(stPLDAPSession);
+	freeLDAPContext(stPLDAPContext);
+	freeLDAPContextOperations(stPLDAPContextOperations);
+printf("Libere LDAP/OpenDS\n");
+
 /*	Cierro el socket	*/
 	close(ficheroServer);
 printf("Libere el ficheroServer\n");
 }
 
-int crearSesionPLDAP( PLDAP_SESSION*	pstPLDAPSession
-					, PLDAP_CONTEXT*	pstPLDAPContext
-					, PLDAP_CONTEXT_OP*	pstPLDAPContextOperations){
-
-	/*	Creo una nueva sesion */
-	*pstPLDAPSession= (*pstPLDAPContextOperations)->newSession(*pstPLDAPContext, "cn=Directory Manager", "password");
-
-	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
-	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations();	/*	Me permite operar sobre una sesion	*/
-	stPLDAPSessionOperations->startSession(*pstPLDAPSession);
-	freeLDAPSessionOperations(stPLDAPSessionOperations);
-
-	/*	TODO: Ver la forma de retornar false.	*/
-	return 1;
-}
-
 int buscarNoticiaEnCache(stArticle*	pstArticulo
-						, char*		sCriterio){
+						, char*		sURL){
 	printf("Entro a buscar la noticia en Memcached\n");
 
 	return 0;
 }
 
 int buscarNoticiaEnBD(stArticle*			pstArticulo
-					 , char*				sCriterio
-					 , PLDAP_CONTEXT*		pstPLDAPContext
-					 , PLDAP_CONTEXT_OP*	pstPLDAPContextOperations){
+					 , char*				sURL
+					 , PLDAP_SESSION*		pstPLDAPSession
+					 , PLDAP_SESSION_OP*	pstPLDAPSessionOperations){
 	printf("Entro a buscar la noticia en OpenDS\n");
-
-
-	PLDAP_SESSION stPLDAPSession;
-	printf("Cree la sesion del LDAP.\n");
-	if(!crearSesionPLDAP(&stPLDAPSession, pstPLDAPContext, pstPLDAPContextOperations))
-		printf("No se pudo crear una sesion con PLDAP\n");
-	printf("Se creo la sesion con PLDAP\n");
-	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations();	/*	Me permite operar sobre una sesion	*/
 
 	/*	Estos dos, son exclusivos para algunas operaciones	*/
 	PLDAP_ENTRY_OP entryOp= 		newLDAPEntryOperations();
@@ -343,25 +335,19 @@ int buscarNoticiaEnBD(stArticle*			pstArticulo
 	/********************************************************************************
 	 *	A partir de aca es de prueba de OpenDS										*
 	 ********************************************************************************/
-				selectEntries(stPLDAPSession, stPLDAPSessionOperations);
-				insertEntry(stPLDAPSession, stPLDAPSessionOperations, entryOp, attribOp, *pstArticulo);
-				selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+				selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
+				insertEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, entryOp, attribOp, *pstArticulo);
+				selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
 
 				(*pstArticulo).sBody= "cambie el body para probar el update";
-				updateEntry(stPLDAPSession, stPLDAPSessionOperations, entryOp, attribOp, *pstArticulo);
-				selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+				updateEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, entryOp, attribOp, *pstArticulo);
+				selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
 
-				deleteEntry(stPLDAPSession, stPLDAPSessionOperations, entryOp, (*pstArticulo).uiArticleID);
-				selectEntries(stPLDAPSession, stPLDAPSessionOperations);
+				deleteEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, entryOp, (*pstArticulo).uiArticleID);
+				selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
 	/********************************************************************************
 	 *	Hasta aca es la prueba														*
 	 *******************************************************************************/
-
-	/*	Libero recursos.	*/
-	stPLDAPSessionOperations->endSession(stPLDAPSession);
-	freeLDAPSessionOperations(stPLDAPSessionOperations);
-	freeLDAPSession(stPLDAPSession);
-	printf("Libere todos los recursos de OpenDS/LDAP bien.\n");
 
 	return 1;
 }
@@ -380,8 +366,13 @@ char* formatearArticuloAHTML(stArticle stArticulo){
 	return response;
 }
 
-char* processRequestTypeNews( char*					sCriterio
+char* processRequestTypeNews( char*					sRecursoPedido
 							, stThreadParameters*	pstParametros){
+
+	/*	TODO: Aca tengo que parsear el recurso y armar el criterio	*/
+
+	char* sCriterio= "utnArticleID=*";	/*	TODO: Aca tendria que parsear sURL y crear un filtro como corresponde. ahora esta hardocodeado!	*/
+
 	stArticle stArticulo;
 	stArticulo.sBody= "este es el body!";
 	stArticulo.sHead= "este es el head!";
@@ -390,7 +381,7 @@ char* processRequestTypeNews( char*					sCriterio
 
 	if(!buscarNoticiaEnCache(&stArticulo, sCriterio)){
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
-		buscarNoticiaEnBD(&stArticulo, sCriterio, (*pstParametros).pstPLDAPContext, (*pstParametros).pstPLDAPContextOperations);
+		buscarNoticiaEnBD(&stArticulo, sCriterio, (*pstParametros).pstPLDAPSession, (*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo);
@@ -400,12 +391,12 @@ char* processRequestTypeNews( char*					sCriterio
 	return formatearArticuloAHTML(stArticulo);
 }
 
-char* processRequestTypeNewsgroup(char* sCriterio
+char* processRequestTypeNewsgroup(char* 				sRecursoPedido
 								, stThreadParameters*	pstParametros){
 
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de grupos de noticias</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
 }
-char* processRequestTypeNewsList( char* parentNewsGroup
+char* processRequestTypeNewsList( char* 				sRecursoPedido
 								, stThreadParameters*	pstParametros){
 
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";

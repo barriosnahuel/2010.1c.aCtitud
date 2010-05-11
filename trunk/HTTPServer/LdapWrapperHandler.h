@@ -16,8 +16,9 @@ char* getDNFor(int dArticleID);
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.
  */
-VOID selectEntries(PLDAP_SESSION			session
-					, PLDAP_SESSION_OP		sessionOp);
+VOID selectEntries(PLDAP_SESSION			stPLDAPSession
+					, PLDAP_SESSION_OP		stPLDAPSessionOperations
+					, char* 				sCriterio);
 
 /**
  * Insertar una nueva entry en base a los atributos de la estructura stArticle que le pasamos.
