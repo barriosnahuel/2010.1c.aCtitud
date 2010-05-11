@@ -90,12 +90,13 @@ VOID deleteEntry(PLDAP_SESSION 			session
  * Se realiza una consulta al directorio en una determinada rama. Para iterar sobre los resultados se utiliza un
  * patron Iterator que recorre cada una de las entries
  */
-VOID selectEntries(	  PLDAP_SESSION 		session
-					, PLDAP_SESSION_OP 		sessionOp){
+VOID selectEntries(	  PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+					, char* 				sCriterio){
 
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
 
-	PLDAP_RESULT_SET resultSet      = sessionOp->searchEntry(session, OPENDS_SCHEMA, "utnArticleID=*");
+	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
