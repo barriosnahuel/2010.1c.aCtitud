@@ -193,9 +193,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int bytesRecibidos;
 	char* sResponse;
 	
-	char* sRecursoPedido;/*	TODO: esto seria toda la url me parece, y en cada
+	char* sRecursoPedido[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
-	char* cadenaAUsarParaImprimirElRecv;
+	char* cadenaAUsarParaImprimirElRecv[1024];
 	
 	int lenRecursoPedido;
 	lenRecursoPedido = strlen(sRecursoPedido);
