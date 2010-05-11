@@ -195,7 +195,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	
 	char sRecursoPedido[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
-	char cadenaAUsarParaImprimirElRecv[1024];
+	/*char cadenaAUsarParaImprimirElRecv[1024];*/
 	
 	int lenRecursoPedido;
 	lenRecursoPedido = 1024;
@@ -203,7 +203,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	
 	/*snprintf(cadenaAUsarParaImprimirElRecv, bytesRecibidos, "###Recibi del cliente el siguiente texto: %s\n", sRecursoPedido);*/
 	printf("Recibi %d bytes del usuario.\n", bytesRecibidos);
-	printf("%s\n", cadenaAUsarParaImprimirElRecv);
+	printf("%s\n", sRecursoPedido);
 	
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
