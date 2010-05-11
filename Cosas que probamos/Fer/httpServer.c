@@ -148,7 +148,7 @@ int main() {
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	/*while (1) {*/
+	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
@@ -173,7 +173,7 @@ int main() {
 			printf("Error al aceptar la conexion\n");
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
 				client.sin_addr));
-	/*}*/
+	}
 
 	printf(
 			"Le doy al thread 15 segundos para responderle al cliente antes que cierre todo... ;)\n");
