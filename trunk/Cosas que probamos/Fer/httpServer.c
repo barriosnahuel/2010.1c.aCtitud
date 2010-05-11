@@ -199,7 +199,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	
 	int lenRecursoPedido;
 	lenRecursoPedido = strlen(sRecursoPedido);
-	//bytesRecibidos = recv(stParametros.ficheroCliente, sRecursoPedido, lenRecursoPedido, 0);
+	/*bytesRecibidos = recv(stParametros.ficheroCliente, sRecursoPedido, lenRecursoPedido, 0);*/
 	
 	snprintf(cadenaAUsarParaImprimirElRecv, 30, "###Recibi del cliente el siguiente texto: %s\n", sRecursoPedido);
 	printf("Recibi %d bytes del usuario.\n", bytesRecibidos);
