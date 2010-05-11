@@ -202,9 +202,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	bytesRecibidos = recv(stParametros.ficheroCliente, sRecursoPedido, lenRecursoPedido, 0);
 	
 	/*snprintf(cadenaAUsarParaImprimirElRecv, bytesRecibidos, "###Recibi del cliente el siguiente texto: %s\n", sRecursoPedido);*/
-	printf("Recibi %d bytes del usuario.\n", bytesRecibidos);
-	printf("############################################################\n");
-	printf("%s\n", sRecursoPedido);
+	printf("Recibi %d bytes del usuario.\n\n", bytesRecibidos);
+	printf("############################################################\n\n");
+	printf("%s", sRecursoPedido);
 	printf("############################################################\n");
 	
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
