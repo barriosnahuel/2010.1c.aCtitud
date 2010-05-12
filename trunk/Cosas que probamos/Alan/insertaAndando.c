@@ -94,42 +94,22 @@ printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d 
 
 // LEVANTAR LA NOTICIA 	----------
 
-char * respuesta;
-  
-/*  
-  t_news *news = malloc(sizeof(t_news));
-char   *newsInBytes;
-int     newsInBytes_size, return_code;
-
-newsInBytes = memcached_get(memcached_cluster, "1111", strlen("1111"), &newsInBytes_size, NULL, &return_code);
-
-memcpy(news->data, newsInBytes, sizeof(t_news_data));
-
-news->head = malloc(news->data.head_len);
-memcpy(news->head, newsInBytes + sizeof(t_news_data), news->data.head_len);
-
-news->body = malloc(news->data.body_len);
-memcpy(news->body, newsInBytes + sizeof(t_news_data) + news->data.head_len, news->data.body_len);
-
-free(newsInBytes);
-*/
-
 t_news * news = malloc(sizeof(t_news));
 char * newsInBytes;
 int   newsInBytes_size, return_code;
 
-newsInBytes = memcached_get(memc, "1111", strlen("1111"), &newsInBytes_size, NULL, &return_code);
+newsInBytes = memcached_get(memc, "1111", strlen("1111"), &newsInBytes_size, &flags, &rc);
 
-memcpy(news->datos, newsInBytes, sizeof(t_news_largo));
+memcpy(news->datos, newsInBytes, sizeof(t_news_largos));
 news->head = malloc(news->datos.largoHead);
-memcpy(news->head, newsInBytes + sizeof(t_news_largo), news->data.largoHead);
+memcpy(news->head, newsInBytes + sizeof(t_news_largos), news->datos.largoHead);
 
 news->body = malloc(news->datos.largoBody);
-memcpy(news->body, newsInBytes + sizeof(t_news_largo) + news->datos.largoHead, news->datos.largoBody);
+memcpy(news->body, newsInBytes + sizeof(t_news_largos) + news->datos.largoHead, news->datos.largoBody);
 
 free(newsInBytes);
 
-printf("Levanta bien el articulo buscado: %s \n",news->datos.largoBody).); // tengo mis dudas sobre si lo que hice realmente traera algo.
+printf("Levanta bien el articulo buscado: %s \n",news->datos.largoBody); // tengo mis dudas sobre si lo que hice realmente traera algo.
 
 
 /*
