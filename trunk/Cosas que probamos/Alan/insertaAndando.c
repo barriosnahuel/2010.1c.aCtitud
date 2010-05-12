@@ -96,7 +96,7 @@ printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d 
 
 char * respuesta;
   
-rc = memcached_get(memc,"111",STRLE("111"),articuloEnBytesLargo,$flags=0, $rc=0);
+rc = memcached_get(memc,"111",STRLE("111"),&articuloEnBytesLargo,(uint32_t*)&algo, &rc);
 
  (stArticle *) respuesta;  
   if(rc == MEMCACHED_SUCCESS)
