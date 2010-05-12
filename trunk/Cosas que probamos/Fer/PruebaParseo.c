@@ -22,17 +22,20 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	while(sMensajeHTTPCliente[i] != '/') {
 		i = i + 1;
 	}
+	printf("Saque el GET\n");
 	k = i;
 	
 	while(sMensajeHTTPCliente[k] != ' ') {
 		k = k + 1;
 	}
+	printf("Ubique el puntero al final del recurso (tengo a i y a k en el ppcio y en el final)\n");
 	
 	while(i != k) {
 		recurso[j] = sMensajeHTTPCliente[i];
-				i = i + 1;
-				j = j + 1;
+		i = i + 1;
+		j = j + 1;
 	}
+	printf("Voy avanzando i y completando el nuevo string\n");
 	//while(sMensajeHTTPCliente[i] != '.') {
 		//recurso[j] = sMensajeHTTPCliente[i];
 		//i = i + 1;
