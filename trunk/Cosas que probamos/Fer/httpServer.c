@@ -102,7 +102,7 @@ void* procesarRequestFuncionThread(void* threadParameters);
 /**
  * Esta funcion parsea el get que recibimos del browser y nos devuelve el recurso pedido por el usuario.
  */
-char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente, char* recurso);
+char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
@@ -197,7 +197,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("---------------- Procesando thread xD -----------------\n");
 	int bytesRecibidos;
 	char* sResponse;
-	char recurso[1024];
+	char sRecursoPedido[1024];
 
 	char sMensajeHTTPCliente[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
@@ -212,9 +212,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("%s", sMensajeHTTPCliente);
 	printf("############################################################\n");
 
-	char sRecursoPedido[1024] = obtenerRecursoDeCabecera(sMensajeHTTPCliente, recurso);
+	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
-	/*printf("El usuario pidio el recurso: %s\n", obtenerRecursoDeCabecera(sMensajeHTTPCliente));*/
+	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
 
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
@@ -426,10 +426,11 @@ char* processRequestTypeNewsList(char* sRecursoPedido,
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
 }
 
-char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente, char* recurso) {
+char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	int i = 0;
 	int j = 0;
 	int k = 0;
+	char recurso[1024];
 
 	/* En este while saco el GET */
 	while (sMensajeHTTPCliente[i] != '/') {
@@ -449,7 +450,7 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente, char* recurso) {
 		j = j + 1;
 	}
 
-	recurso[j] = '\n';
+	recurso[j] = '\0';
 	return recurso;
 
 }
