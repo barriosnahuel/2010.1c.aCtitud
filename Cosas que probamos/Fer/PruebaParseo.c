@@ -7,7 +7,6 @@ int main() {
 	char cadenaAParsearDePrueba[1024] = "GET /pagina12/noticia1.html HTTP/1.1\n";
 	
 	printf("La cadena a parsear es: %s", cadenaAParsearDePrueba);
-	//obtenerRecursoDeCabecera(cadenaAParsearDePrueba);
 	printf("El recurso obtenido es: %s", obtenerRecursoDeCabecera(cadenaAParsearDePrueba));
 	return 1;
 	
@@ -18,32 +17,26 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	int i = 0;
 	int j = 0;
 	int k = 0;
-	printf("Defini los punteritos\n");
 	char recurso[1024];
-	printf("Declaro el recurso a devolver\n");
 	
+	/* En este while saco el GET */
 	while(sMensajeHTTPCliente[i] != '/') {
 		i = i + 1;
 	}
-	printf("Saque el GET\n");
 	k = i;
 	
-	while(sMensajeHTTPCliente[k] != ' ') {
+	/* Aca situo a k al final del recurso (donde esta el primer espacio) */
+	while(sMensajeHTTPCliente[k] != '.') {
 		k = k + 1;
 	}
-	printf("Ubique el puntero al final del recurso (tengo a i y a k en el ppcio y en el final)\n");
 	
+	/* Cuando i = k quiere decir que i llego al .html (al punto en realidad). O sea que ya obtuve el recurso */
 	while(i != k) {
 		recurso[j] = sMensajeHTTPCliente[i];
 		i = i + 1;
 		j = j + 1;
 	}
-	printf("Voy avanzando i y completando el nuevo string\n");
-	//while(sMensajeHTTPCliente[i] != '.') {
-		//recurso[j] = sMensajeHTTPCliente[i];
-		//i = i + 1;
-		//j = j + 1;
-	//}
+	
 	recurso[j] = '\n';
 	return recurso;
 	
