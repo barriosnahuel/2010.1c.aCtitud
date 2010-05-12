@@ -100,7 +100,7 @@ int   newsInBytes_size, return_code;
 
 newsInBytes = memcached_get(memc, "1111", strlen("1111"), &newsInBytes_size, &flags, &rc);
 
-news->datos =newsInBytes
+news->datos =newsInBytes;
 //memcpy(news->datos, newsInBytes, sizeof(t_news_largos));
 news->head = malloc(news->datos.largoHead);
 memcpy(news->head, newsInBytes + sizeof(t_news_largos), news->datos.largoHead);
