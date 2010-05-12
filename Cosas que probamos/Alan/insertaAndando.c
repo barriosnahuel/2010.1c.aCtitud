@@ -99,7 +99,7 @@ char * respuesta;
 respuesta = memcached_get(memc,"111",strlen("111"),&articuloEnBytesLargo,&flags, &rc);
 
   if(rc == MEMCACHED_SUCCESS)
-	printf("Levanta bien el articulo buscado: %s \n",respuesta->body);
+	printf("Levanta bien el articulo buscado: %s \n",respuesta); // tengo mis dudas sobre si lo que hice realmente traera algo.
   else
 	printf("No levanta el articulo buscado \n");
   
