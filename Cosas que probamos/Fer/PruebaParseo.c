@@ -5,7 +5,6 @@ char* sacarEspacios(char* sMensajeHTTPCliente);
 
 int main() {
 	char cadenaAParsearDePrueba[1024] = "GET /pagina12/noticia1.html HTTP/1.1\n";
-	char recursoObtenido[1024];
 	
 	printf("La cadena a parsear es: %s", cadenaAParsearDePrueba);
 	//obtenerRecursoDeCabecera(cadenaAParsearDePrueba);
@@ -17,7 +16,9 @@ int main() {
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	int i, j, k = 0;
+	printf("Defini los punteritos\n");
 	char recurso[1024];
+	printf("Declaro el recurso a devolver\n");
 	
 	while(sMensajeHTTPCliente[i] != '/') {
 		i = i + 1;
