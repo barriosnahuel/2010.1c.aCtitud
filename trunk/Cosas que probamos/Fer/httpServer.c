@@ -197,24 +197,25 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("---------------- Procesando thread xD -----------------\n");
 	int bytesRecibidos;
 	char* sResponse;
-	
+
 	char sRecursoPedido[1024];
 	char sMensajeHTTPCliente[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
-	
+
 	int lenMensajeHTTPCliente;
 	lenMensajeHTTPCliente = 1024;
-	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente, lenMensajeHTTPCliente, 0);
-	
+	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente,
+			lenMensajeHTTPCliente, 0);
+
 	printf("Recibi %d bytes del usuario.\n\n", bytesRecibidos);
 	printf("############################################################\n\n");
 	printf("%s", sMensajeHTTPCliente);
 	printf("############################################################\n");
-	
+
 	sRecursoPedido = obtenerRecursoDeCabecera(sMensajeHTTPCliente);
-	
+
 	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
-	
+
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
 	case REQUEST_TYPE_NEWSGROUP:
@@ -426,6 +427,31 @@ char* processRequestTypeNewsList(char* sRecursoPedido,
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
-	
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	char recurso[1024];
+
+	/* En este while saco el GET */
+	while (sMensajeHTTPCliente[i] != '/') {
+		i = i + 1;
+	}
+	k = i;
+
+	/* Aca situo a k al final del recurso (donde esta el primer espacio) */
+	while (sMensajeHTTPCliente[k] != '.') {
+		k = k + 1;
+	}
+
+	/* Cuando i = k quiere decir que i llego al .html (al punto en realidad). O sea que ya obtuve el recurso */
+	while (i != k) {
+		recurso[j] = sMensajeHTTPCliente[i];
+		i = i + 1;
+		j = j + 1;
+	}
+
+	recurso[j] = '\n';
+	return recurso;
+
 }
 
