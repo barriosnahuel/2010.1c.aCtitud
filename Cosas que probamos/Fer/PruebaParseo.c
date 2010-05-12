@@ -4,10 +4,10 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 char* sacarEspacios(char* sMensajeHTTPCliente);
 
 int main() {
-	char cadenaAParsearDePrueba[1024] = "GET / HTTP/1.1\n";
+	char cadenaAParsearDePrueba[1024] = "GET /pagina12/noticia1.html HTTP/1.1\n";
 	char recursoObtenido[1024];
 	
-	printf("La cadena a parsear es: %s", recursoObtenido);
+	printf("La cadena a parsear es: %s", cadenaAParsearDePrueba);
 	obtenerRecursoDeCabecera(cadenaAParsearDePrueba);
 	printf("El recurso obtenido es: %s", obtenerRecursoDeCabecera(cadenaAParsearDePrueba));
 	return 1;
