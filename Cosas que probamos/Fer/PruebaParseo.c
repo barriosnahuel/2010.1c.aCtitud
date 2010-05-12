@@ -15,7 +15,9 @@ int main() {
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
-	int i, j, k = 0;
+	int i = 0;
+	int j = 0;
+	int k = 0;
 	printf("Defini los punteritos\n");
 	char recurso[1024];
 	printf("Declaro el recurso a devolver\n");
