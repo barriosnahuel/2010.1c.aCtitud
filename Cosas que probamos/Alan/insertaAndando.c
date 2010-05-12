@@ -99,16 +99,18 @@ char * newsInBytes;
 int   newsInBytes_size, return_code;
 
 newsInBytes = memcached_get(memc, "1111", strlen("1111"), &newsInBytes_size, &flags, &rc);
-
+printf("Hola");
 memcpy((char*)&(news->datos), newsInBytes, sizeof(t_news_largos)); // aca me tira error con el primer argumento
+printf("Hola");
 news->head = malloc(news->datos.largoHead);
-memcpy(news->head, newsInBytes + sizeof(t_news_largos), news->datos.largoHead);
-
+printf("Hola");
+memcpy((char*)&(news->head), newsInBytes + sizeof(t_news_largos), news->datos.largoHead);
+printf("Hola");
 news->body = malloc(news->datos.largoBody);
-memcpy(news->body, newsInBytes + sizeof(t_news_largos) + news->datos.largoHead, news->datos.largoBody);
-
+memcpy((char*)&(news->body), newsInBytes + sizeof(t_news_largos) + news->datos.largoHead, news->datos.largoBody);
+printf("Hola");
 free(newsInBytes);
-
+printf("Hola");
 printf("Levanta bien el articulo buscado: %s \n",news->datos.largoBody); // tengo mis dudas sobre si lo que hice realmente traera algo.
 
 
