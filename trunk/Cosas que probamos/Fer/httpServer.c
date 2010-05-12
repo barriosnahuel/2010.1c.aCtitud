@@ -212,9 +212,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("%s", sMensajeHTTPCliente);
 	printf("############################################################\n");
 
-	sRecursoPedido = obtenerRecursoDeCabecera(sMensajeHTTPCliente);
+	/*sRecursoPedido = obtenerRecursoDeCabecera(sMensajeHTTPCliente);*/
 
-	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
+	printf("El usuario pidio el recurso: %s\n", obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
