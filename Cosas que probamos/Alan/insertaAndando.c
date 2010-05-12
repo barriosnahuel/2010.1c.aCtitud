@@ -103,12 +103,12 @@ resultadoCache=memcached_get(memc,"111",strlen("111"),&resultNoticiaEnBytes_lar$
 
 memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
 resultNoticia->head = malloc(resultNoticia->datos.largoHead);
-memcpy(resultNoticia->head,resultadoCache+sizeof(t_news_largos),resultNoticia->$
+memcpy(resultNoticia->head,resultadoCache+sizeof(t_news_largos),resultNoticia->datos.largoHead);
 printf("Resultado HEAD: %s \n",resultNoticia->head);
 printf("Tamanios cabecera : %d \n",resultNoticia->datos.largoHead);
 
 resultNoticia->body=malloc(resultNoticia->datos.largoBody);
-memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->$
+memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->datos.largoHead,resultNoticia->datos.largoBody);
 printf("Resultado BODY : %s \n",resultNoticia->body);
 free(articuloCache);
 free(resultNoticia);
