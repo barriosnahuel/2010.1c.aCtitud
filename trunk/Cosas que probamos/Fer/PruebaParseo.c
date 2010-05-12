@@ -16,19 +16,28 @@ int main() {
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
-	int i = 0;
-	int j = 0;
+	int i, j, k = 0;
 	char recurso[1024];
 	
 	while(sMensajeHTTPCliente[i] != '/') {
 		i = i + 1;
 	}
+	k = i;
 	
-	while(sMensajeHTTPCliente[i] != '.') {
-		recurso[j] = sMensajeHTTPCliente[i];
-		i = i + 1;
-		j = j + 1;
+	while(sMensajeHTTPCliente[k] != ' ') {
+		k = k + 1;
 	}
+	
+	while(i != k) {
+		recurso[j] = sMensajeHTTPCliente[i];
+				i = i + 1;
+				j = j + 1;
+	}
+	//while(sMensajeHTTPCliente[i] != '.') {
+		//recurso[j] = sMensajeHTTPCliente[i];
+		//i = i + 1;
+		//j = j + 1;
+	//}
 	recurso[j] = '\n';
 	return recurso;
 	
