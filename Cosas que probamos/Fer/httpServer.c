@@ -99,6 +99,11 @@ char* formatearArticuloAHTML(stArticle stArticulo);
  */
 void* procesarRequestFuncionThread(void* threadParameters);
 
+/**
+ * Esta funcion parsea el get que recibimos del browser y nos devuelve el recurso pedido por el usuario.
+ */
+char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
+
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
@@ -193,19 +198,22 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int bytesRecibidos;
 	char* sResponse;
 	
-	char sRecursoPedido[1024];/*	TODO: esto seria toda la url me parece, y en cada
+	char sRecursoPedido[1024];
+	char sMensajeHTTPCliente[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
-	/*char cadenaAUsarParaImprimirElRecv[1024];*/
 	
-	int lenRecursoPedido;
-	lenRecursoPedido = 1024;
-	bytesRecibidos = recv(stParametros.ficheroCliente, sRecursoPedido, lenRecursoPedido, 0);
+	int lenMensajeHTTPCliente;
+	lenMensajeHTTPCliente = 1024;
+	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente, lenMensajeHTTPCliente, 0);
 	
-	/*snprintf(cadenaAUsarParaImprimirElRecv, bytesRecibidos, "###Recibi del cliente el siguiente texto: %s\n", sRecursoPedido);*/
 	printf("Recibi %d bytes del usuario.\n\n", bytesRecibidos);
 	printf("############################################################\n\n");
-	printf("%s", sRecursoPedido);
+	printf("%s", sMensajeHTTPCliente);
 	printf("############################################################\n");
+	
+	sRecursoPedido = obtenerRecursoDeCabecera(sMensajeHTTPCliente);
+	
+	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
 	
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
@@ -416,3 +424,8 @@ char* processRequestTypeNewsList(char* sRecursoPedido,
 
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
 }
+
+char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
+	
+}
+
