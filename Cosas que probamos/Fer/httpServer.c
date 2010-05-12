@@ -102,7 +102,7 @@ void* procesarRequestFuncionThread(void* threadParameters);
 /**
  * Esta funcion parsea el get que recibimos del browser y nos devuelve el recurso pedido por el usuario.
  */
-char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
+char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente, char* recurso);
 
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
