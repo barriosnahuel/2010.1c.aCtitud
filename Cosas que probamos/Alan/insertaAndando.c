@@ -92,6 +92,28 @@ printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d 
   else
 	printf("No se pudo insertar \n");	
 
+	
+//MEMCACHED_GET	
+	
+t_news *resultNoticia = malloc(sizeof(t_news));
+char *resultadoCache=NULL;
+int resultNoticiaEnBytes_largo, resultado;
+
+resultadoCache=memcached_get(memc,"111",strlen("111"),&resultNoticiaEnBytes_lar$
+
+memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
+resultNoticia->head = malloc(resultNoticia->datos.largoHead);
+memcpy(resultNoticia->head,resultadoCache+sizeof(t_news_largos),resultNoticia->$
+printf("Resultado HEAD: %s \n",resultNoticia->head);
+printf("Tamanios cabecera : %d \n",resultNoticia->datos.largoHead);
+
+resultNoticia->body=malloc(resultNoticia->datos.largoBody);
+memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->$
+printf("Resultado BODY : %s \n",resultNoticia->body);
+free(articuloCache);
+free(resultNoticia);
+
+	/*
 // LEVANTAR LA NOTICIA 	----------
 
 t_news * news = malloc(sizeof(t_news));
@@ -112,7 +134,7 @@ printf("Hola");
 free(newsInBytes);
 printf("Hola");
 printf("Levanta bien el articulo buscado: %s \n",news->datos.largoBody); // tengo mis dudas sobre si lo que hice realmente traera algo.
-
+*/
 
 /*
 char * respuesta;
