@@ -99,7 +99,7 @@ t_news *resultNoticia = malloc(sizeof(t_news));
 char *resultadoCache=NULL;
 int resultNoticiaEnBytes_largo, resultado;
 
-resultadoCache=memcached_get(memc,"111",strlen("111"),&resultNoticiaEnBytes_lar$
+resultadoCache=memcached_get(memc,"111",strlen("111"),&resultNoticiaEnBytes_largo,&flags,&rc);
 
 memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
 resultNoticia->head = malloc(resultNoticia->datos.largoHead);
