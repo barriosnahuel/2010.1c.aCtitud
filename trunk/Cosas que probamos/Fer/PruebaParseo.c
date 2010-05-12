@@ -8,8 +8,8 @@ int main() {
 	char recursoObtenido[1024];
 	
 	printf("La cadena a parsear es: %s", recursoObtenido);
-	recursoObtenido = obtenerRecursoDeCabecera(cadenaAParsearDePrueba);
-	printf("El recurso obtenido es: %s", recursoObtenido);
+	obtenerRecursoDeCabecera(cadenaAParsearDePrueba);
+	printf("El recurso obtenido es: %s", obtenerRecursoDeCabecera(cadenaAParsearDePrueba));
 	return 1;
 	
 	
