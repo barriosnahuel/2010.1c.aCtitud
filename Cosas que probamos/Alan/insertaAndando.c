@@ -78,8 +78,10 @@ int main()
 	printf("Se inserto correctamente \n");
   else
 	printf("No se pudo insertar \n");	
+  
+  free(articuloCache);
 
-
+  
 //MEMCACHED_GET	
 	
   t_news *resultNoticia = malloc(sizeof(t_news));
@@ -97,7 +99,7 @@ int main()
   resultNoticia->body=malloc(resultNoticia->datos.largoBody);
   memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->datos.largoHead,resultNoticia->datos.largoBody);
   printf("Resultado BODY : %s \n",resultNoticia->body);
-  free(articuloCache);
+  
   free(resultNoticia);
 
   return 0;
