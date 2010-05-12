@@ -198,7 +198,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int bytesRecibidos;
 	char* sResponse;
 
-	char sRecursoPedido[1024];
 	char sMensajeHTTPCliente[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
 
@@ -212,7 +211,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	printf("%s", sMensajeHTTPCliente);
 	printf("############################################################\n");
 
-	/*sRecursoPedido = obtenerRecursoDeCabecera(sMensajeHTTPCliente);*/
+	char sRecursoPedido[1024] = obtenerRecursoDeCabecera(sMensajeHTTPCliente);
 
 	printf("El usuario pidio el recurso: %s\n", obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
