@@ -96,9 +96,8 @@ printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d 
 
 char * respuesta;
   
-rc = memcached_get(memc,"111",strlen("111"),&articuloEnBytes,&flags, &rc);
+respuesta = memcached_get(memc,"111",strlen("111"),&articuloEnBytesLargo,&flags, &rc);
 
- (stArticle *) respuesta;  
   if(rc == MEMCACHED_SUCCESS)
 	printf("Levanta bien el articulo buscado \n");
   else
