@@ -72,9 +72,6 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 
 	/* ------ modificar de ac� para abajo los valores que se quieren guardar --------*/
 
-	/* Cargo el nombre de la aplicacion para el logger */
-	strcpy(stConf->czAppNameForLogger,GetVal(APP_NAME_FOR_LOGGER, pszAux));
-
 	/* Cargo el puerto de OpenDS */
 	stConf->uiBDPuerto = atoi(GetVal(OPENDS_PORT, pszAux));
 	if((stConf->uiBDPuerto) < 1 || (stConf->uiBDPuerto) > 65535 ) {
