@@ -234,7 +234,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
 	if (strlen(sRecursoPedido) == 1) {
-		printf("El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
+		printf(
+				"El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
 		/* El gil de nahuel hace el select correspondiente xD */
 	} else {
 		/* Obtengo el grupo de noticias. */
@@ -420,7 +421,9 @@ char* formatearArticuloAHTML(stArticle stArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
 	char* response;
-	strcpy(response,"<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, pero aca tendria que estar devolviendo una noticia en particular</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>");
+	strcpy(
+			response,
+			"<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, pero aca tendria que estar devolviendo una noticia en particular</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>");
 
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
@@ -487,31 +490,36 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 		i = i + 1;
 	}
 	k = i;
-	strcpy(recurso, ' ');
-	printf("%d", recurso);
-	if(isspace(sMensajeHTTPCliente[k+1])) {
+
+	if (sMensajeHTTPCliente[k + 1] == '') {
 		strcpy(recurso, '/');
-		return recurso;
-	}
+	} else {
+		/* Aca situo a k al final del recurso (donde esta el primer espacio) */
+		while (sMensajeHTTPCliente[k] != '.') {
+			k = k + 1;
+		}
 
-	/* Aca situo a k al final del recurso (donde esta el primer espacio) */
-	while (sMensajeHTTPCliente[k] != '.') {
-		k = k + 1;
-	}
+		/* Cuando i = k quiere decir que i llego al .html (al punto en realidad). O sea que ya obtuve el recurso */
+		while (i != k) {
+			recurso[j] = sMensajeHTTPCliente[i];
+			i = i + 1;
+			j = j + 1;
+		}
 
-	/* Cuando i = k quiere decir que i llego al .html (al punto en realidad). O sea que ya obtuve el recurso */
-	while (i != k) {
-		recurso[j] = sMensajeHTTPCliente[i];
-		i = i + 1;
-		j = j + 1;
-	}
+		recurso[j] = '\0';
 
-	recurso[j] = '\0';
+	}
 
 	LoguearDebugging("<-- obtenerRecursoDeCabecera()", APP_NAME_FOR_LOGGER);
 	return recurso;
 
 }
 
-int obtenerGrupoDeNoticias(char* sRecursoPedido){return;};
-int obtenerDeNoticia(char* sRecursoPedido){return;};
+int obtenerGrupoDeNoticias(char* sRecursoPedido) {
+	return;
+}
+;
+int obtenerDeNoticia(char* sRecursoPedido) {
+	return;
+}
+;
