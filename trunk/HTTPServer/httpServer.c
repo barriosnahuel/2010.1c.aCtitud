@@ -510,3 +510,4 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 }
 
 char* obtenerGrupoDeNoticias(char* sRecursoPedido){};
+char* obtenerDeNoticia(char* sRecursoPedido){};
