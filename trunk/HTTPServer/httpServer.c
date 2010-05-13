@@ -195,6 +195,7 @@ int main(void) {
 }
 
 void* procesarRequestFuncionThread(void* threadParameters) {
+	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 	printf("---------------- Procesando thread xD -----------------\n");
 	int bytesRecibidos;
@@ -254,6 +255,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
 
+	LoguearDebugging("<-- procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	thr_exit(0);/*	Termino el thread.*/
 
 	return 0;
@@ -344,15 +346,16 @@ void liberarRecursos(int 				ficheroServer
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sURL) {
-	printf("Entro a buscar la noticia en Memcached\n");
+	LoguearDebugging("--> buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
+	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return 0;
 }
 
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
-	printf("Entro a buscar la noticia en OpenDS\n");
+	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 
 	/*	Estos dos, son exclusivos para algunas operaciones	*/
 	PLDAP_ENTRY_OP entryOp = newLDAPEntryOperations();
@@ -378,27 +381,34 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
 	 *	Hasta aca es la prueba														*
 	 *******************************************************************************/
 
+	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
 
 void guardarNoticiaEnCache(stArticle stArticulo) {
+	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
+
 	printf("Entre a guardarNoticiaEnCache.\n");
+
+	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return;
 }
 
 char* formatearArticuloAHTML(stArticle stArticulo) {
-	printf("Entro a formatear la noticia a HTML.\n");
+	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
 	char* response;
 	strcpy(
 			response,
 			"<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, pero aca tendria que estar devolviendo una noticia en particular</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>");
 
+	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
 }
 
 char* processRequestTypeNews(char* sRecursoPedido,
 		stThreadParameters* pstParametros) {
+	LoguearDebugging("--> processRequestTypeNews()", APP_NAME_FOR_LOGGER);
 
 	/*	TODO: Aca tengo que parsear el recurso y armar el criterio	*/
 
@@ -421,21 +431,32 @@ char* processRequestTypeNews(char* sRecursoPedido,
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
+	LoguearDebugging("<-- processRequestTypeNews()", APP_NAME_FOR_LOGGER);
 	return formatearArticuloAHTML(stArticulo);
 }
 
 char* processRequestTypeNewsgroup(char* sRecursoPedido,
 		stThreadParameters* pstParametros) {
+	LoguearDebugging("--> processRequestTypeNewsgroup()", APP_NAME_FOR_LOGGER);
 
+	/*	TODO: Aca proceso.	*/
+
+	LoguearDebugging("<-- processRequestTypeNewsgroup()", APP_NAME_FOR_LOGGER);
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de grupos de noticias</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
 }
 char* processRequestTypeNewsList(char* sRecursoPedido,
 		stThreadParameters* pstParametros) {
+	LoguearDebugging("--> processRequestTypeNewsList()", APP_NAME_FOR_LOGGER);
 
+	/*	TODO: Aca proceso.	*/
+
+	LoguearDebugging("<-- processRequestTypeNewsList()", APP_NAME_FOR_LOGGER);
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
+	LoguearDebugging("--> obtenerRecursoDeCabecera()", APP_NAME_FOR_LOGGER);
+
 	int i = 0;
 	int j = 0;
 	int k = 0;
@@ -460,6 +481,8 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	}
 
 	recurso[j] = '\0';
+
+	LoguearDebugging("<-- obtenerRecursoDeCabecera()", APP_NAME_FOR_LOGGER);
 	return recurso;
 
 }
