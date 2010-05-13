@@ -108,7 +108,7 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 /**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo grupoDeNoticias.
  */
-int obtenerGrupoDeNoticias(char* sRecursoPedido);
+char* obtenerGrupoDeNoticias(char* sRecursoPedido);
 
 /**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo Noticia.
