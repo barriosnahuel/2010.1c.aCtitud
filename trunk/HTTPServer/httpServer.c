@@ -533,7 +533,7 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 	int j = 0;
 	char grupoDeNoticias[1024];
 
-	while (sRecursoPedido[i] != '/') {
+	while (sRecursoPedido[i] != '/' && sRecursoPedido[i] != '.') {
 		grupoDeNoticias[j] = sRecursoPedido[i];
 		j = j + 1;
 		i = i + 1;
