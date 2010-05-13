@@ -54,12 +54,10 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-void liberarRecursos( int 				ficheroServer
-					, PLDAP_CONTEXT		stPLDAPContext
-					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
-					, PLDAP_SESSION 	stPLDAPSession
-					, PLDAP_SESSION_OP 	stPLDAPSessionOperations
-					, stConfiguracion	stConf);
+void liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
+		PLDAP_CONTEXT_OP stPLDAPContextOperations,
+		PLDAP_SESSION stPLDAPSession,
+		PLDAP_SESSION_OP stPLDAPSessionOperations, stConfiguracion stConf);
 /**
  * Procesa un request del tipo newsgroup. Es decir, el listado de newsgroup disponibles
  * y devuelve un response en formato HTML.
@@ -107,6 +105,16 @@ void* procesarRequestFuncionThread(void* threadParameters);
  */
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 
+/**
+ * En base a un recurso del estilo /grupoDeNoticia/noticia, parseo dicho string y obtengo grupoDeNoticia.
+ */
+char* obtenerGrupoDeNoticias(char* sRecursoPedido);
+
+/**
+ * En base a un recurso del estilo /grupoDeNoticia/noticia, parseo dicho string y obtengo noticia.
+ */
+char* obtenerNoticia(char* sRecursoPedido);
+
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
@@ -121,7 +129,8 @@ int main(void) {
 		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
 		return -1;
 	} else {
-		LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Archivo de configuracion cargado correctamente.",
+				APP_NAME_FOR_LOGGER);
 		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
 		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
 		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
@@ -147,43 +156,47 @@ int main(void) {
 	 ********************************************************/
 	int ficheroServer; /* los ficheros descriptores */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
-	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
-		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", APP_NAME_FOR_LOGGER);
+	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)) {
+		LoguearError(
+				"No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.",
+				APP_NAME_FOR_LOGGER);
 		return -1;
-	}
-	else
-		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", inet_ntoa(server.sin_addr), stConf.uiAppPuerto);
+	} else
+		printf(
+				"Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n",
+				inet_ntoa(server.sin_addr), stConf.uiAppPuerto);
 
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-/*	while (1) {*/
-		int sin_size = sizeof(struct sockaddr_in);
-		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
+	/*	while (1) {*/
+	int sin_size = sizeof(struct sockaddr_in);
+	struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
-		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
-				&sin_size);
-		if (ficheroCliente != -1) {
-			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
+	int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
+			&sin_size);
+	if (ficheroCliente != -1) {
+		/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
-			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
+		thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
 
-			/*	Le seteo los parametros al nuevo thread.	*/
-			stThreadParameters stParameters;
-			stParameters.ficheroCliente = ficheroCliente;
-			stParameters.pstPLDAPSession = &stPLDAPSession;
-			stParameters.pstPLDAPSessionOperations = &stPLDAPSessionOperations;
+		/*	Le seteo los parametros al nuevo thread.	*/
+		stThreadParameters stParameters;
+		stParameters.ficheroCliente = ficheroCliente;
+		stParameters.pstPLDAPSession = &stPLDAPSession;
+		stParameters.pstPLDAPSessionOperations = &stPLDAPSessionOperations;
 
-			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
-					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
-				printf(
-						"No se pudo crear un nuevo thread para procesar el request.\n");
-		} else
-			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
-		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-/*	}*/
+		if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
+				(void*) &stParameters, 0, &threadProcesarRequest) != 0)
+			printf(
+					"No se pudo crear un nuevo thread para procesar el request.\n");
+	} else
+		LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
+	printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
+	/*	}*/
 
-	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
+	printf(
+			"Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
 	printf("Ahora cierro socket, db, etc...\n");
@@ -200,6 +213,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int bytesRecibidos;
 	char* sResponse;
 	char sRecursoPedido[1024];
+	char sGrupoDeNoticias[1024];
+	char sNoticia[1024];
 
 	char sMensajeHTTPCliente[1024];/*	TODO: esto seria toda la url me parece, y en cada
 	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
@@ -217,6 +232,15 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
+	if (strlen(sRecursoPedido) == 1) {
+		printf("El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
+		/* El gil de nahuel hace el select correspondiente xD */
+	} else {
+		/* Obtengo el grupo de noticias. */
+		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));
+		/* Obtengo la noticia de dicho grupo. */
+		strcpy(sNoticia, obtenerNoticia(sRecursoPedido));
+	}
 
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
@@ -321,12 +345,10 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * 1. Cierra el socket.
  * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
  */
-void liberarRecursos(int 				ficheroServer
-					, PLDAP_CONTEXT		stPLDAPContext
-					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
-					, PLDAP_SESSION 	stPLDAPSession
-					, PLDAP_SESSION_OP	stPLDAPSessionOperations
-					, stConfiguracion	stConf) {
+void liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
+		PLDAP_CONTEXT_OP stPLDAPContextOperations,
+		PLDAP_SESSION stPLDAPSession,
+		PLDAP_SESSION_OP stPLDAPSessionOperations, stConfiguracion stConf) {
 	LoguearDebugging("--> liberarRecursos()", APP_NAME_FOR_LOGGER);
 
 	/*	Cierro/Libero lo relacionado a la BD	*/
@@ -461,5 +483,8 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 
 	recurso[j] = '\0';
 	return recurso;
+}
+
+char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 
 }
