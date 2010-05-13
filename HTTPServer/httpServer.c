@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
+#include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 
@@ -52,11 +53,12 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-void
-		liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
-				PLDAP_CONTEXT_OP stPLDAPContextOperations,
-				PLDAP_SESSION stPLDAPSession,
-				PLDAP_SESSION_OP stPLDAPSessionOperations);
+void liberarRecursos( int 				ficheroServer
+					, PLDAP_CONTEXT		stPLDAPContext
+					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
+					, PLDAP_SESSION 	stPLDAPSession
+					, PLDAP_SESSION_OP 	stPLDAPSessionOperations
+					, stConfiguracion	stConf);
 /**
  * Procesa un request del tipo newsgroup. Es decir, el listado de newsgroup disponibles
  * y devuelve un response en formato HTML.
@@ -107,7 +109,7 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
-int main() {
+int main(void) {
 	/****************************************
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
@@ -115,9 +117,10 @@ int main() {
 
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
+		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
 		return -1;
 	} else {
-		printf("Archivo de configuracion cargado correctamente:\n");
+		LoguearInformacion("Archivo de configuracion cargado correctamente.", stConf.czAppNameForLogger);
 		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
 		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
 		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
@@ -132,7 +135,7 @@ int main() {
 	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 	if (!crearConexionLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
-		printf("No se pudo conectar a OpenDS.");
+		LoguearError("No se pudo conectar a OpenDS.", argv[0]);
 		return -1;
 	} else
 		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer,
@@ -143,17 +146,17 @@ int main() {
 	 ********************************************************/
 	int ficheroServer; /* los ficheros descriptores */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
-	if (!crearConexionConSocket(&stConf, &ficheroServer, &server))
+	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
+		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", argv[0]);
 		return -1;
+	}
 	else
-		printf(
-				"Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n",
-				"ver como obtener esta ip!!", stConf.uiAppPuerto);
+		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", inet_ntoa(server.sin_addr), stConf.uiAppPuerto);
 
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	while (1) {
+/*	while (1) {*/
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
@@ -175,18 +178,16 @@ int main() {
 				printf(
 						"No se pudo crear un nuevo thread para procesar el request.\n");
 		} else
-			printf("Error al aceptar la conexion\n");
-		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(
-				client.sin_addr));
-	}
+			LoguearError("Error al aceptar la conexion.", stConf.czAppNameForLogger);
+		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
+/*	}*/
 
-	printf(
-			"Le doy al thread 15 segundos para responderle al cliente antes que cierre todo... ;)\n");
-	sleep(15);
+	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
+	sleep(8);
 
 	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
-			stPLDAPSession, stPLDAPSessionOperations);
+			stPLDAPSession, stPLDAPSessionOperations, stConf);
 
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
@@ -261,6 +262,7 @@ int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
 		PLDAP_CONTEXT_OP* pstPLDAPContextOperations,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
+	LoguearDebugging("--> crearConexionLDAP()", (*stConf).czAppNameForLogger);
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
 	char *sOpenDSLocation;
@@ -285,6 +287,7 @@ int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
  */
 int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		struct sockaddr_in* server) {
+	LoguearDebugging("--> crearConexionConSocket()", (*stConf).czAppNameForLogger);
 
 	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
@@ -316,10 +319,13 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * 1. Cierra el socket.
  * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
  */
-void liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
-		PLDAP_CONTEXT_OP stPLDAPContextOperations,
-		PLDAP_SESSION stPLDAPSession, PLDAP_SESSION_OP stPLDAPSessionOperations) {
-	printf("Entro a liberar recursos\n");
+void liberarRecursos(int 				ficheroServer
+					, PLDAP_CONTEXT		stPLDAPContext
+					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
+					, PLDAP_SESSION 	stPLDAPSession
+					, PLDAP_SESSION_OP	stPLDAPSessionOperations
+					, stConfiguracion	stConf) {
+	LoguearDebugging("--> liberarRecursos()", stConf.czAppNameForLogger);
 
 	/*	Cierro/Libero lo relacionado a la BD	*/
 	stPLDAPSessionOperations->endSession(stPLDAPSession);
@@ -454,4 +460,3 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	return recurso;
 
 }
-
