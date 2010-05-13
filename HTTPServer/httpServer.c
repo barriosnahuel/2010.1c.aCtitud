@@ -278,7 +278,7 @@ int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
-
+	LoguearDebugging("<-- crearConexionLDAP()", (*stConf).czAppNameForLogger);
 	return 1;
 }
 
@@ -312,6 +312,7 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		exit(-1);
 	}
 
+	LoguearDebugging("<-- crearConexionConSocket()", (*stConf).czAppNameForLogger);
 	return 1;
 }
 
@@ -338,6 +339,7 @@ void liberarRecursos(int 				ficheroServer
 	/*	Cierro el socket	*/
 	close(ficheroServer);
 	printf("Libere el ficheroServer\n");
+	LoguearDebugging("<-- liberarRecursos()", stConf.czAppNameForLogger);
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sURL) {
