@@ -10,7 +10,6 @@ typedef struct stConfiguracion {
 
 	char 			czBDServer[15+1];  	/* se supone que es una direccion IP */
     unsigned int	uiBDPuerto;
-    char 			czAppNameForLogger[20];
 } stConfiguracion;
 
 /* funcion que valida que una ip se haya ingresado correctamente */

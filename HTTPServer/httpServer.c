@@ -9,6 +9,7 @@
 #include "LdapWrapperHandler.h"
 
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
+#define APP_NAME_FOR_LOGGER "HTTPServer"
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
 #define REQUEST_TYPE_NEWS_LIST 2	/*	Indica que se esta solicitando el listado de noticias para un newsgroup especifico. 	*/
 #define REQUEST_TYPE_NEWS 3			/*	Indica que se esta solicitando una noticia en particular.	*/
@@ -120,7 +121,7 @@ int main(void) {
 		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
 		return -1;
 	} else {
-		LoguearInformacion("Archivo de configuracion cargado correctamente.", stConf.czAppNameForLogger);
+		LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
 		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
 		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
 		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
@@ -135,7 +136,7 @@ int main(void) {
 	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 	if (!crearConexionLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
-		LoguearError("No se pudo conectar a OpenDS.", stConf.czAppNameForLogger);
+		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER);
 		return -1;
 	} else
 		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer,
@@ -147,7 +148,7 @@ int main(void) {
 	int ficheroServer; /* los ficheros descriptores */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
-		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", stConf.czAppNameForLogger);
+		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", APP_NAME_FOR_LOGGER);
 		return -1;
 	}
 	else
@@ -178,7 +179,7 @@ int main(void) {
 				printf(
 						"No se pudo crear un nuevo thread para procesar el request.\n");
 		} else
-			LoguearError("Error al aceptar la conexion.", stConf.czAppNameForLogger);
+			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
 /*	}*/
 
@@ -262,7 +263,7 @@ int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
 		PLDAP_CONTEXT_OP* pstPLDAPContextOperations,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
-	LoguearDebugging("--> crearConexionLDAP()", (*stConf).czAppNameForLogger);
+	LoguearDebugging("--> crearConexionLDAP()", APP_NAME_FOR_LOGGER);
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
 	char *sOpenDSLocation;
@@ -278,7 +279,7 @@ int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
-	LoguearDebugging("<-- crearConexionLDAP()", (*stConf).czAppNameForLogger);
+	LoguearDebugging("<-- crearConexionLDAP()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
 
@@ -287,7 +288,7 @@ int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
  */
 int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		struct sockaddr_in* server) {
-	LoguearDebugging("--> crearConexionConSocket()", (*stConf).czAppNameForLogger);
+	LoguearDebugging("--> crearConexionConSocket()", APP_NAME_FOR_LOGGER);
 
 	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Error al crear el socket.\n");
@@ -312,7 +313,7 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		exit(-1);
 	}
 
-	LoguearDebugging("<-- crearConexionConSocket()", (*stConf).czAppNameForLogger);
+	LoguearDebugging("<-- crearConexionConSocket()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
 
@@ -326,7 +327,7 @@ void liberarRecursos(int 				ficheroServer
 					, PLDAP_SESSION 	stPLDAPSession
 					, PLDAP_SESSION_OP	stPLDAPSessionOperations
 					, stConfiguracion	stConf) {
-	LoguearDebugging("--> liberarRecursos()", stConf.czAppNameForLogger);
+	LoguearDebugging("--> liberarRecursos()", APP_NAME_FOR_LOGGER);
 
 	/*	Cierro/Libero lo relacionado a la BD	*/
 	stPLDAPSessionOperations->endSession(stPLDAPSession);
@@ -339,7 +340,7 @@ void liberarRecursos(int 				ficheroServer
 	/*	Cierro el socket	*/
 	close(ficheroServer);
 	printf("Libere el ficheroServer\n");
-	LoguearDebugging("<-- liberarRecursos()", stConf.czAppNameForLogger);
+	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sURL) {
