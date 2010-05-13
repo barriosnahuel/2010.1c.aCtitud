@@ -491,7 +491,7 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	}
 	k = i;
 
-	if (sMensajeHTTPCliente[k + 1] == '') {
+	if (sMensajeHTTPCliente[k + 1] == 32) {
 		strcpy(recurso, "/");
 	} else {
 		/* Aca situo a k al final del recurso (donde esta el primer espacio) */
