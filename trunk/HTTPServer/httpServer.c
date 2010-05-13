@@ -548,6 +548,7 @@ char* obtenerNoticia(char* sRecursoPedido) {
 	printf("Estoy por entrar al while q causa problemas =P \n");
 	while(sRecursoPedido[i] != '\0') {
 		noticia[j] = sRecursoPedido[i];
+		i = i + 1;
 		j = j + 1;
 	}
 	printf("sali del while q causa problemas =P \n");
