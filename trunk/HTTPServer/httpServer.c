@@ -108,12 +108,12 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 /**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo grupoDeNoticias.
  */
-char* obtenerGrupoDeNoticias(char* sRecursoPedido);
+int obtenerGrupoDeNoticias(char* sRecursoPedido);
 
 /**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo Noticia.
  */
-char* obtenerNoticia(char* sRecursoPedido);
+int obtenerNoticia(char* sRecursoPedido);
 
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
@@ -238,9 +238,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		/* El gil de nahuel hace el select correspondiente xD */
 	} else {
 		/* Obtengo el grupo de noticias. */
-		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));
+		/*strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));*/
 		/* Obtengo la noticia de dicho grupo. */
-		strcpy(sNoticia, obtenerNoticia(sRecursoPedido));
+		/*strcpy(sNoticia, obtenerNoticia(sRecursoPedido));*/
 	}
 
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
@@ -509,5 +509,5 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 
 }
 
-char* obtenerGrupoDeNoticias(char* sRecursoPedido){};
-char* obtenerDeNoticia(char* sRecursoPedido){};
+int obtenerGrupoDeNoticias(char* sRecursoPedido){return;};
+int obtenerDeNoticia(char* sRecursoPedido){return;};
