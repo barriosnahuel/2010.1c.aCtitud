@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string>
 #include <fstream>
+#include "../Logger/logger.hpp"
 #include "Configuracion.hpp"
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
@@ -26,6 +27,9 @@ void* threadInterfazDeUsuario(void* parametro);
  * Función que ejecuta el thread de CLUI.
  */
 void* threadInterfazDeUsuario(void* parametro){
+    Logger logger;
+    logger.LoguearDebugging("--> threadInterfazDeUsuario()", "NNTPClient");
+
     string strCadenaIngresada;
 
     //Casteo el parametro a Comando* y comparto el recurso entre los hilos
@@ -46,6 +50,7 @@ void* threadInterfazDeUsuario(void* parametro){
 }
 
 int main(int argn, char *argv[]){
+	Logger logger;
 
     memset(czNombreProceso, 0, 20);
     strcpy(czNombreProceso, "NNTP_Client\0");
