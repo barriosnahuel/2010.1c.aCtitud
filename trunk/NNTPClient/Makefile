@@ -1,20 +1,27 @@
-NNTPClient: Configuracion.o Comando.o NNTPClientDAO.o nntpClient.o
-	g++ -lpthread -lssl -o NNTPClient ./Configuracion.o ./Comando.o ./NNTPClientDAO.o ./nntpClient.o
+OPTFLAGS=-c -o
+
+NNTPClient: Logger.o Configuracion.o Comando.o NNTPClientDAO.o nntpClient.o
+	g++ -lpthread -lssl -o NNTPClient ../Logger/Logger.o ./Configuracion.o ./Comando.o ./NNTPClientDAO.o ./nntpClient.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
+Logger.o: ../Logger/logger-Debian.cpp ../Logger/logger.hpp
+	g++ $(OPTFLAGS) ../Logger/Logger.o ../Logger/logger-Debian.cpp
+
 Configuracion.o: Configuracion.cpp Configuracion.hpp
-	g++ -c -o Configuracion.o Configuracion.cpp
+	g++ $(OPTFLAGS) Configuracion.o Configuracion.cpp
+
+semaforo.o: semaforo.cpp semaforo.hpp
+	g++ $(OPTFLAGS) semaforo.o semaforo.cpp
 
 Comando.o: Comando.cpp Comando.hpp
-	g++ -c -o Comando.o Comando.cpp
+	g++ $(OPTFLAGS) Comando.o Comando.cpp
 
 NNTPClientDAO.o: NNTPClientDAO.cpp NNTPClientDAO.hpp
-	g++ -c -o NNTPClientDAO.o NNTPClientDAO.cpp
+	g++ $(OPTFLAGS) NNTPClientDAO.o NNTPClientDAO.cpp
 
 nntpClient.o: nntpClient.cpp
-	g++ -c -o nntpClient.o nntpClient.cpp
-
+	g++ $(OPTFLAGS) nntpClient.o nntpClient.cpp
 
 #	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos
 #			nuevamente cuando nos dice ya estan compilados con la ultima version.
