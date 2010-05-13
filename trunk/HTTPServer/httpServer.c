@@ -526,7 +526,7 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 	char grupoDeNoticias[1024];
 	
 	while(sRecursoPedido[i] != '/') {
-		grupoDeNoticias[i] = sRecursoPedido[j];
+		grupoDeNoticias[j] = sRecursoPedido[i];
 		j = j + 1;
 		i = i + 1;
 	}	
