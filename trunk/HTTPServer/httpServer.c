@@ -544,10 +544,12 @@ char* obtenerNoticia(char* sRecursoPedido) {
 	while (sRecursoPedido[i] != '/') {
 		i = i + 1;
 	}
+	printf("Estoy por entrar al while q causa problemas =P \n");
 	while(sRecursoPedido[i] != '\0') {
 		noticia[j] = sRecursoPedido[i];
 		j = j + 1;
 	}
+	printf("sali del while q causa problemas =P \n");
 	noticia[j] = '\0';
 	LoguearDebugging("<-- obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
 	return noticia;
