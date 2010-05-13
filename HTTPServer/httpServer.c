@@ -234,15 +234,18 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
 	if (strlen(sRecursoPedido) == 1) {
-		printf(
-				"El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
+		printf("El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
 		/* El gil de nahuel hace el select correspondiente xD */
 	} else {
 		/* Obtengo el grupo de noticias. */
 		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));
+		printf("El grupo de noticias es: %s\n", sGrupoDeNoticias);
 		/* Obtengo la noticia de dicho grupo. */
 		/*strcpy(sNoticia, obtenerNoticia(sRecursoPedido));*/
 	}
+	
+	
+	
 
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
 	switch (uiOperation) {
