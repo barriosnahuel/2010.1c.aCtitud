@@ -7,6 +7,8 @@
 #define APP_PORT "AppPort="
 #define OPENDS_SERVER "OpenDSServer="
 #define OPENDS_PORT "OpenDSPort="
+#define APP_NAME_FOR_LOGGER "AppNameForLogger="
+
 
 char *GetVal(const char *sValBuff, const char *sBuff){
     char *sVal;
@@ -22,7 +24,7 @@ char *GetVal(const char *sValBuff, const char *sBuff){
     sVal = strtok(sVal, "=");
     if(!sVal) return sVal2;
     sVal = strtok(NULL, "\n");
-    sVal[strlen(sVal)-1] = '\0';
+    sVal[strlen(sVal)] = '\0';
     return sVal;
 }
 

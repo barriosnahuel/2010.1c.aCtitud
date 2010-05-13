@@ -3,8 +3,8 @@ CFLAGS=-ansi
 OPENDSLIBS=-L/usr/local/lib -lldap -llber
 LIBS= $(OPENDSLIBS) -lsocket -lnsl
 
-HTTPServer: configuration.o LdapWrapper.o Article.o LdapWrapperHandler.o httpServer.o 
-	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o
+HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o 
+	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o ../Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
@@ -13,6 +13,11 @@ configuration.o: configuration.c configuration.h
 
 LdapWrapper.o: LdapWrapper.c LdapWrapper.h
 	gcc $(CFLAGS) $(OPTFLAGS) LdapWrapper.o LdapWrapper.c
+
+#	Esto todavia no se esta usando, hay que hacer el logger para Solaris.
+#	En el target HTTPServer hay que poner Logger.o y en gcc ../Logger/Logger.o
+Logger.o: ../Logger/logger-Solaris.c ../Logger/logger.h
+	gcc $(CFLAGS) $(OPTFLAGS) ../Logger/Logger.o ../Logger/logger-Solaris.c
 
 Article.o: Article.c Article.h
 	gcc $(CFLAGS) $(OPTFLAGS) Article.o Article.c
