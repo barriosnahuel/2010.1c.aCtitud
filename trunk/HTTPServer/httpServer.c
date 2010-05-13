@@ -488,7 +488,7 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 	}
 	k = i;
 	
-	if(sMensajeHTTPCliente[k+1] == ' ') {
+	if(isspace(sMensajeHTTPCliente[k+1])) {
 		strcpy(recurso, '/');
 		return recurso;
 	}
