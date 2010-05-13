@@ -6,10 +6,10 @@
  * se debe modificar acorde a los datos
  * que se tomaran del archivo */
 typedef struct stConfiguracion {
-    unsigned int uiAppPuerto;	/*	Puerto sobre el que estara escuchando la aplicacion.	*/
+    unsigned int 	uiAppPuerto;		/*	Puerto sobre el que estara escuchando la aplicacion.	*/
 
-	char czBDServer[15+1];  	/* se supone que es una direccion IP */
-    unsigned int uiBDPuerto;
+	char 			czBDServer[15+1];  	/* se supone que es una direccion IP */
+    unsigned int	uiBDPuerto;
 } stConfiguracion;
 
 /* funcion que valida que una ip se haya ingresado correctamente */
