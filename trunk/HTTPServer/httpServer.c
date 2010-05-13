@@ -534,7 +534,7 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 	return grupoDeNoticias;
 }
 
-char* obtenerDeNoticia(char* sRecursoPedido) {
+char* obtenerNoticia(char* sRecursoPedido) {
 	LoguearDebugging("--> obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
 
 	int i = 1;
