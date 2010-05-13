@@ -113,7 +113,7 @@ int obtenerGrupoDeNoticias(char* sRecursoPedido);
 /**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo Noticia.
  */
-int obtenerNoticia(char* sRecursoPedido);
+char* obtenerNoticia(char* sRecursoPedido);
 
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
@@ -239,7 +239,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		/* El gil de nahuel hace el select correspondiente xD */
 	} else {
 		/* Obtengo el grupo de noticias. */
-		/*strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));*/
+		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));
 		/* Obtengo la noticia de dicho grupo. */
 		/*strcpy(sNoticia, obtenerNoticia(sRecursoPedido));*/
 	}
@@ -515,11 +515,24 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 
 }
 
-int obtenerGrupoDeNoticias(char* sRecursoPedido) {
-	return;
+char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
+	LoguearDebugging("--> obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+
+	int i = 1;
+	int j = 0;
+	char grupoDeNoticias[1024];
+	
+	while(sRecursoPedido[i] != '/') {
+		grupoDeNoticias[i] = sRecursoPedido[j];
+		j = j + 1;
+		i = i + 1;
+	}	
+	grupoDeNoticias[j] = '\0';
+	LoguearDebugging("<-- obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	return grupoDeNoticias;
 }
-;
+
 int obtenerDeNoticia(char* sRecursoPedido) {
 	return;
 }
-;
+
