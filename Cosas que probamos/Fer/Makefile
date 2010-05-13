@@ -16,8 +16,8 @@ LdapWrapper.o: LdapWrapper.c LdapWrapper.h
 
 #	Esto todavia no se esta usando, hay que hacer el logger para Solaris.
 #	En el target HTTPServer hay que poner Logger.o y en gcc ../Logger/Logger.o
-Logger.o: ../Logger/logger-Solaris.c ../Logger/logger.h
-	gcc $(CFLAGS) $(OPTFLAGS) ../Logger/Logger.o ../Logger/logger-Solaris.c
+Logger.o: ../../Logger/logger-Solaris.c ../../Logger/logger.h
+	gcc $(CFLAGS) $(OPTFLAGS) ../../Logger/Logger.o ../../Logger/logger-Solaris.c
 
 Article.o: Article.c Article.h
 	gcc $(CFLAGS) $(OPTFLAGS) Article.o Article.c
