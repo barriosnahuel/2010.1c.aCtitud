@@ -135,7 +135,7 @@ int main(void) {
 	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 	if (!crearConexionLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
-		LoguearError("No se pudo conectar a OpenDS.", argv[0]);
+		LoguearError("No se pudo conectar a OpenDS.", stConf.czAppNameForLogger);
 		return -1;
 	} else
 		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer,
@@ -147,7 +147,7 @@ int main(void) {
 	int ficheroServer; /* los ficheros descriptores */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
-		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", argv[0]);
+		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", stConf.czAppNameForLogger);
 		return -1;
 	}
 	else
