@@ -565,6 +565,7 @@ char* obtenerNoticia(char* sRecursoPedido) {
 }
 
 int llevaNoticia(char* sRecursoPedido) {
+	LoguearDebugging("--> llevaNoticia()", APP_NAME_FOR_LOGGER);
 	int i = 1;
 	
 	while(sRecursoPedido[i] != '/' && sRecursoPedido[i] != '\0' ) {
@@ -574,6 +575,7 @@ int llevaNoticia(char* sRecursoPedido) {
 	if(sRecursoPedido[i] == '\0') {
 		return 0;
 	}
+	LoguearDebugging("<-- llevaNoticia()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
 
