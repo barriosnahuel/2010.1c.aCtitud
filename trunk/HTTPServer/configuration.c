@@ -7,6 +7,8 @@
 #define APP_PORT "AppPort="
 #define OPENDS_SERVER "OpenDSServer="
 #define OPENDS_PORT "OpenDSPort="
+#define APP_NAME_FOR_LOGGER "AppNameForLogger="
+
 
 char *GetVal(const char *sValBuff, const char *sBuff){
     char *sVal;
@@ -69,6 +71,9 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	fclose(pfsArchConfig);
 
 	/* ------ modificar de ac� para abajo los valores que se quieren guardar --------*/
+
+	/* Cargo el nombre de la aplicacion para el logger */
+	strcpy(stConf->czAppNameForLogger,GetVal(APP_NAME_FOR_LOGGER, pszAux));
 
 	/* Cargo el puerto de OpenDS */
 	stConf->uiBDPuerto = atoi(GetVal(OPENDS_PORT, pszAux));
