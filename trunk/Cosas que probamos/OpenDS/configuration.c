@@ -22,7 +22,7 @@ char *GetVal(const char *sValBuff, const char *sBuff){
     sVal = strtok(sVal, "=");
     if(!sVal) return sVal2;
     sVal = strtok(NULL, "\n");
-    sVal[strlen(sVal)-1] = '\0';
+    sVal[strlen(sVal)] = '\0';
     return sVal;
 }
 
