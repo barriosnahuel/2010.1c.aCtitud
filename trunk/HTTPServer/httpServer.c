@@ -111,6 +111,11 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
 char* obtenerGrupoDeNoticias(char* sRecursoPedido);
 
 /**
+ * Funcion que devuelve 1 en caso de que el recurso sea del estilo /grupoDeNoticias/Noticia. Devolverá 0 si es /grupoDeNoticias nomas.
+ */
+int llevaNoticia(char* sRecursoPedido);
+
+/**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo Noticia.
  */
 char* obtenerNoticia(char* sRecursoPedido);
@@ -234,16 +239,20 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
 	if (strlen(sRecursoPedido) == 1) {
-		printf(
-				"El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
+		printf("El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
 		/* El gil de nahuel hace el select correspondiente xD */
 	} else {
 		/* Obtengo el grupo de noticias. */
 		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));
 		printf("El grupo de noticias es: %s\n", sGrupoDeNoticias);
-		/* Obtengo la noticia de dicho grupo. */
-		strcpy(sNoticia, obtenerNoticia(sRecursoPedido));
-		printf("La noticia es: %s\n", sNoticia);
+		
+		/* Me fijo si ademas del grupo de noticias viene la noticia */
+		if (llevaNoticia(sRecursoPedido)) {
+			/* Obtengo la noticia de dicho grupo. */
+			strcpy(sNoticia, obtenerNoticia(sRecursoPedido));
+			printf("La noticia es: %s\n", sNoticia);
+		}
+		
 	}
 
 	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
@@ -553,5 +562,18 @@ char* obtenerNoticia(char* sRecursoPedido) {
 	noticia[j] = '\0';
 	LoguearDebugging("<-- obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
 	return noticia;
+}
+
+int llevaNoticia(char* sRecursoPedido) {
+	int i = 1;
+	
+	while(sRecursoPedido[i] != '/' && sRecursoPedido[i] != '\0' ) {
+		i = i + 1;
+	}
+	
+	if(sRecursoPedido[i] == '\0') {
+		return 0;
+	}
+	return 1;
 }
 
