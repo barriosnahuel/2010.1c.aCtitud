@@ -536,11 +536,12 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 
 char* obtenerNoticia(char* sRecursoPedido) {
 	LoguearDebugging("--> obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
-
+	printf("Entre a obtener noticia.\n");
 	int i = 1;
 	int j = 0;
 	char noticia[1024];
 
+	printf("Entro al primer while.\n");
 	while (sRecursoPedido[i] != '/') {
 		i = i + 1;
 	}
