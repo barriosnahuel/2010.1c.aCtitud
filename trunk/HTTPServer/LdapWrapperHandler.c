@@ -7,13 +7,13 @@
 
 #include "LdapWrapperHandler.h"
 
+#define APP_NAME_FOR_LOGGER "HTTPServer"
+
 /*	Constantes de OpenDS	*/
 #define OPENDS_SCHEMA "ou=so,dn=utn,dn=edu"
 #define OPENDS_ATTRIBUTE_OBJECT_CLASS "objectClass"
 	#define OPENDS_ATTRIBUTE_OBJECT_CLASS_TOP "top"
 	#define OPENDS_ATTRIBUTE_OBJECT_CLASS_ARTICLE "utnArticle"
-#define OPENDS_ATTRIBUTE_ARTICLE_ID "utnArticleID"
-#define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME "utnArticleGroupName"
 #define OPENDS_ATTRIBUTE_ARTICLE_HEAD "utnArticleHead"
 #define OPENDS_ATTRIBUTE_ARTICLE_BODY "utnArticleBody"
 
@@ -84,6 +84,61 @@ VOID deleteEntry(PLDAP_SESSION 			session
 	sessionOp->deleteEntryObj(session, entry);*/
 	/* O se puede eliminar una entry pasando el dn correspondiente */
 
+}
+
+stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+					, char* 				sGrupoDeNoticias
+					, char* 				sArticleID){
+	LoguearDebugging("-->getArticle()", APP_NAME_FOR_LOGGER);
+	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
+
+	unsigned int uiMaxNumberOfCharacters=
+				strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)
+				+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT
+				+strlen(OPENDS_ATTRIBUTE_ARTICLE_ID)
+				+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT;
+	char* sCriterio= (char*)malloc(sizeof(char)*(uiMaxNumberOfCharacters));
+	memset(sCriterio, 0, uiMaxNumberOfCharacters);
+	sprintf(sCriterio, "(&(%s= %s)(%s= %s))", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias, OPENDS_ATTRIBUTE_ARTICLE_ID, sArticleID);
+
+	printf("sCriterio vale: %s\n", sCriterio);
+
+	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
+	PLDAP_ITERATOR iterator         = NULL;
+	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
+
+	stArticle stArticleToReturn;
+
+	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
+	iterator = resultSet->iterator;
+	if(!(iterator->hasNext(resultSet)))
+		printf("No hay ninguna entry que mostrar.\n");
+	while(iterator->hasNext(resultSet)) {
+		PLDAP_RECORD record = iterator->next(resultSet);
+
+		/* Itero sobre los campos de cada uno de los record */
+		while(recordOp->hasNextField(record)) {
+			PLDAP_FIELD field = recordOp->nextField(record);
+
+			if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
+				stArticleToReturn.sBody= (char*)field->valuesSize;
+			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)==0)
+				stArticleToReturn.sNewsgroup= (char*)field->valuesSize;
+			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_HEAD)==0)
+				stArticleToReturn.sHead= (char*)field->valuesSize;
+			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_ID)==0)
+				stArticleToReturn.uiArticleID= (int)field->valuesSize;
+
+			/* se libera la memoria utilizada por el field si este ya no es necesario. */
+			freeLDAPField(field);
+		}
+		/* libero los recursos consumidos por el record */
+		freeLDAPRecord(record);
+	}
+
+	LoguearDebugging("<-- getArticle()", APP_NAME_FOR_LOGGER);
+	return stArticleToReturn;
 }
 
 /**
