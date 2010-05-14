@@ -7,7 +7,7 @@
  * que se tomaran del archivo */
 typedef struct stConfiguracion {
     unsigned int 	uiAppPuerto;		/*	Puerto sobre el que estara escuchando la aplicacion.	*/
-    char 			czAppServer[15+1];  	/* se supone que es una direccion IP */
+    char 			czAppServer[15+1];  /* se supone que es una direccion IP */
 
 	char 			czBDServer[15+1];  	/* se supone que es una direccion IP */
     unsigned int	uiBDPuerto;
