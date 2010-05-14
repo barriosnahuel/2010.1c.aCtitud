@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <thread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
@@ -13,6 +14,7 @@
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
 #define REQUEST_TYPE_NEWS_LIST 2	/*	Indica que se esta solicitando el listado de noticias para un newsgroup especifico. 	*/
 #define REQUEST_TYPE_NEWS 3			/*	Indica que se esta solicitando una noticia en particular.	*/
+#define MAX_CHARACTERS_FOR_RESPONSE 5000	/*	TODO: La cantidad maxima de caracteres para el response esta bien 5000?	*/
 
 /*int thr_create(void *stack_base
  , size_t stack_size
@@ -31,7 +33,9 @@ typedef struct stThreadParameters {
 	/*	OpenDS/LDAP	*/
 	PLDAP_SESSION* pstPLDAPSession; /*	La sesion de OpenDS/LDAP */
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
-	 insertar/modificar/eliminar entries		*/
+													insertar/modificar/eliminar entries		*/
+
+	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
 /************************************************************************************************************
@@ -54,36 +58,38 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-void liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
-		PLDAP_CONTEXT_OP stPLDAPContextOperations,
-		PLDAP_SESSION stPLDAPSession,
-		PLDAP_SESSION_OP stPLDAPSessionOperations, stConfiguracion stConf);
+unsigned int obtenerTipoOperacionYVariables(char* sURL, char* sGrupoDeNoticias, char* sArticleID);
+void liberarRecursos( int 				ficheroServer
+					, PLDAP_CONTEXT		stPLDAPContext
+					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
+					, PLDAP_SESSION 	stPLDAPSession
+					, PLDAP_SESSION_OP 	stPLDAPSessionOperations
+					, stConfiguracion	stConf);
 /**
- * Procesa un request del tipo newsgroup. Es decir, el listado de newsgroup disponibles
+ * Procesa un request del tipo grupo de noticias. Es decir, el listado de grupo de noticias disponibles
  * y devuelve un response en formato HTML.
  */
-char* processRequestTypeNewsgroup(char* sRecursoPedido,
-		stThreadParameters* pstParametros);
+char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros);
 /**
- * Procesa un request del tipo news list. Es decir, busca las noticias pertenecientes a un newsgroup en particular
+ * Procesa un request del tipo news list. Es decir, busca las noticias pertenecientes a un grupo de noticias en particular
  * y devuelve un response en formato HTML.
  */
-char* processRequestTypeNewsList(char* sRecursoPedido,
+char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
 		stThreadParameters* pstParametros);
 /**
  * Procesa un request del tipo news. Es decir, busca una noticia en particular en base al sCriterio
  * y devuelve un response en formato HTML.
  */
-char* processRequestTypeNews(char* sRecursoPedido,
+char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
  */
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sURL);
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
-int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
+int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
 /**
@@ -91,27 +97,20 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
  */
 void guardarNoticiaEnCache(stArticle stArticulo);
 /**
- * Formatea la noticia la noticia a un char* en formato HTML para poder enviarle eso al cliente
- * y visualizar bien la pagina HTML.
- */
-char* formatearArticuloAHTML(stArticle stArticulo);
-/**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
 void* procesarRequestFuncionThread(void* threadParameters);
-
 /**
  * Esta funcion parsea el get que recibimos del browser y nos devuelve el recurso pedido por el usuario.
  */
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
-
 /**
  * De un string del estilo /grupoDeNoticias/Noticia obtengo grupoDeNoticias.
  */
 char* obtenerGrupoDeNoticias(char* sRecursoPedido);
 
 /**
- * Funcion que devuelve 1 en caso de que el recurso sea del estilo /grupoDeNoticias/Noticia. Devolverá 0 si es /grupoDeNoticias nomas.
+ * Funcion que devuelve 1 en caso de que el recurso sea del estilo /grupoDeNoticias/Noticia. Devolverï¿½ 0 si es /grupoDeNoticias nomas.
  */
 int llevaNoticia(char* sRecursoPedido);
 
@@ -119,6 +118,21 @@ int llevaNoticia(char* sRecursoPedido);
  * De un string del estilo /grupoDeNoticias/Noticia obtengo Noticia.
  */
 char* obtenerNoticia(char* sRecursoPedido);
+
+/************************************************
+ *	Declaracion funciones relacionadas al HTML	*
+ ************************************************/
+/**
+ * Formatea la noticia la noticia a un char* en formato HTML para poder enviarle eso al cliente
+ * y visualizar bien la pagina HTML.
+ */
+char* formatearArticuloAHTML(stArticle stArticulo);
+char* formatearListadoDeGruposDeNoticiasAHTML(stConfiguracion* pstConf, char* listadoGruposDeNoticias[], int len);
+/**
+ * Arma un tag a de HTML con un hipervinculo al sURL que se le pasa como parametro,
+ * y mostrando el  sNombreDelLink como el hipervinculo.
+ */
+char* armarLinkCon(char* sURL, char* sNombreDelLink);
 
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
@@ -134,8 +148,7 @@ int main(void) {
 		LoguearError("Archivo de configuracion no vÃ¡lido.", "HTTPServer");
 		return -1;
 	} else {
-		LoguearInformacion("Archivo de configuracion cargado correctamente.",
-				APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
 		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
 		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
 		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
@@ -161,47 +174,50 @@ int main(void) {
 	 ********************************************************/
 	int ficheroServer; /* los ficheros descriptores */
 	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
-	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)) {
-		LoguearError(
-				"No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.",
-				APP_NAME_FOR_LOGGER);
+	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
+		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", APP_NAME_FOR_LOGGER);
 		return -1;
-	} else
-		printf(
-				"Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n",
-				inet_ntoa(server.sin_addr), stConf.uiAppPuerto);
+	}
+	else{
+		strcpy(stConf.czAppServer, inet_ntoa(server.sin_addr));
+		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", stConf.czAppServer, stConf.uiAppPuerto);
+	}
+
+	printf("appServer: %s\n", stConf.czAppServer);
+	printf("appPuerto: %d\n", stConf.uiAppPuerto);
+
 
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	/*	while (1) {*/
-	int sin_size = sizeof(struct sockaddr_in);
-	struct sockaddr_in client; /* para la informacion de la direccion del cliente */
+/*	while (1) {*/
+		int sin_size = sizeof(struct sockaddr_in);
+		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
-	int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
-			&sin_size);
-	if (ficheroCliente != -1) {
-		/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
+		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
+				&sin_size);
+		if (ficheroCliente != -1) {
+			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
-		thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
+			thread_t threadProcesarRequest;/*	Declaro un nuevo thread. */
 
-		/*	Le seteo los parametros al nuevo thread.	*/
-		stThreadParameters stParameters;
-		stParameters.ficheroCliente = ficheroCliente;
-		stParameters.pstPLDAPSession = &stPLDAPSession;
-		stParameters.pstPLDAPSessionOperations = &stPLDAPSessionOperations;
+			/*	Le seteo los parametros al nuevo thread.	*/
+			stThreadParameters stParameters;
+			stParameters.ficheroCliente= ficheroCliente;
+			stParameters.pstPLDAPSession= &stPLDAPSession;
+			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
+			stParameters.pstConfiguration= &stConf;
 
-		if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
-				(void*) &stParameters, 0, &threadProcesarRequest) != 0)
-			printf(
-					"No se pudo crear un nuevo thread para procesar el request.\n");
-	} else
-		LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
-	printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-	/*	}*/
+			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
+					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
+				printf(
+						"No se pudo crear un nuevo thread para procesar el request.\n");
+		} else
+			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
+		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
+/*	}*/
 
-	printf(
-			"Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
+	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
 	printf("Ahora cierro socket, db, etc...\n");
@@ -215,66 +231,49 @@ int main(void) {
 void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
+
 	printf("---------------- Procesando thread xD -----------------\n");
 	int bytesRecibidos;
-	char* sResponse;
-	char sRecursoPedido[1024];
-	char sGrupoDeNoticias[1024];
-	char sNoticia[1024];
-
-	char sMensajeHTTPCliente[1024];/*	TODO: esto seria toda la url me parece, y en cada
-	 funcion la parseo y creo el criterio por el que voy a buscar en OpenDS!!			*/
+	char sMensajeHTTPCliente[1024];/*	TODO: No pueden valer lo mismo estos dos.	*/
 
 	int lenMensajeHTTPCliente;
 	lenMensajeHTTPCliente = 1024;
-	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente,
-			lenMensajeHTTPCliente, 0);
+	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente, lenMensajeHTTPCliente, 0);
 
 	printf("Recibi %d bytes del usuario.\n\n", bytesRecibidos);
 	printf("############################################################\n\n");
 	printf("%s", sMensajeHTTPCliente);
 	printf("############################################################\n");
 
+	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
-	if (strlen(sRecursoPedido) == 1) {
-		printf("El recurso es una '/', por lo tanto hay que mostrarle el listado de newsgroups.\n");
-		/* El gil de nahuel hace el select correspondiente xD */
-	} else {
-		/* Obtengo el grupo de noticias. */
-		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sRecursoPedido));
-		printf("El grupo de noticias es: %s\n", sGrupoDeNoticias);
-		
-		/* Me fijo si ademas del grupo de noticias viene la noticia */
-		if (llevaNoticia(sRecursoPedido)) {
-			/* Obtengo la noticia de dicho grupo. */
-			strcpy(sNoticia, obtenerNoticia(sRecursoPedido));
-			printf("La noticia es: %s\n", sNoticia);
-		}
-		
-	}
 
-	unsigned int uiOperation = REQUEST_TYPE_NEWS;/*	TODO: Esto hay que setearlo en base a lo que se pida en la URL	*/
+	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
+	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
+	unsigned int uiOperation= obtenerTipoOperacionYVariables(sRecursoPedido, sGrupoDeNoticia, sArticleID);
+	char* sResponse= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	switch (uiOperation) {
 	case REQUEST_TYPE_NEWSGROUP:
-		printf("Proceso la obtencion del listado de newsgroup.\n");
-		sResponse = processRequestTypeNewsgroup(sRecursoPedido, &stParametros);
+		LoguearInformacion("Proceso la obtencion del listado de grupos de noticias.", APP_NAME_FOR_LOGGER);
+		sResponse = processRequestTypeListadoGruposDeNoticias(&stParametros);
 		break;
 	case REQUEST_TYPE_NEWS_LIST:
-		printf(
-				"Proceso la obtencion del listado de noticias para un newsgroup.\n");
-		sResponse = processRequestTypeNewsList(sRecursoPedido, &stParametros);
+		LoguearInformacion("Proceso la obtencion del listado de noticias para un grupo de noticias.", APP_NAME_FOR_LOGGER);
+		sResponse = processRequestTypeListadoDeNoticias(sGrupoDeNoticia, &stParametros);
 		break;
 	case REQUEST_TYPE_NEWS:
-		printf("Proceso la obtencion de una noticia en particular.\n");
-		sResponse = processRequestTypeNews(sRecursoPedido, &stParametros);
+		LoguearInformacion("Proceso la obtencion de una noticia en particular.", APP_NAME_FOR_LOGGER);
+		sResponse = processRequestTypeUnaNoticia(sGrupoDeNoticia, sArticleID, &stParametros);
 		break;
 	default:
-		printf("Por default proceso la obtencion del listado de newsgroup.\n");
-		sResponse = processRequestTypeNewsgroup(sRecursoPedido, &stParametros);
+		LoguearInformacion("Por default, obtengo el listado de grupos de noticias.", APP_NAME_FOR_LOGGER);
+		sResponse = processRequestTypeListadoGruposDeNoticias(&stParametros);
 		break;
 	}
+	free(sGrupoDeNoticia);
+	free(sArticleID);
 
 	int len, bytesEnviados;
 	len = strlen(sResponse);
@@ -288,6 +287,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	printf("Voy a cerrar la conexion con el cliente\n");
 	close(stParametros.ficheroCliente);
+
+	/*	TODO: Libero la memoria	*/
+	free(sResponse);
 
 	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
 
@@ -359,10 +361,12 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * 1. Cierra el socket.
  * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
  */
-void liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
-		PLDAP_CONTEXT_OP stPLDAPContextOperations,
-		PLDAP_SESSION stPLDAPSession,
-		PLDAP_SESSION_OP stPLDAPSessionOperations, stConfiguracion stConf) {
+void liberarRecursos(int 				ficheroServer
+					, PLDAP_CONTEXT		stPLDAPContext
+					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
+					, PLDAP_SESSION 	stPLDAPSession
+					, PLDAP_SESSION_OP	stPLDAPSessionOperations
+					, stConfiguracion	stConf) {
 	LoguearDebugging("--> liberarRecursos()", APP_NAME_FOR_LOGGER);
 
 	/*	Cierro/Libero lo relacionado a la BD	*/
@@ -379,14 +383,14 @@ void liberarRecursos(int ficheroServer, PLDAP_CONTEXT stPLDAPContext,
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
 
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sURL) {
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sArticleID) {
 	LoguearDebugging("--> buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
-	return 0;
+	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
 }
 
-int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
+int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
@@ -395,25 +399,7 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
 	PLDAP_ENTRY_OP entryOp = newLDAPEntryOperations();
 	PLDAP_ATTRIBUTE_OP attribOp = newLDAPAttributeOperations();
 
-	/********************************************************************************
-	 *	A partir de aca es de prueba de OpenDS										*
-	 ********************************************************************************/
-	selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
-	insertEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, entryOp,
-			attribOp, *pstArticulo);
-	selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
-
-	(*pstArticulo).sBody = "cambie el body para probar el update";
-	updateEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, entryOp,
-			attribOp, *pstArticulo);
-	selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
-
-	deleteEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, entryOp,
-			(*pstArticulo).uiArticleID);
-	selectEntries(*pstPLDAPSession, *pstPLDAPSessionOperations, sURL);
-	/********************************************************************************
-	 *	Hasta aca es la prueba														*
-	 *******************************************************************************/
+	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
@@ -422,8 +408,6 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sURL,
 void guardarNoticiaEnCache(stArticle stArticulo) {
 	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
-	printf("Entre a guardarNoticiaEnCache.\n");
-
 	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return;
 }
@@ -431,32 +415,21 @@ void guardarNoticiaEnCache(stArticle stArticulo) {
 char* formatearArticuloAHTML(stArticle stArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
-	char* response;
-	strcpy(
-			response,
-			"<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, pero aca tendria que estar devolviendo una noticia en particular</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>");
+	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	sprintf(response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P>%s<P></BODY></HTML>", stArticulo.sHead, stArticulo.sBody);
 
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
 }
 
-char* processRequestTypeNews(char* sRecursoPedido,
+char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
-	LoguearDebugging("--> processRequestTypeNews()", APP_NAME_FOR_LOGGER);
-
-	/*	TODO: Aca tengo que parsear el recurso y armar el criterio	*/
-
-	char* sCriterio = "utnArticleID=*"; /*	TODO: Aca tendria que parsear sURL y crear un filtro como corresponde. ahora esta hardocodeado!	*/
+	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	stArticulo.sBody = "este es el body!";
-	stArticulo.sHead = "este es el head!";
-	stArticulo.sNewsgroup = "blablabla.com";
-	stArticulo.uiArticleID = 12345;
-
-	if (!buscarNoticiaEnCache(&stArticulo, sCriterio)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
-		buscarNoticiaEnBD(&stArticulo, sCriterio,
+		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
@@ -465,26 +438,72 @@ char* processRequestTypeNews(char* sRecursoPedido,
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
-	LoguearDebugging("<-- processRequestTypeNews()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 	return formatearArticuloAHTML(stArticulo);
 }
 
-char* processRequestTypeNewsgroup(char* sRecursoPedido,
-		stThreadParameters* pstParametros) {
-	LoguearDebugging("--> processRequestTypeNewsgroup()", APP_NAME_FOR_LOGGER);
+char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
+	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 
-	/*	TODO: Aca proceso.	*/
+	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
+	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
 
-	LoguearDebugging("<-- processRequestTypeNewsgroup()", APP_NAME_FOR_LOGGER);
-	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de grupos de noticias</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
+	int len= 2;
+	char* listadoGrupoNoticias[len];
+
+	/*	TODO: Aca hago la busqueda.	*/
+	listadoGrupoNoticias[0]= "Clarin";
+	listadoGrupoNoticias[1]= "La Nacion";
+
+	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	return formatearListadoDeGruposDeNoticiasAHTML((*pstParametros).pstConfiguration, listadoGrupoNoticias, len);
 }
-char* processRequestTypeNewsList(char* sRecursoPedido,
-		stThreadParameters* pstParametros) {
-	LoguearDebugging("--> processRequestTypeNewsList()", APP_NAME_FOR_LOGGER);
 
-	/*	TODO: Aca proceso.	*/
+char* formatearListadoDeGruposDeNoticiasAHTML(stConfiguracion* pstConf, char* listadoGruposDeNoticias[], int len){
+	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 
-	LoguearDebugging("<-- processRequestTypeNewsList()", APP_NAME_FOR_LOGGER);
+	char* sURL= (char*)malloc(sizeof(char)*(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+30));
+	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
+
+	int i;
+	for(i=0; i<len; i++){
+		sprintf(sURL, "%s:%d/%s", (*pstConf).czAppServer, (*pstConf).uiAppPuerto, listadoGruposDeNoticias[i]);
+		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGruposDeNoticias[i]));
+	}
+	free(sURL);
+	sprintf(response, "%s%s", response, "</BODY></HTML>");
+
+	LoguearDebugging("<-- formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
+	return response;
+}
+
+char* armarLinkCon(char* sURL, char* sNombreDelLink){
+	LoguearDebugging("--> armarLinkCon()", APP_NAME_FOR_LOGGER);
+printf("url vale: %s\n", sURL);
+	/*	+50 Porque tengo que tener en cuenta ip:puerto/grupoNoticia/noticiaID	*/
+	char* sTag= (char*)malloc(sizeof(char)*(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50));
+	memset(sTag, 0, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50);
+	sprintf(sTag, "<A href=\"/%s\">%s</A><BR />", sURL, sNombreDelLink);
+printf("tag vale: %s\n", sTag);
+	LoguearDebugging("<-- armarLinkCon()", APP_NAME_FOR_LOGGER);
+	return sTag;
+}
+
+char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
+	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
+
+	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
+	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
+
+	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT];
+	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias);
+
+	printf("sCriterio quedo en: %s\n", sCriterio);
+	/*	TODO: Aca hago la busqueda	*/
+
+
+	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
 }
 
@@ -579,3 +598,25 @@ int llevaNoticia(char* sRecursoPedido) {
 	return 1;
 }
 
+
+unsigned int obtenerTipoOperacionYVariables(char* sURL, char* sGrupoDeNoticias, char* sArticleID){
+	unsigned int uiOperation;
+	if (strlen(sURL) == 1)
+		uiOperation= REQUEST_TYPE_NEWSGROUP;
+	else {
+		/* Obtengo el grupo de noticias. */
+		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sURL));
+
+		/* Me fijo si ademas del grupo de noticias viene la noticia */
+		if (llevaNoticia(sURL)) {
+			/* Obtengo la noticia de dicho grupo. */
+			strcpy(sArticleID, obtenerNoticia(sURL));
+			uiOperation= REQUEST_TYPE_NEWS;
+		}
+		else
+			/*	Como la URL no tiene el sufijo /noticiaID, el cliente me esta pidiendo
+				 el listado de noticias para un grupo de noticia dado.					*/
+			uiOperation= REQUEST_TYPE_NEWS_LIST;
+	}
+	return uiOperation;
+}

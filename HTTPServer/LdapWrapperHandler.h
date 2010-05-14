@@ -11,7 +11,20 @@
 #include "LdapWrapper.h"
 #include "Article.h"
 
+/*	Estos dos atributos los defino aca, porque necesito tener acceso
+ *  desde el httpServer.c para poder buscar lo que necesito.
+ */
+#define OPENDS_ATTRIBUTE_ARTICLE_ID "utnArticleID"
+#define OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT 11
+#define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME "utnArticleGroupName"
+#define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT 25
+
 char* getDNFor(int dArticleID);
+
+stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+					, char* 				sGrupoDeNoticias
+					, char* 				sArticleID);
 
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.
