@@ -183,9 +183,6 @@ int main(void) {
 		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", stConf.czAppServer, stConf.uiAppPuerto);
 	}
 
-	printf("appServer: %s\n", stConf.czAppServer);
-	printf("appPuerto: %d\n", stConf.uiAppPuerto);
-
 
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
