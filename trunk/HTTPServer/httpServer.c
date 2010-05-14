@@ -127,7 +127,7 @@ char* obtenerNoticia(char* sRecursoPedido);
  * y visualizar bien la pagina HTML.
  */
 char* formatearArticuloAHTML(stArticle stArticulo);
-char* formatearListadoDeGruposDeNoticiasAHTML(stConfiguracion* pstConf, char* listadoGruposDeNoticias[], int len);
+char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len);
 /**
  * Arma un tag a de HTML con un hipervinculo al sURL que se le pasa como parametro,
  * y mostrando el  sNombreDelLink como el hipervinculo.
@@ -442,6 +442,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 
+	/*	Sumo 3 por el =* y el \0	*/
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
 
@@ -453,19 +454,20 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	listadoGrupoNoticias[1]= "La Nacion";
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML((*pstParametros).pstConfiguration, listadoGrupoNoticias, len);
+	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticias, len);
 }
 
-char* formatearListadoDeGruposDeNoticiasAHTML(stConfiguracion* pstConf, char* listadoGruposDeNoticias[], int len){
+char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 
-	char* sURL= (char*)malloc(sizeof(char)*(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+30));
+	/*	1+OPEN...+5+1 = /nombreGrupoNoticia.html\0	*/
+	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
 
 	int i;
 	for(i=0; i<len; i++){
-		sprintf(sURL, "%s:%d/%s", (*pstConf).czAppServer, (*pstConf).uiAppPuerto, listadoGruposDeNoticias[i]);
+		sprintf(sURL, "%s%s", listadoGruposDeNoticias[i], ".html");
 		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGruposDeNoticias[i]));
 	}
 	free(sURL);
