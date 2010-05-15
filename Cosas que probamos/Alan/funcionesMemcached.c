@@ -115,7 +115,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  fomarClave(claveCache,sGrupoDeNoticias,sArticle->uiArticleID);
+  fomarClave(claveCache,sGrupoDeNoticias,pstArticulo>uiArticleID);
   
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
@@ -138,11 +138,11 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   
    
   pstArticulo->sNewsgroup = sGrupoDeNoticias;
-  pstArticulo->uiArticulo = sArticle->uiArticleID;
+  pstArticulo->uiArticulo = pstArticulo->uiArticleID;
   pstArticulo->sHead	  = resultNoticia->head;
   pstArticulo->sBody	  = resultNoticia->body;
   
   free(claveCache);
   free(resultNoticia);
   return 0;
-}
+};
