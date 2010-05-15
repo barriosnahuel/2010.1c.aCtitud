@@ -502,10 +502,8 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
 	int i;
 	int j = 0;
-	printf("Entre a quitarRepetidos!!\n");
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		printf("Entre al for\n");
 		if(!estaEnArrayDeNoRepetidos(listadoGruposDeNoticias[i], listadoGruposDeNoticiasSinRepetir)) {
 			printf("Asigne al listado de noticias sin repetir el siguiente newsgroup: %s\n", listadoGruposDeNoticias[i]);
 			listadoGruposDeNoticiasSinRepetir[j] = listadoGruposDeNoticias[i];
@@ -517,15 +515,17 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 }
 
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
-	printf("Entre al estaEnArrayDeNoRepetidos\n");
-	int i;
-	int longitudArray = sizeof(listadoGruposDeNoticiasSinRepetir);
+	int i = 0;
+	int longitudArray = 5;
 	
-	for(i = 0; i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias; i++) {
-		;
+	while(i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
+		i = i + 1;
 	}
+	/*for(i = 0; i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias; i++) {
+		;
+	}*/
 	
-	if(listadoGruposDeNoticiasSinRepetir[i] == grupoDeNoticias) {
+	if(strcmp(listadoGruposDeNoticiasSinRepetir[i], grupoDeNoticias) == 0) {
 		return 1;
 	}
 	
