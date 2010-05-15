@@ -15,7 +15,6 @@
 void iniciarClusterCache(memcached_st* memc)
 {
   memcached_server_st *servers = NULL;
-  memcached_st *memc;
   memcached_return rc;
   uint32_t flags;
 
