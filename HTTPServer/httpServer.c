@@ -547,6 +547,7 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], i
 	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
 		sprintf(sURL, "%s%s", listadoGruposDeNoticias[i], ".html");
 		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGruposDeNoticias[i]));
+		printf("Cicle %d vez\n", (i+1));
 	}
 	free(sURL);
 
