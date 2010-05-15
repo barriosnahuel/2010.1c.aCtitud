@@ -93,6 +93,11 @@ printf("1 lo que quedo: %s\n", cBuffer);
         printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
 
+        char cBufferPrueba[3064];
+        SSL_read(ssl, cBufferPrueba, sizeof(cBufferPrueba));
+
+        printf("el buffer de prueba: %s\n", cBufferPrueba);
+
         printf("bytesleidos: %d\n", bytesLeidos);
         cBuffer[bytesLeidos] = '\0';
 
