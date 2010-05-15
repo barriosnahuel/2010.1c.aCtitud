@@ -497,6 +497,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	printf("SI ESTO ANDA ES UNA VERGA: %s\n", listadoGrupoDeNoticiasSinRepetir[0]);
 	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoDeNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
@@ -514,7 +515,6 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 	if(j > 0) {
 		return (j-1);
 	}
-	printf("voy a devolver 1\n");
 	return iCantidadDeGruposDeNoticias;
 	
 	
@@ -548,9 +548,7 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRep
 	int i;
 	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
 		sprintf(sURL, "%s%s", listadoGrupoDeNoticiasSinRepetir[i], ".html");
-		printf("pude hacer el primer sprintf\n");
 		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGrupoDeNoticiasSinRepetir[i]));
-		printf("Cicle %d vez\n", (i+1));
 	}
 	free(sURL);
 
