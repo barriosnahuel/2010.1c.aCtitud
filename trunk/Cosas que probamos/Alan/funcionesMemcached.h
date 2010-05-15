@@ -1,6 +1,6 @@
 #ifndef FUNCIONES_MEMCACHED
 #define FUNCIONES_MEMCACHED
-
+#include <libmemcached/memcached.h>
 typedef struct _largoArticulo{
   size_t largoHead;
   size_t largoBody;
