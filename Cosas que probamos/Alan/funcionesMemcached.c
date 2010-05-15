@@ -12,7 +12,7 @@
 //    char* sBody;				/*	El body de la noticia	*/
 //} stArticle;
 
-memcached_st* iniciarClusterMemcached()
+void iniciarClusterMemcached(memcached_st* memc)
 {
   memcached_server_st *servers = NULL;
   memcached_st *memc;
@@ -35,7 +35,7 @@ memcached_st* iniciarClusterMemcached()
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 
-  return memc;
+  return;
 }
 
 
