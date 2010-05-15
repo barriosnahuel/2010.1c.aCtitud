@@ -94,6 +94,7 @@ printf("1 lo que quedo: %s\n", cBuffer);
         printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
 
+        enviarMensaje("ARTICLE 69");
         char cBufferPrueba[3064];
         SSL_read(ssl, cBufferPrueba, sizeof(cBufferPrueba));
 
