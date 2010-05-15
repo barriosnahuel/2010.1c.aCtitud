@@ -497,7 +497,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	printf("SI ESTO ANDA ES UNA VERGA: %s\n", listadoGrupoDeNoticiasSinRepetir[0]);
+	printf("SI ESTO ANDA ES UNA VERGA: %s\n", listadoGrupoDeNoticias[0]);
 	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoDeNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
