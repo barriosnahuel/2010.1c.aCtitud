@@ -530,9 +530,34 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoN
 	int p = 0;
 	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
 	
-	while(p <= longitudArray && (strcmp(listadoGrupoNoticiasSinRepetir[p], grupoDeNoticias) != 0)) {
-		p = p + 1;
+
+
+	/*NBarrios: esto es prueba mip*/
+	int index;
+	int cantidadEnNoRepetidos= 0;/*esto es dinamico*/
+	int cantidadEnRepetidos= 3;/*esto es dinamico*/
+
+	for(index=0; index<cantidadEnRepetidos; index++){
+
+		int contadorRepetidos;
+		for(contadorRepetidos=0;	contadorRepetidos<cantidadEnNoRepetidos
+									&& contadorRepetidos<cantidadEnRepetidos
+									&& (strcmp(listadoGrupoNoticiasSinRepetir[contadorRepetidos], grupoDeNoticias)!=0)	;	contadorRepetidos++){
+			printf("entro al while\n");
+			cantidadEnNoRepetidos++;
+			printf("incremento p y vale: %d\n", contadorRepetidos);
+		}
+		listadoGrupoNoticiasSinRepetir[contadorRepetidos]= grupoDeNoticias;
+
 	}
+	/*NBarrios: esto es prueba mip*/
+
+
+
+
+/*	while(p <= longitudArray && (strcmp(listadoGrupoNoticiasSinRepetir[p], grupoDeNoticias) == 1)) {
+		p = p + 1;
+	}*/
 	
 	if(p > longitudArray) {
 		return 0;
