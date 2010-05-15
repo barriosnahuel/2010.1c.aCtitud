@@ -495,6 +495,8 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
+	printf("El primer articulo de LOS REPETIDOS: %s\n", listadoGrupoNoticias[0]);
+	printf("El primer articulo de LOS NOOOO REPETIDOS: %s\n", listadoGrupoNoticiasSinRepetir[0]);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
