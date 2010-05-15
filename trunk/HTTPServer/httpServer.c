@@ -511,7 +511,11 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 			j = j + 1;
 		}
 	}
-	return (j-1);
+	if(j > 0) {
+		return (j-1);
+	} else {
+		return iCantidadDeGruposDeNoticias;
+	}
 	
 }
 
