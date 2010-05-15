@@ -523,14 +523,14 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
 	
-	int i = 0;
+	int p = 0;
 	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
 	
-	while(i <= longitudArray && listadoGrupoNoticiasSinRepetir[i] != grupoDeNoticias) {
-		i = i + 1;
+	while(p <= longitudArray/* && listadoGrupoNoticiasSinRepetir[p] != grupoDeNoticias*/) {
+		p = p + 1;
 	}
 	
-	if(i > longitudArray) {
+	if(p > longitudArray) {
 		return 0;
 	}
 	return 1;
