@@ -111,7 +111,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   memcached_return rc;
  
   t_news *resultNoticia = malloc(sizeof(t_news));
-  char *resultadoCache  = NULL;
+  char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
