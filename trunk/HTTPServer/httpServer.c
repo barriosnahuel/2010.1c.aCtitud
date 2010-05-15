@@ -512,6 +512,7 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 			j = j + 1;
 		}
 	}
+	printf("Jota vale: %d\n", j);
 	if(j > 0) {
 		return (j-1);
 	}
