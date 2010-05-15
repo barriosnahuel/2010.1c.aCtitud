@@ -115,7 +115,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  fomarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);
+  formarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);
   
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
