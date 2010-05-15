@@ -9,6 +9,7 @@
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 #include "funcionesMemcached.h"
+#include <libmemcached/memcached.h>
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define APP_NAME_FOR_LOGGER "HTTPServer"
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
