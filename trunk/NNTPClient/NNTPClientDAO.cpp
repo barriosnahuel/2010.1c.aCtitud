@@ -83,7 +83,7 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 
 string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos;
-        memset(cBuffer, 0, 1024);
+        memset(cBuffer, 1024, 0);
         // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
 
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
