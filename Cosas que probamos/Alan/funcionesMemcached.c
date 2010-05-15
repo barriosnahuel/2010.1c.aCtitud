@@ -106,7 +106,7 @@ char* formarClave(char* sGrupoDeNoticias, int ID )
 	
 }
 
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st memc)
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
 {
   uint32_t flags;
   memcached_return rc;

@@ -24,6 +24,6 @@ void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias);
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
  */
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st memc);
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st* memc);
 
 #endif
