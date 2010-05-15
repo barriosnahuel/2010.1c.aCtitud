@@ -1,3 +1,5 @@
+#include"funcionesMemcached.h"
+
 #ifndef FUNCIONES_MEMCACHED
 #define FUNCIONES_MEMCACHED
 
@@ -13,6 +15,7 @@ typedef struct _articuloCache{
 }t_news;
 
 memcached_st iniciarClusterCache();
+
 
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias);
 
