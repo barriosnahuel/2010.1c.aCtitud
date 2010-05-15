@@ -423,9 +423,10 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
-	memcached_st memc = iniciarClusterCache(); //Dps le voy a tener que pasar el puerto y la ip de los servidores
+	memcached_st memc = iniciarClusterCache(); /*Dps le voy a tener que pasar el puerto y la ip de los servidores*/
 	
 	stArticle stArticulo;
+	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID,memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
