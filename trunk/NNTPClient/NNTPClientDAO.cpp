@@ -82,12 +82,22 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 }
 
 string NNTPClientDAO::recibirRespuesta() {
-        int bytesLeidos;
-        memset(cBuffer, 1024, 0);
+        int bytesLeidos= 0;
+
+printf("1: %s\n", cBuffer);
+        memset(cBuffer, 0, 3064);
         // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
 
+        printf("2: %s\n", cBuffer);
+
+        printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
+
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
+
+        printf("bytesleidos: %d\n", bytesLeidos);
         cBuffer[bytesLeidos] = '\0';
+
+        printf("3: %s\n", cBuffer);
 
 
         return cBuffer;
