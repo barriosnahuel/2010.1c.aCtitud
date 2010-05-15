@@ -526,7 +526,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoN
 	int i = 0;
 	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
 	
-	while(i <= longitudArray && listadoGrupoNoticiasSinRepetir[i] != grupoDeNoticias) {
+	while(i <= longitudArray && (strcmp(listadoGrupoNoticiasSinRepetir[i],grupoDeNoticias))) {
 		printf("La segunda vez esto no deberia mostrarse\n");
 		i = i + 1;
 	}
