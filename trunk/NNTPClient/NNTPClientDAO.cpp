@@ -83,7 +83,6 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 }
 
 string NNTPClientDAO::recibirRespuesta() {
-		stLogger.LoguearDebugging("--> recibirRespuesta()", "NNTPClient");
         int bytesLeidos= 0;
 
 		char cBuffer[3064];/*	TODO: Chequear este tamaño.	*/
@@ -94,6 +93,5 @@ string NNTPClientDAO::recibirRespuesta() {
 
         printf("cBuffer vale: %s\n", cBuffer);
 
-        stLogger.LoguearDebugging("<-- recibirRespuesta()", "NNTPClient");
         return cBuffer;
 }
