@@ -505,7 +505,7 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 	int j = 0;
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		if(!estaEnArrayDeNoRepetidos(&listadoGruposDeNoticias[i], &listadoGruposDeNoticiasSinRepetir)) {
+		if(!estaEnArrayDeNoRepetidos(listadoGruposDeNoticias[i], listadoGruposDeNoticiasSinRepetir)) {
 			printf("Asigne al listado de noticias sin repetir el siguiente newsgroup: %s\n", listadoGruposDeNoticias[i]);
 			listadoGruposDeNoticiasSinRepetir[j] = listadoGruposDeNoticias[i];
 			j = j + 1;
@@ -522,9 +522,9 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
 	
 	int i = 0;
-	int longitudArray = 5;
+	int longitudArray = 0;
 	
-	while(i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
+	while(i =< longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
 		i = i + 1;
 	}
 	/*for(i = 0; i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias; i++) {
