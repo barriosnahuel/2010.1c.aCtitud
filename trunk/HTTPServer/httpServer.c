@@ -522,7 +522,7 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
 	
 	int i = 0;
-	int longitudArray = sizeof(listadoGruposDeNoticiasSinRepetir);
+	int longitudArray = 1000;
 	
 	printf("El sizeof del listado sin repetir es de: %d\n", longitudArray);
 	
