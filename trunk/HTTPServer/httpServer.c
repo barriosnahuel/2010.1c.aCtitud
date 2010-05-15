@@ -514,6 +514,7 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 	if(j > 0) {
 		return (j-1);
 	}
+	printf("voy a devolver 1\n");
 	return iCantidadDeGruposDeNoticias;
 	
 	
