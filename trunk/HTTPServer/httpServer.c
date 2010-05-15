@@ -528,7 +528,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoN
 	
 	strcpy(grupoDeNoticiasAux, listadoGrupoNoticiasSinRepetir[0]);
 	
-	while(p <= longitudArray && (strcpr(grupoDeNoticiasAux, grupoDeNoticias)) == 1) {
+	while(p <= longitudArray && (strcmp(grupoDeNoticiasAux, grupoDeNoticias)) == 1) {
 		p = p + 1;
 		strcpy(grupoDeNoticiasAux, listadoGrupoNoticiasSinRepetir[p]);
 	}
