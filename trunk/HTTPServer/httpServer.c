@@ -524,7 +524,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupos
 	int i = 0;
 	int longitudArray = 0;
 	
-	while(i =< longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
+	while(i <= longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
 		i = i + 1;
 	}
 	/*for(i = 0; i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias; i++) {
