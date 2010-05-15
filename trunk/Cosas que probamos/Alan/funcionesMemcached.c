@@ -3,14 +3,15 @@
 #include <unistd.h>
 #include<stdlib.h>
 #include"funcionesMemcached.h"
-#include <libmemcached/memcached.h>
 
-//typedef struct stArticle {
-//    unsigned int uiArticleID;	/*	ID de la noticia.	*/
-//    char* sNewsgroup;			/*	El grupo al que pertenece la noticia.	*/
-//    char* sHead;				/*	El header de la noticia.	*/
-//    char* sBody;				/*	El body de la noticia	*/
-//} stArticle;
+
+/** 
+typedef struct stArticle {
+     unsigned int uiArticleID;	
+     char* sNewsgroup;			
+     char* sHead;				
+     char* sBody;				
+} stArticle;
 /*
 void iniciarClusterCache(memcached_st* memc)
 {
