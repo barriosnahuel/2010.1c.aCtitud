@@ -1,0 +1,5 @@
+g++ loggertest.cpp logger.cpp -o loggertest
+
+
+gcc loggertest.c logger.c -o loggertest
+2
