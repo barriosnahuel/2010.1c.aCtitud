@@ -474,6 +474,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	printf("Entre a processRequestTypeListadoGruposDeNoticias\n");
 
 	/*	Sumo 3 por el =* y el \0	*/
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
@@ -486,12 +487,16 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	char* listadoGrupoDeNoticiasSinRepetir[1000];
 	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
-
+	
+	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
+	
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
 	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, &cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
+	
+	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoDeNoticiasSinRepetir, cantidadDeGruposSinRepetir);
+	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoDeNoticiasSinRepetir, &cantidadDeGruposSinRepetir);
 }
 
 unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
@@ -525,6 +530,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupos
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
+	printf("Estoy formateando el listado de noticias sin repetir\n");
 
 	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
