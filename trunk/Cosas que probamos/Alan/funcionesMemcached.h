@@ -16,4 +16,5 @@ typedef struct _articuloCache{
 void iniciarClusterCache(memcached_st* memc);
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st* memc);
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st* memc);
+void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID );
 #endif 
