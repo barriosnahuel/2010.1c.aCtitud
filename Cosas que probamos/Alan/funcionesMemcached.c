@@ -41,7 +41,7 @@ void iniciarClusterCache(memcached_st* memc)
 
 void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st* memc)
 {
-	
+  memcached_return rc;
   t_news *articuloCache = malloc(sizeof(t_news));
   char* claveCache = NULL;
   int largoID;
