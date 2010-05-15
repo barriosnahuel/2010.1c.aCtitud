@@ -520,7 +520,7 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 }
 
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
-	printf("entre a estaEnArrayDeNoRepetidos\n");
+	
 	int i = 0;
 	int longitudArray = 5;
 	
@@ -531,6 +531,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupos
 		;
 	}*/
 	
+	printf("TOY POR HACER EL STRCMP\n");
 	if(strcmp(listadoGruposDeNoticiasSinRepetir[i], grupoDeNoticias) == 0) {
 		return 1;
 	}
