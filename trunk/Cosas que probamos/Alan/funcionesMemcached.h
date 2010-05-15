@@ -15,7 +15,7 @@ typedef struct _articuloCache{
   char *body;
 }t_news;
 
-memcached_st * iniciarClusterCache();
+void iniciarClusterCache(memcached_st * memc);
 
 
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias);
