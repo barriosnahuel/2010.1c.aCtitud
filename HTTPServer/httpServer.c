@@ -524,10 +524,10 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
 	
 	int i = 0;
-	int longitudArray = 1000; /* TODO: Hay que ver como modificar esto */
+	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
 	
 	while(i <= longitudArray && listadoGrupoNoticiasSinRepetir[i] != grupoDeNoticias) {
-		printf("Esto deberia mostrarse solamente 1 vez\n");
+		printf("La segunda vez esto no deberia mostrarse\n");
 		i = i + 1;
 	}
 	
