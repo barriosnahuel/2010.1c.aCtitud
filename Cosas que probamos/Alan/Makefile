@@ -3,8 +3,8 @@ CFLAGS=-ansi
 OPENDSLIBS=-L/usr/local/lib -lldap -llber
 LIBS= $(OPENDSLIBS) -lsocket -lnsl -lmemcached
 
-HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o funcionesMemcached.o
-	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o ./funcionesMemcached.o
+HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o memcachedServer.o
+	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o ./memcachedServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
