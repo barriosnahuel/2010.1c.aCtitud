@@ -84,14 +84,15 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos= 0;
 
-printf("1: %s\n", cBuffer);
+printf("1 lo que quedo: %s\n", cBuffer);
         memset(cBuffer, 0, 3064);
         // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
 
-        printf("2: %s\n", cBuffer);
+        printf("2 lo limpie: %s\n", cBuffer);
 
         printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
-
+printf("%s\n", ssl);
+printf("%d\n", ssl);
         bytesLeidos = SSL_read(ssl, cBuffer, 3064);
 
         printf("bytesleidos: %d\n", bytesLeidos);
