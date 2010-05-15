@@ -1,10 +1,10 @@
 OPTFLAGS=-c -o
 CFLAGS=-ansi
 OPENDSLIBS=-L/usr/local/lib -lldap -llber
-LIBS= $(OPENDSLIBS) -lsocket -lnsl -lmemcached
+LIBS= $(OPENDSLIBS) -lsocket -lnsl
 
-HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o funcionesMemcached.o
-	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o ../Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o ./funcionesMemcached.o
+HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o 
+	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o ../Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
@@ -28,10 +28,7 @@ LdapWrapperHandler.o: LdapWrapperHandler.c LdapWrapperHandler.h
 httpServer.o: httpServer.c 
 	gcc $(CFLAGS) $(OPTFLAGS) httpServer.o httpServer.c
 
-funcionesMemcached.o: funcionesMemcached.c funcionesMemcached.h
-	gcc $(CFLAGS) $(OPTFLAGS) funcionesMemcached.o funcionesMemcached.c
 
-	
 #	-------------------------------------------------------
 #	Nota:	Podemos ejecutar "make clean" y esto elimina todos los *.o para poder generarlos
 #			nuevamente cuando nos dice ya estan compilados con la ultima version.
