@@ -120,8 +120,9 @@ char* obtenerNoticia(char* sRecursoPedido);
 
 /**
  * Del array listadoGruposDeNoticias toma los grupos y va guardando los que no se repiten en listadoGruposDeNoticiasSinRepetir.
+ * Retorna la cantidad de elementos de listadoGruposDeNoticiasSinRepetir.
  */
-VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]);
+unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]);
 
 /**
  * Devuelve 1 si el grupoDeNoticias ya se encuentra en listadoGruposDeNoticiasSinRepetir.
@@ -481,18 +482,19 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	unsigned int cantidadDeGrupos= 0;
+	unsigned int cantidadDeGruposSinRepetir= 0;
 	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	char* listadoGrupoDeNoticiasSinRepetir[1000];
 	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
-	quitarRepetidos(&listadoGrupoNoticias, &cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
+	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, &cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticias, cantidadDeGrupos);
+	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoDeNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
-VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
+unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
 	int i;
 	int j = 0;
 	
@@ -502,6 +504,7 @@ VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNot
 			j = j + 1;
 		}
 	}
+	return (j-1);
 	
 }
 
