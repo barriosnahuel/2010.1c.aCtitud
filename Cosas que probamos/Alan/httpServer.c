@@ -424,7 +424,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	memcached_st* memc;
-    iniciarClusterCache(&memc); /*Dps le voy a tener que pasar el puerto y la ip de los servidores*/
+    iniciarClusterCache(*memc); /*Dps le voy a tener que pasar el puerto y la ip de los servidores*/
 	
 	stArticle stArticulo;
 	
