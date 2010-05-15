@@ -8,7 +8,7 @@
 #include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
-
+#include "funcionesMemcached.h"
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define APP_NAME_FOR_LOGGER "HTTPServer"
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
@@ -423,15 +423,17 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
+	memcached_st memc = iniciarClusterCache(); //Dps le voy a tener que pasar el puerto y la ip de los servidores
+	
 	stArticle stArticulo;
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID,memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo);
+		guardarNoticiaEnCache(stArticulo,memc);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
