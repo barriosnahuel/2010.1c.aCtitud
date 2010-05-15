@@ -22,7 +22,6 @@ class NNTPClientDAO {
 		SSL_CTX *ctx;
 		int     sdServer;
 		SSL     *ssl;
-		char    cBuffer[3064];
 
 		void InitCTX(void);
 		void OpenConnection(const char *hostname, int port);
