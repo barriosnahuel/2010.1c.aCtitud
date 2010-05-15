@@ -138,7 +138,6 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   
    
   pstArticulo->sNewsgroup = sGrupoDeNoticias;
-  pstArticulo->uiArticulo = pstArticulo->uiArticleID;
   pstArticulo->sHead	  = resultNoticia->head;
   pstArticulo->sBody	  = resultNoticia->body;
   
