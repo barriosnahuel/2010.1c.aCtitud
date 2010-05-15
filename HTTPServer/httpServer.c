@@ -118,6 +118,16 @@ int llevaNoticia(char* sRecursoPedido);
  */
 char* obtenerNoticia(char* sRecursoPedido);
 
+/**
+ * Del array listadoGruposDeNoticias toma los grupos y va guardando los que no se repiten en listadoGruposDeNoticiasSinRepetir.
+ */
+VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]);
+
+/**
+ * Devuelve 1 si el grupoDeNoticias ya se encuentra en listadoGruposDeNoticiasSinRepetir.
+ */
+unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]);
+
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
  ************************************************/
@@ -472,12 +482,42 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	unsigned int cantidadDeGrupos= 0;
 	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	char* listadoGrupoDeNoticiasSinRepetir[1000];
 	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
+	quitarRepetidos(&listadoGrupoNoticias, &cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticias, cantidadDeGrupos);
+}
+
+VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
+	int i;
+	int j = 0;
+	
+	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
+		if(!estaEnArrayDeNoRepetidos(listadoGruposDeNoticias[i], listadoGruposDeNoticiasSinRepetir)) {
+			listadoGruposDeNoticiasSinRepetir[j] = listadoGruposDeNoticias[i];
+			j = j + 1;
+		}
+	}
+	
+}
+
+unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
+	int i;
+	int longitudArray = sizeof(listadoGruposDeNoticiasSinRepetir);
+	
+	for(i = 0; i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias; i++) {
+		;
+	}
+	
+	if(listadoGruposDeNoticiasSinRepetir[i] == grupoDeNoticias) {
+		return 1;
+	}
+	
+	return 0;
 }
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias){
@@ -644,26 +684,6 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 
 	return grupoDeNoticias;
 }
-
-/*
-char* obtenerGrupoDeNoticias(char* sGrupoDeNoticias, char* sRecursoPedido) {
-	LoguearDebugging("--> obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-
-	int i = 1;
-	int j = 0;
-	char grupoDeNoticias[1024];
-
-	while (sRecursoPedido[i] != '/' && sRecursoPedido[i] != '.') {
-		grupoDeNoticias[j] = sRecursoPedido[i];
-		j = j + 1;
-		i = i + 1;
-	}
-	grupoDeNoticias[j] = '\0';
-
-	sprintf(sGrupoDeNoticias, "%s", grupoDeNoticias);
-
-	LoguearDebugging("<-- obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-}*/
 
 char* obtenerNoticia(char* sRecursoPedido) {
 	LoguearDebugging("--> obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
