@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
+#include <thread.h>
 #include "logger.h"
 
 void LoguearInformacion(char *czData, char *czNombreProceso) {
@@ -38,9 +39,9 @@ void EscribirLog(char cTipoLog, char *czData, char *czNombreProceso) {
    /* se abre o crea al archivo log */
    if((arch = fopen(czNombreArch, "a+")) == NULL)
       perror("Error al generar el archivo Log.");
-   else
+/*   else
       stderr = arch;
-
+*/
    /*Se obtiene el tiempo actual*/
    tiempoActual = time(NULL);
 
@@ -48,25 +49,26 @@ void EscribirLog(char cTipoLog, char *czData, char *czNombreProceso) {
    strftime(czFecha, 50, "%d/%m/%Y %T", localtime(&tiempoActual));
 
     /*se obtiene el id del thread*/
-   tid = (pid_t) syscall(SYS_gettid);
+   tid= thr_self();
+
 
 	/*registramos todo en el archivo */
-	fprintf(stderr, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),tid);
+	fprintf(arch, "%s %s [%d][%d] ",czFecha,czNombreProceso,getpid(),tid);
 	switch(cTipoLog) {
 		case _INFO:
-			fprintf(stderr, "%s: %s\n","INFO",czData);
+			fprintf(arch, "%s:\t%s\n","INFO",czData);
 			break;
 		case _WARN:
-            fprintf(stderr, "%s: %s\n","WARN",czData);
+            fprintf(arch, "%s:\t%s\n","WARN",czData);
 			break;
 		case _ERROR:
-            fprintf(stderr, "%s: %s\n","ERROR",czData);
+            fprintf(arch, "%s:\t%s\n","ERROR",czData);
 			break;
 		case _DEBUG:
-            fprintf(stderr, "%s: %s\n","DEBUG",czData);
+            fprintf(arch, "%s:\t%s\n","DEBUG",czData);
 			break;
 		default:
-            fprintf(stderr, "%s: %s\n","MSG",czData);
+            fprintf(arch, "%s:\t%s\n","MSG",czData);
 			break;
 	};
 

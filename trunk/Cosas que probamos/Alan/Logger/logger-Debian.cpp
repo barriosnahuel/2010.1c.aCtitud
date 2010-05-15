@@ -49,7 +49,7 @@ void Logger::SetearFechaYHora(void) {
 	strftime(czFecha, 50, "%d/%m/%Y %T", localtime(&tiempoActual));
 };
 
-//métodos de logging
+//mï¿½todos de logging
 void Logger::EscribirLog(char cTipoLog, const char *czData, const char *czNombreProceso) {
 
 	PrepararArchivoLogProceso(czNombreProceso);
@@ -76,7 +76,7 @@ void Logger::EscribirLog(char cTipoLog, const char *czData, const char *czNombre
 			break;
 	};
 
-    arch << ": " << czData << endl;
+    arch << ":\t" << czData << endl;
 
 	CerrarArchivoLogProceso();
 };
