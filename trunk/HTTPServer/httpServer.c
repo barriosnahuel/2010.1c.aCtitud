@@ -486,29 +486,28 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	unsigned int cantidadDeGrupos= 0;
 	unsigned int cantidadDeGruposSinRepetir= 0;
 	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
-	char* listadoGrupoDeNoticiasSinRepetir[1000];
+	char* listadoGrupoNoticiasSinRepetir[1000];
 	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
-	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
+	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	printf("SI ESTO ANDA ES UNA VERGA: %s\n", listadoGrupoNoticias[0]);
-	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoDeNoticiasSinRepetir, cantidadDeGruposSinRepetir);
+	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
-unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
+unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
 	int i;
 	int j = 0;
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		if((!estaEnArrayDeNoRepetidos(listadoGruposDeNoticias[i], listadoGruposDeNoticiasSinRepetir)) == 1) {
-			printf("Asigne al listado de noticias sin repetir el siguiente newsgroup: %s\n", listadoGruposDeNoticias[i]);
-			listadoGruposDeNoticiasSinRepetir[j] = listadoGruposDeNoticias[i];
+		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], listadoGrupoNoticiasSinRepetir)) == 1) {
+			printf("Asigne al listado de noticias sin repetir el siguiente newsgroup: %s\n", listadoGrupoNoticias[i]);
+			listadoGrupoNoticiasSinRepetir[j] = listadoGrupoNoticias[i];
 			j = j + 1;
 		}
 	}
@@ -520,12 +519,13 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 	
 }
 
-unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
+unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
 	
 	int i = 0;
 	int longitudArray = 1000; /* TODO: Hay que ver como modificar esto */
 	
-	while(i <= longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
+	while(i <= longitudArray && listadoGrupoNoticiasSinRepetir[i] != grupoDeNoticias) {
+		printf("probando listadoGrupoNoticiasSinRepetir: %s\n", listadoGrupoNoticiasSinRepetir[i]);
 		i = i + 1;
 	}
 	
