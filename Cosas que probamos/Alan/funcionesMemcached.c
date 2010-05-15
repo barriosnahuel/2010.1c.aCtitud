@@ -104,7 +104,7 @@ void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
   return; 
 	
 }
-/*
+
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
 {
   uint32_t flags;
@@ -115,7 +115,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  fomarClave(claveCache,sGrupoDeNoticias,pstArticulo>uiArticleID);
+  fomarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);
   
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
@@ -145,4 +145,4 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   free(claveCache);
   free(resultNoticia);
   return 0;
-};*/
+};
