@@ -1,4 +1,5 @@
 #include"funcionesMemcached.h"
+#include <libmemcached/memcached.h>
 
 #ifndef FUNCIONES_MEMCACHED
 #define FUNCIONES_MEMCACHED
