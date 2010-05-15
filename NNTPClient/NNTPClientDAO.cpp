@@ -92,7 +92,7 @@ printf("1: %s\n", cBuffer);
 
         printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
 
-        bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
+        bytesLeidos = SSL_read(ssl, cBuffer, 3064);
 
         printf("bytesleidos: %d\n", bytesLeidos);
         cBuffer[bytesLeidos] = '\0';
