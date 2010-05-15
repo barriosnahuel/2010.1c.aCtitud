@@ -85,17 +85,15 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
  */
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
-/**
+
+/** int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
+
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
-/**
- * Guarda la noticia que se le pasa como parametro en cache.
- */
-void guardarNoticiaEnCache(stArticle stArticulo);
+
 /**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
