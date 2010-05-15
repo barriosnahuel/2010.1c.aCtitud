@@ -503,6 +503,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 }
 
 unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
+	printf("Entre a quitarRepetidos\n");
 	int i;
 	int j = 0;
 	
@@ -522,7 +523,7 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 }
 
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
-	
+	printf("Entre a estaEnArrayDeNoRepetidos\n");
 	int p = 0;
 	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
 	
@@ -537,6 +538,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoN
 }
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
+	printf("Entre a formatearListadoDeGruposDeNoticiasAHTML\n");
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 
 	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
