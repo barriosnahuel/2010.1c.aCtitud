@@ -1,6 +1,7 @@
 #ifndef FUNCIONES_MEMCACHED
 #define FUNCIONES_MEMCACHED
 #include <libmemcached/memcached.h>
+#include "Article.h"
 typedef struct _largoArticulo{
   size_t largoHead;
   size_t largoBody;
@@ -14,5 +15,5 @@ typedef struct _articuloCache{
 
 void iniciarClusterCache(memcached_st* memc);
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st* memc);
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st* memc)
-#endif
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st* memc);
+#endif 
