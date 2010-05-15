@@ -19,7 +19,7 @@ typedef struct _articuloCache{
 void iniciarClusterCache(memcached_st * memc);
 
 
-void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias);
+void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st * memc);
 
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.

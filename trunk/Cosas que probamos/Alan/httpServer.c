@@ -384,7 +384,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sA
 
 	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
-//}
+
 
 
 
@@ -436,7 +436,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,memc);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,memc);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
