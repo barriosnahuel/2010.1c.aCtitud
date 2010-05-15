@@ -534,7 +534,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupos
 	return 1;
 }
 
-char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias){
+char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 	printf("Estoy formateando el listado de noticias sin repetir\n");
 
@@ -543,12 +543,12 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], i
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
 
-	printf("estoy por entrar al for y el primer grupo de noticias es %s\n", listadoGruposDeNoticias[0]);
+	printf("estoy por entrar al for y el primer grupo de noticias es %s\n", listadoGrupoDeNoticiasSinRepetir[0]);
 	int i;
 	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
-		sprintf(sURL, "%s%s", listadoGruposDeNoticias[i], ".html");
+		sprintf(sURL, "%s%s", listadoGrupoDeNoticiasSinRepetir[i], ".html");
 		printf("pude hacer el primer sprintf\n");
-		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGruposDeNoticias[i]));
+		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGrupoDeNoticiasSinRepetir[i]));
 		printf("Cicle %d vez\n", (i+1));
 	}
 	free(sURL);
