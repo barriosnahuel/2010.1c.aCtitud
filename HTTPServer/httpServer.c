@@ -526,11 +526,11 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	/*	TODO: Aca hago la busqueda	*/
 
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
-	unsigned int uiCantidadDeGrupos= 0;
+	unsigned int uiCantidadDeNoticias= 0;
 /*	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 /*	selectArticles(&listadoNoticias, &uiCantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_BODY_Y_HEAD);*/
 
-printf("uicantidaddegrupos vale: %d\n", uiCantidadDeGrupos);
+printf("uicantidaddegrupos vale: %d\n", uiCantidadDeNoticias);
 
 
 /*
@@ -540,7 +540,7 @@ printf("el id 1 vale: %d\n", (listadoNoticias[1]).uiArticleID);
 */
 
 
-	uiCantidadDeGrupos= 2;
+	uiCantidadDeNoticias= 2;
 	stArticle listadoNoticias[2];
 	stArticle stArticle1;
 	stArticle1.sBody= "un body de clarin";
@@ -559,7 +559,7 @@ printf("el id 1 vale: %d\n", (listadoNoticias[1]).uiArticleID);
 
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeGrupos);
+	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
 }
 
 char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias){
