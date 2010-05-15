@@ -128,7 +128,7 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 /**
  * Devuelve 1 si el grupoDeNoticias ya se encuentra en listadoGruposDeNoticiasSinRepetir.
  */
-unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]);
+unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGruposDeNoticiasSinRepetir[], unsigned int* cantidadEnNoRepetidos);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -503,66 +503,36 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 }
 
 unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
-	printf("Entre a quitarRepetidos\n");
+	LoguearDebugging("--> quitarRepetidos", APP_NAME_FOR_LOGGER);
 	int i;
-	int j = 0;
-	
+	unsigned int cantidadNoRepetidos= 0;
+
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir)) == 1) {
-			listadoGrupoNoticiasSinRepetir[j] = listadoGrupoNoticias[i];
-			printf("Asigne %s en %s: \n", listadoGrupoNoticias[i], listadoGrupoNoticiasSinRepetir[j]);
-			j = j + 1;
+		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir, &cantidadNoRepetidos)) == 1) {
+			listadoGrupoNoticiasSinRepetir[cantidadNoRepetidos] = listadoGrupoNoticias[i];
+			printf("Asigne %s en %d: \n", listadoGrupoNoticias[i], cantidadNoRepetidos);
+			cantidadNoRepetidos++;
 		}
 	}
-	printf("Estoy por verificar el contenido del array\n");
-	printf("Primer grupo: %s\n", listadoGrupoNoticiasSinRepetir[0]);
-	printf("Deberia haber un cero: %s\n", listadoGrupoNoticiasSinRepetir[1]);
-	if(j > 0) {
-		return j;
-	}
-	return iCantidadDeGruposDeNoticias;
-	
-	
+
+	LoguearDebugging("<-- quitarRepetidos", APP_NAME_FOR_LOGGER);
+	return iCantidadDeGruposDeNoticias-1;
 }
 
-unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
-	printf("Entre a estaEnArrayDeNoRepetidos\n");
-	int p = 0;
-	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
-	
+unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGrupoNoticiasSinRepetir[], unsigned int* cantidadEnNoRepetidos) {
+	LoguearDebugging("--> estaEnArrayDeNoRepetidos", APP_NAME_FOR_LOGGER);
 
+	int indexNoRepetidos= 0;
+	printf("en la pos 0 hay: \n", listadoGrupoNoticiasSinRepetir[indexNoRepetidos]);
 
-	/*NBarrios: esto es prueba mip*/
-	int index;
-	int cantidadEnNoRepetidos= 0;/*esto es dinamico*/
-	int cantidadEnRepetidos= 3;/*esto es dinamico*/
+	for(	indexNoRepetidos=0
+			;	indexNoRepetidos<(*cantidadEnNoRepetidos)
+				&& (strcmp((*listadoGrupoNoticiasSinRepetir)[indexNoRepetidos], grupoDeNoticias)!=0)
+			; indexNoRepetidos++)
+		;/*No hago nada, solo incremento el index.*/
 
-	for(index=0; index<cantidadEnRepetidos; index++){
-
-		int contadorRepetidos;
-		for(contadorRepetidos=0;	contadorRepetidos<cantidadEnNoRepetidos
-									&& contadorRepetidos<cantidadEnRepetidos
-									&& (strcmp(listadoGrupoNoticiasSinRepetir[contadorRepetidos], grupoDeNoticias)!=0)	;	contadorRepetidos++){
-			printf("entro al while\n");
-			cantidadEnNoRepetidos++;
-			printf("incremento p y vale: %d\n", contadorRepetidos);
-		}
-		listadoGrupoNoticiasSinRepetir[contadorRepetidos]= grupoDeNoticias;
-
-	}
-	/*NBarrios: esto es prueba mip*/
-
-
-
-
-/*	while(p <= longitudArray && (strcmp(listadoGrupoNoticiasSinRepetir[p], grupoDeNoticias) == 1)) {
-		p = p + 1;
-	}*/
-	
-	if(p > longitudArray) {
-		return 0;
-	}
-	return 1;
+	LoguearDebugging("<-- estaEnArrayDeNoRepetidos", APP_NAME_FOR_LOGGER);
+	return indexNoRepetidos<(*cantidadEnNoRepetidos);
 }
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
