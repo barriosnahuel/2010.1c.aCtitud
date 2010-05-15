@@ -12,7 +12,7 @@
 //    char* sBody;				/*	El body de la noticia	*/
 //} stArticle;
 
-void iniciarClusterMemcached(memcached_st* memc)
+void iniciarClusterCache(memcached_st* memc)
 {
   memcached_server_st *servers = NULL;
   memcached_st *memc;
