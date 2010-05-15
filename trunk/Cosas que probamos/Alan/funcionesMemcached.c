@@ -11,8 +11,8 @@ typedef struct stArticle {
      char* sNewsgroup;			
      char* sHead;				
      char* sBody;				
-} stArticle;
-/*
+} stArticle;*/
+
 void iniciarClusterCache(memcached_st* memc)
 {
   memcached_server_st *servers = NULL;
@@ -92,7 +92,7 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   free(claveCache);
   return;
 }
-*/
+
 void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
 {
   int largoID;
