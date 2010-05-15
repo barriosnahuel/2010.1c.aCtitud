@@ -54,14 +54,14 @@ void NNTPClientDAO::abrirConexion(const char *hostname, int port) {
         SSL_set_fd(ssl, sdServer);
 
         if ( SSL_connect(ssl) == -1 ) {
-                cout << "Conexi�n al servidor fallida." << endl;
+                cout << "Conexion al servidor fallida." << endl;
         } else {
                 cout << "Conectado! Usando encriptado: " << SSL_get_cipher(ssl) << endl;
         }
 }
 
 void NNTPClientDAO::cerrarConexion(void) {
-    cout << "Se iniciar� el cierre de la conexi�n con el servidor" << endl;
+    cout << "Se iniciara el cierre de la conexion con el servidor" << endl;
 
     SSL_free(ssl);
     close(sdServer);
