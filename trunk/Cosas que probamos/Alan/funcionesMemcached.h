@@ -15,6 +15,7 @@ typedef struct _articuloCache{
   char *body;
 }t_news;
 
+/*memc es el ptro a la memcached, se usa siempre*/
 void iniciarClusterCache(memcached_st * memc);
 
 
