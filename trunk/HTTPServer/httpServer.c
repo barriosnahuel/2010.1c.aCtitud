@@ -543,7 +543,7 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], i
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
 
-	printf("estoy por entrar al for\n");
+	printf("estoy por entrar al for y el primer grupo de noticias es %s\n", listadoGruposDeNoticias[0]);
 	int i;
 	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
 		sprintf(sURL, "%s%s", listadoGruposDeNoticias[i], ".html");
