@@ -28,7 +28,7 @@ LdapWrapperHandler.o: LdapWrapperHandler.c LdapWrapperHandler.h
 httpServer.o: httpServer.c 
 	gcc $(CFLAGS) $(OPTFLAGS) httpServer.o httpServer.c
 
-funcionesMemcached.o: funcionesMemcached.c 
+funcionesMemcached.o: funcionesMemcached.c funcionesMemcached.h
 	gcc $(CFLAGS) $(OPTFLAGS) funcionesMemcached.o funcionesMemcached.c
 
 	
