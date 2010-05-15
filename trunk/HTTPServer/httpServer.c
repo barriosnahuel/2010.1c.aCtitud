@@ -508,7 +508,7 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 	int j = 0;
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir, i)) == 1) {
+		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir)) == 1) {
 			listadoGrupoNoticiasSinRepetir[j] = listadoGrupoNoticias[i];
 			printf("Asigne %s en %s: \n", listadoGrupoNoticias[i], listadoGrupoNoticiasSinRepetir[j]);
 			j = j + 1;
