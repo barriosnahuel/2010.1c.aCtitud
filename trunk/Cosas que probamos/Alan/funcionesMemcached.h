@@ -15,7 +15,7 @@ typedef struct _articuloCache{
 }t_news;
 
 /*memc es el ptro a la memcached, se usa siempre*/
-void iniciarClusterCache(memcached_st * memc);
+void iniciarClusterCache(memcached_st* memc);
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st * memc);
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
