@@ -91,9 +91,7 @@ printf("1 lo que quedo: %s\n", cBuffer);
         printf("2 lo limpie: %s\n", cBuffer);
 
         printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
-printf("%s\n", ssl);
-printf("%d\n", ssl);
-        bytesLeidos = SSL_read(ssl, cBuffer, 3064);
+        bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
 
         printf("bytesleidos: %d\n", bytesLeidos);
         cBuffer[bytesLeidos] = '\0';
