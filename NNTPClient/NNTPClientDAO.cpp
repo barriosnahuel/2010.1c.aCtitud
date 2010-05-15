@@ -75,9 +75,9 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
     cout << "Se intentar� enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
     
     bytesEscritos = SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
-    if (bytesEscritos > 0)
+    if (bytesEscritos > 0) {
         cout << "-------- ok" << endl;
-    cout << "estos son los bytes escritos" << bytesEscritos << endl;
+    cout << "estos son los bytes escritos" << bytesEscritos << endl;}
     else
         cout << "-------- MAL!!!" << endl;
 }
