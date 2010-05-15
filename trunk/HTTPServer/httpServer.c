@@ -532,7 +532,7 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupos
 	}*/
 	
 	printf("TOY POR HACER EL STRCMP\n");
-	if(strcmp(grupoDeNoticias/*listadoGruposDeNoticiasSinRepetir[i]*/, grupoDeNoticias) == 0) {
+	if(strcmp(listadoGruposDeNoticiasSinRepetir[i], listadoGruposDeNoticiasSinRepetir[i]/*grupoDeNoticias*/) == 0) {
 		return 1;
 	}
 	
