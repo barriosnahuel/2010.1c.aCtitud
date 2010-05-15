@@ -58,7 +58,6 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-unsigned int obtenerTipoOperacionYVariables(char* sURL, char* sGrupoDeNoticias, char* sArticleID);
 void liberarRecursos( int 				ficheroServer
 					, PLDAP_CONTEXT		stPLDAPContext
 					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
@@ -126,7 +125,8 @@ char* obtenerNoticia(char* sRecursoPedido);
  * Formatea la noticia la noticia a un char* en formato HTML para poder enviarle eso al cliente
  * y visualizar bien la pagina HTML.
  */
-char* formatearArticuloAHTML(stArticle stArticulo);
+char* formatearArticuloAHTML(stArticle* pstArticulo);
+char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias);
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len);
 /**
  * Arma un tag a de HTML con un hipervinculo al sURL que se le pasa como parametro,
@@ -249,7 +249,29 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
-	unsigned int uiOperation= obtenerTipoOperacionYVariables(sRecursoPedido, sGrupoDeNoticia, sArticleID);
+
+	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
+	unsigned int uiOperation;
+	if (strlen(sRecursoPedido) == 1)
+		uiOperation= REQUEST_TYPE_NEWSGROUP;
+	else {
+		/* Obtengo el grupo de noticias. */
+
+		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedido));
+
+		printf("%s\n", sGrupoDeNoticia);
+		/* Me fijo si ademas del grupo de noticias viene la noticia */
+		if (llevaNoticia(sRecursoPedido)) {
+			/* Obtengo la noticia de dicho grupo. */
+			strcpy(sArticleID, obtenerNoticia(sRecursoPedido));
+			uiOperation= REQUEST_TYPE_NEWS;
+		}
+		else
+			/*	Como la URL no tiene el sufijo /noticiaID, el cliente me esta pidiendo
+				 el listado de noticias para un grupo de noticia dado.					*/
+			uiOperation= REQUEST_TYPE_NEWS_LIST;
+	}
+
 	char* sResponse= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	switch (uiOperation) {
 	case REQUEST_TYPE_NEWSGROUP:
@@ -409,11 +431,11 @@ void guardarNoticiaEnCache(stArticle stArticulo) {
 	return;
 }
 
-char* formatearArticuloAHTML(stArticle stArticulo) {
+char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
-	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	sprintf(response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P>%s<P></BODY></HTML>", stArticulo.sHead, stArticulo.sBody);
+	char* response;
+	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
 
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
@@ -436,7 +458,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
-	return formatearArticuloAHTML(stArticulo);
+	return formatearArticuloAHTML(&stArticulo);
 }
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
@@ -446,31 +468,33 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
 
-	int len= 2;
-	char* listadoGrupoNoticias[len];
 
-	/*	TODO: Aca hago la busqueda.	*/
-	listadoGrupoNoticias[0]= "Clarin";
-	listadoGrupoNoticias[1]= "La Nacion";
+	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
+	unsigned int cantidadDeGrupos= 0;
+	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
+
+	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticias, len);
+	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticias, cantidadDeGrupos);
 }
 
-char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len){
+char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 
-	/*	1+OPEN...+5+1 = /nombreGrupoNoticia.html\0	*/
+	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
 
 	int i;
-	for(i=0; i<len; i++){
+	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
 		sprintf(sURL, "%s%s", listadoGruposDeNoticias[i], ".html");
 		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGruposDeNoticias[i]));
 	}
 	free(sURL);
+
 	sprintf(response, "%s%s", response, "</BODY></HTML>");
 
 	LoguearDebugging("<-- formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
@@ -479,12 +503,12 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], i
 
 char* armarLinkCon(char* sURL, char* sNombreDelLink){
 	LoguearDebugging("--> armarLinkCon()", APP_NAME_FOR_LOGGER);
-printf("url vale: %s\n", sURL);
+
 	/*	+50 Porque tengo que tener en cuenta ip:puerto/grupoNoticia/noticiaID	*/
 	char* sTag= (char*)malloc(sizeof(char)*(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50));
 	memset(sTag, 0, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50);
 	sprintf(sTag, "<A href=\"/%s\">%s</A><BR />", sURL, sNombreDelLink);
-printf("tag vale: %s\n", sTag);
+
 	LoguearDebugging("<-- armarLinkCon()", APP_NAME_FOR_LOGGER);
 	return sTag;
 }
@@ -501,9 +525,65 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	printf("sCriterio quedo en: %s\n", sCriterio);
 	/*	TODO: Aca hago la busqueda	*/
 
+	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
+	unsigned int uiCantidadDeGrupos= 0;
+/*	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+/*	selectArticles(&listadoNoticias, &uiCantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_BODY_Y_HEAD);*/
+
+printf("uicantidaddegrupos vale: %d\n", uiCantidadDeGrupos);
+
+
+/*
+printf("el body 0 vale: %s\n", (listadoNoticias[0]).sBody);
+printf("el id 0 vale: %d\n", (listadoNoticias[0]).uiArticleID);
+printf("el id 1 vale: %d\n", (listadoNoticias[1]).uiArticleID);
+*/
+
+
+	uiCantidadDeGrupos= 2;
+	stArticle listadoNoticias[2];
+	stArticle stArticle1;
+	stArticle1.sBody= "un body de clarin";
+	stArticle1.sHead= "un hea de clarin.";
+	stArticle1.sNewsgroup= "Clarin";
+	stArticle1.uiArticleID= 1;
+
+	stArticle stArticle2;
+	stArticle2.sBody= "un body de la nacion";
+	stArticle2.sHead= "un hea de la nacion.";
+	stArticle2.sNewsgroup= "La Nacion";
+	stArticle2.uiArticleID= 2;
+
+	listadoNoticias[0]= stArticle1;
+	listadoNoticias[1]= stArticle2;
+
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
+	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeGrupos);
+}
+
+char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias){
+	LoguearDebugging("--> formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
+
+
+	/*	1+OPEN...+1+OPEN...5+1 Es igual a: /nombreGrupoNoticia/noticiaID.html\0	*/
+	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+1+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+5+1));
+	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	sprintf(response, "<HTML><HEAD><TITLE>Listado de noticias de %s</TITLE></HEAD><BODY>", sGrupoDeNoticias);
+
+	int i;
+	for(i=0; i<uiCantidadDeNoticias; i++){
+		stArticle stArticle= listadoDeNoticias[i];
+
+		sprintf(sURL, "%s/%d%s", sGrupoDeNoticias, stArticle.uiArticleID, ".html");
+printf("surl vale: %s\n", sURL);
+		sprintf(response, "%s%s", response, armarLinkCon(sURL, stArticle.sHead));
+	}
+	free(sURL);
+	sprintf(response, "%s%s", response, "</BODY></HTML>");
+
+	LoguearDebugging("<-- formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
+	return response;
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
@@ -557,9 +637,33 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 		i = i + 1;
 	}
 	grupoDeNoticias[j] = '\0';
+
+	/*sprintf(sGrupoDeNoticias, "%s", grupoDeNoticias);*/
+
 	LoguearDebugging("<-- obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+
 	return grupoDeNoticias;
 }
+
+/*
+char* obtenerGrupoDeNoticias(char* sGrupoDeNoticias, char* sRecursoPedido) {
+	LoguearDebugging("--> obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+
+	int i = 1;
+	int j = 0;
+	char grupoDeNoticias[1024];
+
+	while (sRecursoPedido[i] != '/' && sRecursoPedido[i] != '.') {
+		grupoDeNoticias[j] = sRecursoPedido[i];
+		j = j + 1;
+		i = i + 1;
+	}
+	grupoDeNoticias[j] = '\0';
+
+	sprintf(sGrupoDeNoticias, "%s", grupoDeNoticias);
+
+	LoguearDebugging("<-- obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+}*/
 
 char* obtenerNoticia(char* sRecursoPedido) {
 	LoguearDebugging("--> obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
@@ -570,13 +674,13 @@ char* obtenerNoticia(char* sRecursoPedido) {
 	while (sRecursoPedido[i] != '/') {
 		i = i + 1;
 	}
-	
+
 	while(sRecursoPedido[i+1] != '\0') {
 		noticia[j] = sRecursoPedido[i+1];
 		i = i + 1;
 		j = j + 1;
 	}
-	
+
 	noticia[j] = '\0';
 	LoguearDebugging("<-- obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
 	return noticia;
@@ -585,37 +689,14 @@ char* obtenerNoticia(char* sRecursoPedido) {
 int llevaNoticia(char* sRecursoPedido) {
 	LoguearDebugging("--> llevaNoticia()", APP_NAME_FOR_LOGGER);
 	int i = 1;
-	
+
 	while(sRecursoPedido[i] != '/' && sRecursoPedido[i] != '\0' ) {
 		i = i + 1;
 	}
-	
+
 	if(sRecursoPedido[i] == '\0') {
 		return 0;
 	}
 	LoguearDebugging("<-- llevaNoticia()", APP_NAME_FOR_LOGGER);
 	return 1;
-}
-
-
-unsigned int obtenerTipoOperacionYVariables(char* sURL, char* sGrupoDeNoticias, char* sArticleID){
-	unsigned int uiOperation;
-	if (strlen(sURL) == 1)
-		uiOperation= REQUEST_TYPE_NEWSGROUP;
-	else {
-		/* Obtengo el grupo de noticias. */
-		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sURL));
-
-		/* Me fijo si ademas del grupo de noticias viene la noticia */
-		if (llevaNoticia(sURL)) {
-			/* Obtengo la noticia de dicho grupo. */
-			strcpy(sArticleID, obtenerNoticia(sURL));
-			uiOperation= REQUEST_TYPE_NEWS;
-		}
-		else
-			/*	Como la URL no tiene el sufijo /noticiaID, el cliente me esta pidiendo
-				 el listado de noticias para un grupo de noticia dado.					*/
-			uiOperation= REQUEST_TYPE_NEWS_LIST;
-	}
-	return uiOperation;
 }

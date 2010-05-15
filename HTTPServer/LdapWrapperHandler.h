@@ -19,6 +19,9 @@
 #define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME "utnArticleGroupName"
 #define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT 25
 
+#define OPENDS_SELECT_GRUPO_DE_NOTICIA 1
+#define OPENDS_SELECT_BODY_Y_HEAD 2
+
 char* getDNFor(int dArticleID);
 
 stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
@@ -29,9 +32,12 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.
  */
-VOID selectEntries(PLDAP_SESSION			stPLDAPSession
-					, PLDAP_SESSION_OP		stPLDAPSessionOperations
-					, char* 				sCriterio);
+VOID selectEntries(	  char*					pczListado[]
+                   	, unsigned int*			puiCantidadEntries
+					, PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+					, char* 				sCriterio
+					, unsigned int			uiTipoDeSelect);
 
 /**
  * Insertar una nueva entry en base a los atributos de la estructura stArticle que le pasamos.
