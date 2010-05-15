@@ -491,6 +491,8 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
+	listadoGrupoNoticiasSinRepetir[0] = "hola\0";
+	printf("El primer articulo de LOS NOOOO REPETIDOS: %s\n", listadoGrupoNoticiasSinRepetir[0]);
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
 	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
 	
@@ -507,7 +509,7 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 	int j = 0;
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], listadoGrupoNoticiasSinRepetir)) == 1) {
+		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir)) == 1) {
 			printf("Asigne al listado de noticias sin repetir el siguiente newsgroup: %s\n", listadoGrupoNoticias[i]);
 		/*	listadoGrupoNoticiasSinRepetir[j] = listadoGrupoNoticias[i];*/
 			j = j + 1;
