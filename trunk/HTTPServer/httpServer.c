@@ -520,6 +520,7 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 }
 
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
+	printf("entre a estaEnArrayDeNoRepetidos\n");
 	int i = 0;
 	int longitudArray = 5;
 	
