@@ -24,7 +24,7 @@ void NNTPClientDAO::OpenConnection(const char *hostname, int port) {
         }
 }
 
-/* Levanta un nuevo contexto para arrancar la conexión.*/
+/* Levanta un nuevo contexto para arrancar la conexiï¿½n.*/
 void NNTPClientDAO::InitCTX() {
         SSL_METHOD *method;
  
@@ -48,31 +48,31 @@ void NNTPClientDAO::abrirConexion(const char *hostname, int port) {
 
     ssl = SSL_new(ctx);
 
-    /* "Bindeo" el socket con la conexión SSL.
-        Si no quiero enviar mensajes por SSL usaré sdServer.send().
-        Caso contrario usaré ssl. */
+    /* "Bindeo" el socket con la conexiï¿½n SSL.
+        Si no quiero enviar mensajes por SSL usarï¿½ sdServer.send().
+        Caso contrario usarï¿½ ssl. */
         SSL_set_fd(ssl, sdServer);
 
         if ( SSL_connect(ssl) == -1 ) {
-                cout << "Conexión al servidor fallida." << endl;
+                cout << "Conexiï¿½n al servidor fallida." << endl;
         } else {
                 cout << "Conectado! Usando encriptado: " << SSL_get_cipher(ssl) << endl;
         }
 }
 
 void NNTPClientDAO::cerrarConexion(void) {
-    cout << "Se iniciará el cierre de la conexión con el servidor" << endl;
+    cout << "Se iniciarï¿½ el cierre de la conexiï¿½n con el servidor" << endl;
 
     SSL_free(ssl);
     close(sdServer);
     SSL_CTX_free(ctx);
-    cout << "Se cerró la conexión con el servidor y se liberaron todos los recursos." << endl;
+    cout << "Se cerrï¿½ la conexiï¿½n con el servidor y se liberaron todos los recursos." << endl;
 }
 
 void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
     int bytesEscritos;
     
-    cout << "Se intentará enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
+    cout << "Se intentarï¿½ enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
     
     bytesEscritos = SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
     if (bytesEscritos > 0)
@@ -83,10 +83,12 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
 
 string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos;
-
+        memset(cBuffer, 0, 1024);
         // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
+
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
         cBuffer[bytesLeidos] = '\0';
+
 
         return cBuffer;
 }
