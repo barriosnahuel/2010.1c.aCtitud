@@ -513,36 +513,25 @@ unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGru
 	}
 	if(j > 0) {
 		return (j-1);
-	} else {
-		return iCantidadDeGruposDeNoticias;
 	}
+	return iCantidadDeGruposDeNoticias;
+	
 	
 }
 
 unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
 	
 	int i = 0;
-	int longitudArray = 1000;
-	
-	printf("El sizeof del listado sin repetir es de: %d\n", longitudArray);
+	int longitudArray = 1000; /* TODO: Hay que ver como modificar esto */
 	
 	while(i <= longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias) {
 		i = i + 1;
 	}
-	/*for(i = 0; i < longitudArray && listadoGruposDeNoticiasSinRepetir[i] != grupoDeNoticias; i++) {
-		;
-	}*/
 	
 	if(i > longitudArray) {
 		return 0;
 	}
 	return 1;
-	/*printf("TOY POR HACER EL STRCMP\n");
-	if(strcmp(listadoGruposDeNoticiasSinRepetir[i], grupoDeNoticias) == 0) {
-		return 1;
-	}
-	
-	return 0;*/
 }
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias){
