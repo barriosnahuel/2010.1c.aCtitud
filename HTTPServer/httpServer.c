@@ -487,19 +487,15 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	unsigned int cantidadDeGruposSinRepetir= 0;
 	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	char* listadoGrupoNoticiasSinRepetir[1000];
+	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
 	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
-	listadoGrupoNoticiasSinRepetir[0] = "hola\0";
-	printf("El primer articulo de LOS NOOOO REPETIDOS: %s\n", listadoGrupoNoticiasSinRepetir[0]);
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
 	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
-	printf("El primer articulo de LOS REPETIDOS: %s\n", listadoGrupoNoticias[0]);
-	listadoGrupoNoticiasSinRepetir[0] = listadoGrupoNoticias[0];
-	printf("El primer articulo de LOS NOOOO REPETIDOS: %s\n", listadoGrupoNoticiasSinRepetir[0]);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
@@ -511,8 +507,8 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
 		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir)) == 1) {
+			listadoGrupoNoticiasSinRepetir[j] = listadoGrupoNoticias[i];
 			printf("Asigne al listado de noticias sin repetir el siguiente newsgroup: %s\n", listadoGrupoNoticias[i]);
-		/*	listadoGrupoNoticiasSinRepetir[j] = listadoGrupoNoticias[i];*/
 			j = j + 1;
 		}
 	}
