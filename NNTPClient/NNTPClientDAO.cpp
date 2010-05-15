@@ -86,25 +86,22 @@ string NNTPClientDAO::recibirRespuesta() {
         int bytesLeidos= 0;
 
 printf("1 lo que quedo: %s\n", cBuffer);
-        memset(cBuffer, 0, 3064);
+        memset(cBuffer, 0, sizeof(cBuffer));
+
         // EN LA LINEA SIGUIeNTe Se MUeRe LA 2DA VEZ!!!! 
 
         printf("2 lo limpie: %s\n", cBuffer);
 
         printf("sizeof buffer vale: %d\n", sizeof(cBuffer));
-        bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
-
-        enviarMensaje("ARTICLE 69");
-        char cBufferPrueba[3064];
-        SSL_read(ssl, cBufferPrueba, sizeof(cBufferPrueba));
-
-        printf("el buffer de prueba: %s\n", cBufferPrueba);
-
+		char buffer[3064];
+printf("paso por aca\n");
+        bytesLeidos = SSL_read(ssl, buffer, sizeof(cBuffer));
+printf("por aca tambien.\n");
         printf("bytesleidos: %d\n", bytesLeidos);
         cBuffer[bytesLeidos] = '\0';
 
-        printf("3: %s\n", cBuffer);
+        printf("3: %s\n", buffer);
 
 
-        return cBuffer;
+        return buffer;
 }
