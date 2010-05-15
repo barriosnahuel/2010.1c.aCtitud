@@ -115,7 +115,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  fomarClave(claveCache,sGrupoDeNoticias,sArticleID.uiArticle);
+  fomarClave(claveCache,sGrupoDeNoticias,sArticle->uiArticleID);
   
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
@@ -138,7 +138,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   
    
   pstArticulo->sNewsgroup = sGrupoDeNoticias;
-  pstArticulo->uiArticulo = uiArticleID;
+  pstArticulo->uiArticulo = sArticle->uiArticleID;
   pstArticulo->sHead	  = resultNoticia->head;
   pstArticulo->sBody	  = resultNoticia->body;
   
