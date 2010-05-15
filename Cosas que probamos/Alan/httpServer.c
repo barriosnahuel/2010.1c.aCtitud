@@ -5,7 +5,7 @@
 #include <thread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "/Logger/logger.h"
+#include "Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 #include "funcionesMemcached.h"
