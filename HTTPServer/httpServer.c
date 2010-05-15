@@ -491,17 +491,18 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
-	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, &cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
+	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoDeNoticiasSinRepetir);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoDeNoticiasSinRepetir, &cantidadDeGruposSinRepetir);
+	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoDeNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
 unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]) {
 	int i;
 	int j = 0;
+	printf("Entre a quitarRepetidos!!\n");
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
 		printf("Entre al for\n");
