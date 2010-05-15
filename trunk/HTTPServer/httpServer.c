@@ -487,6 +487,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	unsigned int cantidadDeGruposSinRepetir= 0;
 	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	char* listadoGrupoNoticiasSinRepetir[1000];
+	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
 	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
 	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
@@ -537,14 +538,12 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoN
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
-	printf("Estoy formateando el listado de noticias sin repetir\n");
 
 	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
 
-	printf("estoy por entrar al for y el primer grupo de noticias es %s\n", listadoGrupoDeNoticiasSinRepetir[0]);
 	int i;
 	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
 		sprintf(sURL, "%s%s", listadoGrupoDeNoticiasSinRepetir[i], ".html");
