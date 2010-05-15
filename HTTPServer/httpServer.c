@@ -524,13 +524,9 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupoN
 	
 	int p = 0;
 	int longitudArray = 3; /* TODO: Hay que ver como modificar esto */
-	char grupoDeNoticiasAux[100];
 	
-	strcpy(grupoDeNoticiasAux, listadoGrupoNoticiasSinRepetir[0]);
-	
-	while(p <= longitudArray && (strcmp(grupoDeNoticiasAux, grupoDeNoticias)) == 1) {
+	while(p <= longitudArray && (strcmp(listadoGrupoNoticiasSinRepetir[p], grupoDeNoticias) == 1)) {
 		p = p + 1;
-		strcpy(grupoDeNoticiasAux, listadoGrupoNoticiasSinRepetir[p]);
 	}
 	
 	if(p > longitudArray) {
