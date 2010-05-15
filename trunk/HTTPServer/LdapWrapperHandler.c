@@ -100,7 +100,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 				+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT;
 	char* sCriterio= (char*)malloc(sizeof(char)*(uiMaxNumberOfCharacters));
 	memset(sCriterio, 0, uiMaxNumberOfCharacters);
-	sprintf(sCriterio, "(&(%s= %s)(%s= %s) utnArticleHead)", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias, OPENDS_ATTRIBUTE_ARTICLE_ID, sArticleID);
+	sprintf(sCriterio, "(&(%s= %s)(%s= %s))", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias, OPENDS_ATTRIBUTE_ARTICLE_ID, sArticleID);
 
 	char* sDebugMessage;
 	asprintf(&sDebugMessage, "El criterio por el que se busco en OpenDS es: %s", sCriterio);
