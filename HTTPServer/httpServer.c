@@ -533,12 +533,16 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char* listadoGrupos
 		;
 	}*/
 	
-	printf("TOY POR HACER EL STRCMP\n");
+	if(i > longitudArray) {
+		return 0;
+	}
+	return 1;
+	/*printf("TOY POR HACER EL STRCMP\n");
 	if(strcmp(listadoGruposDeNoticiasSinRepetir[i], grupoDeNoticias) == 0) {
 		return 1;
 	}
 	
-	return 0;
+	return 0;*/
 }
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias){
