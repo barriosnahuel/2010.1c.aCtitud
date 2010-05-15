@@ -514,6 +514,7 @@ unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGrupos
 			j = j + 1;
 		}
 	}
+	printf("Estoy por verificar el contenido del array\n");
 	printf("Primer grupo: %s\n", listadoGrupoNoticiasSinRepetir[0]);
 	printf("Deberia haber un cero: %s\n", listadoGrupoNoticiasSinRepetir[1]);
 	if(j > 0) {
