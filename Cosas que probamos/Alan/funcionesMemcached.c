@@ -11,7 +11,7 @@
 //    char* sHead;				/*	El header de la noticia.	*/
 //    char* sBody;				/*	El body de la noticia	*/
 //} stArticle;
-
+/*
 void iniciarClusterCache(memcached_st* memc)
 {
   memcached_server_st *servers = NULL;
@@ -104,7 +104,7 @@ char* formarClave(char* sGrupoDeNoticias, int ID )
   return claveCache; 
 	
 }
-
+*/
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
 {
   uint32_t flags;
@@ -146,5 +146,3 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   free(resultNoticia);
   return 0;
 }
-
-
