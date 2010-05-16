@@ -125,6 +125,8 @@ char* obtenerNoticia(char* sRecursoPedido);
  */
 VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias);
 
+unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
+
 /**
  * Devuelve 1 si el grupoDeNoticias ya se encuentra en listadoGruposDeNoticiasSinRepetir.
  */
@@ -484,6 +486,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	int q;
+	int k;
 	unsigned int cantidadDeGrupos= 0;
 	unsigned int cantidadDeGruposSinRepetir= 0;
 	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
@@ -498,6 +501,10 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
 	
 	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
+	
+	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
+	
+	for(k = 0; k < cantidadDeGruposSinRepetir; k++) printf("Contenido de la posicion %d del array LIMPIO es: %s\n", k, listadoGrupoNoticiasSinRepetir[k]);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
@@ -518,6 +525,19 @@ VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGrupo
 			}
 		}
 	}
+}
+
+unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
+	int p;
+	int l = 0;
+	
+	for(p = 0; p < iCantidadDeGruposDeNoticias; p++) {
+		if(strcmp("0", listadoGrupoNoticiasRepetidos[p]) != 0) {
+			listadoGrupoNoticiasSinRepetir[l] = listadoGrupoNoticiasRepetidos[p];
+			l++;
+		}
+	}
+	return (l-1);
 }
 
 
