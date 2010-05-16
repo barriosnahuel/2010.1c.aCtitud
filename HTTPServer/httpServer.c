@@ -491,22 +491,22 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char* listadoGrupoNoticiasSinRepetir[1000];
 	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
 	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
-	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
+	selectEntries(&listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
-	quitarRepetidos(listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
+	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
 	
 	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
 	
-	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
+	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
 	
 	for(k = 0; k < cantidadDeGruposSinRepetir; k++) printf("Contenido de la posicion %d del array LIMPIO es: %s\n", k, listadoGrupoNoticiasSinRepetir[k]);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
+	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
 VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
