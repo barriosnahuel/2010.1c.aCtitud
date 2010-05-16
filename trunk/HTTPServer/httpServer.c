@@ -537,7 +537,7 @@ unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCant
 			l++;
 		}
 	}
-	return (l-1);
+	return l;
 }
 
 
