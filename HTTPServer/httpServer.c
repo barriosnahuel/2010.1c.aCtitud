@@ -181,6 +181,88 @@ int main(void) {
 		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer,
 				stConf.uiBDPuerto);
 
+
+/*	Esto es prueba!!	*/
+/*
+  	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 2);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 3);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 4);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 5);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 6);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 7);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 8);
+*/
+/*		stArticle stArticulo;
+
+		stArticulo.sBody = "un body para la 1";
+		stArticulo.sHead = "un head para la 1";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 1;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 2";
+		stArticulo.sHead = "un head para la 2";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 2;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 3";
+		stArticulo.sHead = "un head para la 3";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 3;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 4";
+		stArticulo.sHead = "un head para la 4";
+		stArticulo.sNewsgroup = "Pagina 12";
+		stArticulo.uiArticleID = 4;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 5";
+		stArticulo.sHead = "un head para la 5";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 5;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 6";
+		stArticulo.sHead = "un head para la 6";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 6;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 7";
+		stArticulo.sHead = "un head para la 7";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 7;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 8 (clarin en minuscula)";
+		stArticulo.sHead = "un head para la 8 (clarin en minuscula)";
+		stArticulo.sNewsgroup = "clarin";
+		stArticulo.uiArticleID = 8;
+
+		stArticulo.sBody = "un body para la 9";
+		stArticulo.sHead = "un head para la 9";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 9;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 10";
+		stArticulo.sHead = "un head para la 10";
+		stArticulo.sNewsgroup = "Fruta";
+		stArticulo.uiArticleID = 10;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 11";
+		stArticulo.sHead = "un head para la 11";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 11;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		selectAndPrintEntries(stPLDAPSession, stPLDAPSessionOperations, "(utnArticleID=*)");
+*/
+
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
@@ -199,7 +281,7 @@ int main(void) {
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-/*	while (1) {*/
+	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
@@ -224,7 +306,7 @@ int main(void) {
 		} else
 			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
 		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-/*	}*/
+	}
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
@@ -323,8 +405,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	free(sResponse);
 
 	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
-
-	LoguearDebugging("<-- procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	thr_exit(0);/*	Termino el thread.*/
 
 	return 0;
@@ -426,10 +506,6 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 
-	/*	Estos dos, son exclusivos para algunas operaciones	*/
-	PLDAP_ENTRY_OP entryOp = newLDAPEntryOperations();
-	PLDAP_ATTRIBUTE_OP attribOp = newLDAPAttributeOperations();
-
 	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
@@ -481,7 +557,6 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
 
-
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	int q;
 	int k;
@@ -491,7 +566,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char* listadoGrupoNoticiasSinRepetir[1000];
 	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
 	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
-	selectEntries(&listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
+	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
@@ -506,7 +581,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
+	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
 VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
@@ -585,36 +660,8 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	unsigned int uiCantidadDeNoticias= 0;
-/*	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
-/*	selectArticles(&listadoNoticias, &uiCantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_BODY_Y_HEAD);*/
-
-printf("uicantidaddegrupos vale: %d\n", uiCantidadDeNoticias);
-
-
-/*
-printf("el body 0 vale: %s\n", (listadoNoticias[0]).sBody);
-printf("el id 0 vale: %d\n", (listadoNoticias[0]).uiArticleID);
-printf("el id 1 vale: %d\n", (listadoNoticias[1]).uiArticleID);
-*/
-
-
-	uiCantidadDeNoticias= 2;
-	stArticle listadoNoticias[2];
-	stArticle stArticle1;
-	stArticle1.sBody= "un body de clarin";
-	stArticle1.sHead= "un hea de clarin.";
-	stArticle1.sNewsgroup= "Clarin";
-	stArticle1.uiArticleID= 1;
-
-	stArticle stArticle2;
-	stArticle2.sBody= "un body de la nacion";
-	stArticle2.sHead= "un hea de la nacion.";
-	stArticle2.sNewsgroup= "La Nacion";
-	stArticle2.uiArticleID= 2;
-
-	listadoNoticias[0]= stArticle1;
-	listadoNoticias[1]= stArticle2;
-
+	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
@@ -623,22 +670,22 @@ printf("el id 1 vale: %d\n", (listadoNoticias[1]).uiArticleID);
 char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias){
 	LoguearDebugging("--> formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
 
-
 	/*	1+OPEN...+1+OPEN...5+1 Es igual a: /nombreGrupoNoticia/noticiaID.html\0	*/
+	/*	TODO: Chequear si se puede sacar el malloc usando asprintf ;)	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+1+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+5+1));
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	sprintf(response, "<HTML><HEAD><TITLE>Listado de noticias de %s</TITLE></HEAD><BODY>", sGrupoDeNoticias);
+	sprintf(response, "<HTML><HEAD><TITLE>Listado de noticias de %s</TITLE></HEAD><BODY><P><B>Listado de noticias de %s</B></P><OL>", sGrupoDeNoticias, sGrupoDeNoticias);
 
 	int i;
 	for(i=0; i<uiCantidadDeNoticias; i++){
 		stArticle stArticle= listadoDeNoticias[i];
 
 		sprintf(sURL, "%s/%d%s", sGrupoDeNoticias, stArticle.uiArticleID, ".html");
-printf("surl vale: %s\n", sURL);
-		sprintf(response, "%s%s", response, armarLinkCon(sURL, stArticle.sHead));
+
+		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, stArticle.sHead));
 	}
 	free(sURL);
-	sprintf(response, "%s%s", response, "</BODY></HTML>");
+	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
 
 	LoguearDebugging("<-- formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
 	return response;

@@ -27,56 +27,59 @@ char* getDNFor(int dArticleID){
 	return sDn;
 }
 
-VOID updateEntry(PLDAP_SESSION			session
-				, PLDAP_SESSION_OP		sessionOp
-				, PLDAP_ENTRY_OP		entryOp
-				, PLDAP_ATTRIBUTE_OP	attribOp
-				, stArticle				article) {
+VOID updateEntry(PLDAP_SESSION			stSession
+				, PLDAP_SESSION_OP		stSessionOperations
+				, stArticle				stArticulo) {
 
-	PLDAP_ENTRY entry = entryOp->createEntry();
+	PLDAP_ENTRY_OP stEntryOperations= newLDAPEntryOperations();
+	PLDAP_ATTRIBUTE_OP stAttributeOperations= newLDAPAttributeOperations();
 
-	entry->dn = getDNFor(article.uiArticleID);
+	PLDAP_ENTRY entry = stEntryOperations->createEntry();
+
+	entry->dn = getDNFor(stArticulo.uiArticleID);
 
 	/* Agrego el atributo a la entry en modo delete */
-	entryOp->editAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_ID, 1, getArticleIDAsString(article)));
-	entryOp->editAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, 1, article.sNewsgroup));
-	entryOp->editAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_HEAD, 1, article.sHead));
-	entryOp->editAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_BODY, 1, article.sBody));
+	stEntryOperations->editAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_ID, 1, getArticleIDAsString(stArticulo)));
+	stEntryOperations->editAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, 1, stArticulo.sNewsgroup));
+	stEntryOperations->editAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_HEAD, 1, stArticulo.sHead));
+	stEntryOperations->editAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_BODY, 1, stArticulo.sBody));
 
-	sessionOp->editEntry(session, entry);
+	stSessionOperations->editEntry(stSession, entry);
 }
 
-VOID insertEntry(PLDAP_SESSION 			session
-				, PLDAP_SESSION_OP 		sessionOp
-				, PLDAP_ENTRY_OP 		entryOp
-				, PLDAP_ATTRIBUTE_OP 	attribOp
-				, stArticle 			article){
+VOID insertEntry(PLDAP_SESSION 			stSession
+				, PLDAP_SESSION_OP 		stSessionOperations
+				, stArticle 			stArticulo){
+
+	PLDAP_ENTRY_OP stEntryOperations= newLDAPEntryOperations();
+	PLDAP_ATTRIBUTE_OP stAttributeOperations= newLDAPAttributeOperations();
 
 	/* Creo una nueva entry. */
-	PLDAP_ENTRY entry = entryOp->createEntry();
-	entry->dn = getDNFor(article.uiArticleID);
+	PLDAP_ENTRY entry = stEntryOperations->createEntry();
+	entry->dn = getDNFor(stArticulo.uiArticleID);
 
 	/*	Seteo los atributos	*/
-	entryOp->addAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_OBJECT_CLASS, 2, OPENDS_ATTRIBUTE_OBJECT_CLASS_TOP, OPENDS_ATTRIBUTE_OBJECT_CLASS_ARTICLE));
-	entryOp->addAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_ID, 1, getArticleIDAsString(article)));
-	entryOp->addAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_HEAD, 1, article.sHead));
-	entryOp->addAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_BODY, 1, article.sBody));
-	entryOp->addAttribute(entry, attribOp->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, 1, article.sNewsgroup));
+	stEntryOperations->addAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_OBJECT_CLASS, 2, OPENDS_ATTRIBUTE_OBJECT_CLASS_TOP, OPENDS_ATTRIBUTE_OBJECT_CLASS_ARTICLE));
+	stEntryOperations->addAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_ID, 1, getArticleIDAsString(stArticulo)));
+	stEntryOperations->addAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_HEAD, 1, stArticulo.sHead));
+	stEntryOperations->addAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_BODY, 1, stArticulo.sBody));
+	stEntryOperations->addAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, 1, stArticulo.sNewsgroup));
 
 	/* inserto la entry en el directorio */
-	sessionOp->addEntry(session, entry);
+	stSessionOperations->addEntry(stSession, entry);
 }
 
-VOID deleteEntry(PLDAP_SESSION 			session
-				, PLDAP_SESSION_OP 		sessionOp
-				, PLDAP_ENTRY_OP 		entryOp
+VOID deleteEntry(PLDAP_SESSION 			stSession
+				, PLDAP_SESSION_OP 		stSessionOperations
 				, unsigned int 			uiArticleID) {
+
+	PLDAP_ENTRY_OP stEntryOperations= newLDAPEntryOperations();
 
 	/* creo una nueva entry.
 	le agrego los parametros correspondientes */
-	PLDAP_ENTRY entry = entryOp->createEntry();
+	PLDAP_ENTRY entry= stEntryOperations->createEntry();
 
-	sessionOp->deleteEntryDn(session, getDNFor(uiArticleID));
+	stSessionOperations->deleteEntryDn(stSession, getDNFor(uiArticleID));
 
 /*        entry->dn = getDNFor(uiArticleID);
 
@@ -200,7 +203,7 @@ VOID selectEntries(	  char*					pczListado[]
  * 		1:	sGrupoDeNoticia
  * 		2:	sBody, sHead
  */
-VOID selectArticles(  stArticle*			pczListado[]
+VOID selectArticles(  stArticle			pczListado[]
 					, unsigned int*			puiCantidadEntries
 					, PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
@@ -239,8 +242,7 @@ VOID selectArticles(  stArticle*			pczListado[]
 			/* se libera la memoria utilizada por el field si este ya no es necesario. */
 			freeLDAPField(field);
 		}
-
-		pczListado[*puiCantidadEntries]= &stArticle;
+		pczListado[*puiCantidadEntries]= stArticle;
 
 		/* libero los recursos consumidos por el record */
 		freeLDAPRecord(record);
@@ -255,8 +257,7 @@ VOID selectArticles(  stArticle*			pczListado[]
  * Se realiza una consulta al directorio en una determinada rama. Para iterar sobre los resultados se utiliza un
  * patron Iterator que recorre cada una de las entries, y se las imprime por stdin.
  */
-VOID selectAndPrintEntries(	  char**				pczListado[]
-							, PLDAP_SESSION 		stPLDAPSession
+VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
 							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 							, char* 				sCriterio){
 
@@ -279,7 +280,7 @@ VOID selectAndPrintEntries(	  char**				pczListado[]
 			PLDAP_FIELD field = recordOp->nextField(record);
 			INT     index = 0;
 
-			printf("\tattribute: %s - values: %d\n", field->name, (int)field->valuesSize);
+			printf("\tAttribute: %s - values: %d\n", field->name, (int)field->valuesSize);
 
 			for(; index < field->valuesSize; index++)
 				printf("\t\tValue[%d]: %s\n", index, field->values[index]);
