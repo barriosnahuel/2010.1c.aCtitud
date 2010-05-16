@@ -130,11 +130,6 @@ VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNot
  */
 unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
 
-/**
- * Devuelve 1 si el grupoDeNoticias ya se encuentra en listadoGruposDeNoticiasSinRepetir.
- */
-/*unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGruposDeNoticiasSinRepetir[], unsigned int* cantidadEnNoRepetidos);*/
-
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
  ************************************************/
@@ -500,7 +495,6 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
-	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
 	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
 	
 	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
