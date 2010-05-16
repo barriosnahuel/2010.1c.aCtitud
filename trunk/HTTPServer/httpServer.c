@@ -120,11 +120,14 @@ int llevaNoticia(char* sRecursoPedido);
 char* obtenerNoticia(char* sRecursoPedido);
 
 /**
- * Del array listadoGruposDeNoticias toma los grupos y va guardando los que no se repiten en listadoGruposDeNoticiasSinRepetir.
- * Retorna la cantidad de elementos de listadoGruposDeNoticiasSinRepetir.
+ * Quita los elementos repetidos del array listadoGruposDeNoticias, y pone ceros en las posiciones donde se repiten.
  */
 VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias);
 
+/**
+ * Pasa los campos que sean distintos de cero del array listadoGrupoNoticiasRepetidos a listadoGrupoNoticiasSinRepetir y retorna la cantidad de campos que posee este
+ * ultimo.
+ */
 unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
 
 /**
@@ -539,40 +542,6 @@ unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCant
 	}
 	return l;
 }
-
-
-/*unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
-	LoguearDebugging("--> quitarRepetidos", APP_NAME_FOR_LOGGER);
-	int i;
-	unsigned int cantidadNoRepetidos= 0;
-
-	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		if((!estaEnArrayDeNoRepetidos(listadoGrupoNoticias[i], &listadoGrupoNoticiasSinRepetir, &cantidadNoRepetidos)) == 1) {
-			listadoGrupoNoticiasSinRepetir[cantidadNoRepetidos] = listadoGrupoNoticias[i];
-			printf("Asigne %s en %d: \n", listadoGrupoNoticias[i], cantidadNoRepetidos);
-			cantidadNoRepetidos++;
-		}
-	}
-
-	LoguearDebugging("<-- quitarRepetidos", APP_NAME_FOR_LOGGER);
-	return iCantidadDeGruposDeNoticias-1;
-}
-
-unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGrupoNoticiasSinRepetir[], unsigned int* cantidadEnNoRepetidos) {
-	LoguearDebugging("--> estaEnArrayDeNoRepetidos", APP_NAME_FOR_LOGGER);
-
-	int indexNoRepetidos= 0;
-	printf("en la pos 0 hay: \n", listadoGrupoNoticiasSinRepetir[indexNoRepetidos]);
-
-	for(	indexNoRepetidos=0
-			;	indexNoRepetidos<(*cantidadEnNoRepetidos)
-				&& (strcmp((*listadoGrupoNoticiasSinRepetir)[indexNoRepetidos], grupoDeNoticias)!=0)
-			; indexNoRepetidos++)
-		;/*No hago nada, solo incremento el index.
-
-	LoguearDebugging("<-- estaEnArrayDeNoRepetidos", APP_NAME_FOR_LOGGER);
-	return indexNoRepetidos<(*cantidadEnNoRepetidos);
-}*/
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
 	printf("Entre a formatearListadoDeGruposDeNoticiasAHTML\n");
