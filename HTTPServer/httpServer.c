@@ -123,12 +123,12 @@ char* obtenerNoticia(char* sRecursoPedido);
  * Del array listadoGruposDeNoticias toma los grupos y va guardando los que no se repiten en listadoGruposDeNoticiasSinRepetir.
  * Retorna la cantidad de elementos de listadoGruposDeNoticiasSinRepetir.
  */
-unsigned int quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGruposDeNoticiasSinRepetir[]);
+VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias);
 
 /**
  * Devuelve 1 si el grupoDeNoticias ya se encuentra en listadoGruposDeNoticiasSinRepetir.
  */
-unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGruposDeNoticiasSinRepetir[], unsigned int* cantidadEnNoRepetidos);
+/*unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGruposDeNoticiasSinRepetir[], unsigned int* cantidadEnNoRepetidos);*/
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -483,18 +483,21 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 
 
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
+	int q;
 	unsigned int cantidadDeGrupos= 0;
 	unsigned int cantidadDeGruposSinRepetir= 0;
-	char* listadoGrupoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	char* listadoGrupoNoticiasSinRepetir[1000];
 	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
 	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
-	selectEntries(&listadoGrupoNoticias, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
+	selectEntries(&listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
 	/*	TODO: Aca tengo que eliminar los grupos de noticias repetidos!	*/
-	cantidadDeGruposSinRepetir = quitarRepetidos(&listadoGrupoNoticias, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
+	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
+	
+	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
@@ -502,7 +505,22 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	return formatearListadoDeGruposDeNoticiasAHTML(&listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
-unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
+VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
+	int i;
+	char grupoDeNoticias[70];
+	
+	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
+		strcpy(grupoDeNoticias, listadoGrupoNoticiasRepetidos[i]);
+		for(j = i+1; j < iCantidadDeGruposDeNoticias; j++) {
+			if(strcmp(grupoDeNoticias, listadoGrupoNoticiasRepetidos[j]) == 0) {
+				listadoGrupoNoticiasRepetidos[j] = "0\0";
+			}
+		}
+	}
+}
+
+
+/*unsigned int quitarRepetidos(char* listadoGrupoNoticias[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
 	LoguearDebugging("--> quitarRepetidos", APP_NAME_FOR_LOGGER);
 	int i;
 	unsigned int cantidadNoRepetidos= 0;
@@ -529,11 +547,11 @@ unsigned int estaEnArrayDeNoRepetidos(char* grupoDeNoticias, char** listadoGrupo
 			;	indexNoRepetidos<(*cantidadEnNoRepetidos)
 				&& (strcmp((*listadoGrupoNoticiasSinRepetir)[indexNoRepetidos], grupoDeNoticias)!=0)
 			; indexNoRepetidos++)
-		;/*No hago nada, solo incremento el index.*/
+		;/*No hago nada, solo incremento el index.
 
 	LoguearDebugging("<-- estaEnArrayDeNoRepetidos", APP_NAME_FOR_LOGGER);
 	return indexNoRepetidos<(*cantidadEnNoRepetidos);
-}
+}*/
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
 	printf("Entre a formatearListadoDeGruposDeNoticiasAHTML\n");
