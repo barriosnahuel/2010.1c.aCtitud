@@ -507,6 +507,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 
 VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
 	int i;
+	int j;
 	char grupoDeNoticias[70];
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
