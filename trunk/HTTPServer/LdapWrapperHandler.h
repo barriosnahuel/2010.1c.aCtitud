@@ -39,31 +39,36 @@ VOID selectEntries(	  char*					pczListado[]
 					, char* 				sCriterio
 					, unsigned int			uiTipoDeSelect);
 
+VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
+							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+							, char* 				sCriterio);
+
+VOID selectArticles(  stArticle				pczListado[]
+					, unsigned int*			puiCantidadEntries
+					, PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+					, char* 				sCriterio);
+
 /**
  * Insertar una nueva entry en base a los atributos de la estructura stArticle que le pasamos.
  */
-VOID insertEntry(PLDAP_SESSION			session
-				, PLDAP_SESSION_OP		sessionOp
-				, PLDAP_ENTRY_OP		entryOp
-				, PLDAP_ATTRIBUTE_OP	attribOp
-				, stArticle 			article);
+VOID insertEntry(PLDAP_SESSION			stSession
+				, PLDAP_SESSION_OP		stSessionOperations
+				, stArticle 			stArticulo);
 
 /**
  * Esta funcion modifica el articulo de la base que se le pasa como parametro con sus atributos ya modificados.
  * Es decir, actualiza la entry con el articulo que le damos.
  */
-VOID updateEntry(PLDAP_SESSION			session
-				, PLDAP_SESSION_OP		sessionOp
-				, PLDAP_ENTRY_OP		entryOp
-				, PLDAP_ATTRIBUTE_OP	attribOp
-				, stArticle 			article);
+VOID updateEntry(PLDAP_SESSION			stSession
+				, PLDAP_SESSION_OP		stSessionOperations
+				, stArticle 			stArticulo);
 
 /**
  * Eliminar una entrada existente a partir del ID del articulo.
  */
-VOID deleteEntry(PLDAP_SESSION		session
-			, PLDAP_SESSION_OP		sessionOp
-			, PLDAP_ENTRY_OP		entryOp
+VOID deleteEntry(PLDAP_SESSION		stSession
+			, PLDAP_SESSION_OP		stSessionOperations
 			, unsigned int 			uiArticleID);
 
 
