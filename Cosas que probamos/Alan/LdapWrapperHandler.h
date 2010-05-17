@@ -19,6 +19,9 @@
 #define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME "utnArticleGroupName"
 #define OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT 25
 
+#define OPENDS_SELECT_GRUPO_DE_NOTICIA 1
+#define OPENDS_SELECT_BODY_Y_HEAD 2
+
 char* getDNFor(int dArticleID);
 
 stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
@@ -29,35 +32,43 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.
  */
-VOID selectEntries(PLDAP_SESSION			stPLDAPSession
-					, PLDAP_SESSION_OP		stPLDAPSessionOperations
+VOID selectEntries(	  char*					pczListado[]
+                   	, unsigned int*			puiCantidadEntries
+					, PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+					, char* 				sCriterio
+					, unsigned int			uiTipoDeSelect);
+
+VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
+							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+							, char* 				sCriterio);
+
+VOID selectArticles(  stArticle				pczListado[]
+					, unsigned int*			puiCantidadEntries
+					, PLDAP_SESSION 		stPLDAPSession
+					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sCriterio);
 
 /**
  * Insertar una nueva entry en base a los atributos de la estructura stArticle que le pasamos.
  */
-VOID insertEntry(PLDAP_SESSION			session
-				, PLDAP_SESSION_OP		sessionOp
-				, PLDAP_ENTRY_OP		entryOp
-				, PLDAP_ATTRIBUTE_OP	attribOp
-				, stArticle 			article);
+VOID insertEntry(PLDAP_SESSION			stSession
+				, PLDAP_SESSION_OP		stSessionOperations
+				, stArticle 			stArticulo);
 
 /**
  * Esta funcion modifica el articulo de la base que se le pasa como parametro con sus atributos ya modificados.
  * Es decir, actualiza la entry con el articulo que le damos.
  */
-VOID updateEntry(PLDAP_SESSION			session
-				, PLDAP_SESSION_OP		sessionOp
-				, PLDAP_ENTRY_OP		entryOp
-				, PLDAP_ATTRIBUTE_OP	attribOp
-				, stArticle 			article);
+VOID updateEntry(PLDAP_SESSION			stSession
+				, PLDAP_SESSION_OP		stSessionOperations
+				, stArticle 			stArticulo);
 
 /**
  * Eliminar una entrada existente a partir del ID del articulo.
  */
-VOID deleteEntry(PLDAP_SESSION		session
-			, PLDAP_SESSION_OP		sessionOp
-			, PLDAP_ENTRY_OP		entryOp
+VOID deleteEntry(PLDAP_SESSION		stSession
+			, PLDAP_SESSION_OP		stSessionOperations
 			, unsigned int 			uiArticleID);
 
 
