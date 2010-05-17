@@ -151,6 +151,10 @@ int main(void) {
 		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
 		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
 		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
+		printf("\tIP memcachedServer 1: %s\n",stConf.memachedServer1);
+		printf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
+		printf("\tIP memcachedServer 2: %s\n",stConf.memachedServer2);
+		printf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	}
 
 	/****************************************************
@@ -426,7 +430,6 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 	memcached_st* memc;
     iniciarClusterCache(memc); /*Dps le voy a tener que pasar el puerto y la ip de los servidores*/
-	
 	stArticle stArticulo;
 	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)) {
