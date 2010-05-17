@@ -133,7 +133,7 @@ unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCant
 /**
  * Reemplaza los %20 por espacios.
  */
-VOID formatearEspacios(char* sGrupoDeNoticias);
+VOID formatearEspacios(char* sRecursoPedido);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -350,6 +350,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	
+	formatearEspacios(&sRecursoPedido);
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
@@ -363,7 +365,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		/* Obtengo el grupo de noticias. */
 		
 		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedido));
-		formatearEspacios(&sGrupoDeNoticia);
 		/* Me fijo si ademas del grupo de noticias viene la noticia */
 		if (llevaNoticia(sRecursoPedido)) {
 			/* Obtengo la noticia de dicho grupo. */
@@ -535,16 +536,16 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	return response;
 }
 
-VOID formatearEspacios(char* sGrupoDeNoticias){
+VOID formatearEspacios(char* sRecursoPedido){
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
 	
-	printf("->>>>>>>>>> %c\n", *(sGrupoDeNoticias+i));
-	while(strcmp('\0', *(sGrupoDeNoticias+i)) != 0) {
+	printf("->>>>>>>>>> %c\n", sRecursoPedido[i]);
+	while(sRecursoPedido[i] != '\0') {
 		printf("Entre al while\n");
-		if(strcmp('%20', sGrupoDeNoticias[i]) == 0) {
+		if(sRecursoPedido[i] == '%20') {
 			printf("Entre al if\n");
-			sGrupoDeNoticias[i] = ' ';
+			sRecursoPedido[i] = 32;
 		}
 		i++;
 	}
