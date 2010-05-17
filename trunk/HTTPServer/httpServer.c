@@ -540,7 +540,7 @@ VOID formatearEspacios(char* sRecursoPedido){
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
 	
-	printf("->>>>>>>>>> %c\n", sRecursoPedido[i]);
+	
 	while(sRecursoPedido[i] != '\0') {
 		printf("Entre al while\n");
 		if(sRecursoPedido[i] == '%20') {
@@ -550,6 +550,7 @@ VOID formatearEspacios(char* sRecursoPedido){
 		i++;
 	}
 	
+	printf("Quedo el recurso %s\n", sRecursoPedido);
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
