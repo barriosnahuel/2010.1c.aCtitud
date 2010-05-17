@@ -283,7 +283,7 @@ int main(void) {
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	/*while (1) {*/
+	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
@@ -308,7 +308,7 @@ int main(void) {
 
 		asprintf(&sLogMessage, "Se obtuvo una conexion desde %s.", inet_ntoa(client.sin_addr));
 		LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	/*}*/
+	}
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
