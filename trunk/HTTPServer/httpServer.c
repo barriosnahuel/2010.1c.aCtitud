@@ -540,6 +540,7 @@ VOID formatearEspacios(char* sGrupoDeNoticias){
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
 	
+	printf("->>>>>>>>>> %c\n", *(sGrupoDeNoticias+i));
 	while(strcmp('\0', *(sGrupoDeNoticias+i)) != 0) {
 		printf("Entre al while\n");
 		if(strcmp('%20', sGrupoDeNoticias[i]) == 0) {
