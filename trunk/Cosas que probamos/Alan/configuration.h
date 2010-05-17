@@ -11,6 +11,12 @@ typedef struct stConfiguracion {
 
 	char 			czBDServer[15+1];  	/* se supone que es una direccion IP */
     unsigned int	uiBDPuerto;
+	
+	char			memcachedServer1[15+1];
+	unsigned int	memcachedServer1Puerto;
+	char			memcachedServer2[15+1];
+	unsigned int 	memcachedServer2Puerto;
+	
 } stConfiguracion;
 
 /* funcion que valida que una ip se haya ingresado correctamente */
