@@ -37,6 +37,7 @@ typedef struct stThreadParameters {
 													insertar/modificar/eliminar entries		*/
 
 	stConfiguracion* pstConfiguration;
+	memcached_st* memc; 						/* Para poder pasar la conexion */
 } stThreadParameters;
 
 /************************************************************************************************************
@@ -159,8 +160,7 @@ int main(void) {
 	
 	/****************************************************
 	 *	Conecto a Servidores Memcached					*
-	 ****************************************************/
-	memcached_st* memc;
+	*/
     iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
 	/****************************************************
@@ -213,6 +213,12 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
+			/****************************************************
+			*	    Conecto a Servidores Memcached				*
+			*/
+			iniciarClusterCache(stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	
+			stParameters.mc
 
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -271,7 +277,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		break;
 	case REQUEST_TYPE_NEWS:
 		LoguearInformacion("Proceso la obtencion de una noticia en particular.", APP_NAME_FOR_LOGGER);
-		sResponse = processRequestTypeUnaNoticia(sGrupoDeNoticia, sArticleID, &stParametros, memc);
+		sResponse = processRequestTypeUnaNoticia(sGrupoDeNoticia, sArticleID, &stParametros);
 		break;
 	default:
 		LoguearInformacion("Por default, obtengo el listado de grupos de noticias.", APP_NAME_FOR_LOGGER);
@@ -431,21 +437,21 @@ char* formatearArticuloAHTML(stArticle stArticulo) {
 }
 
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
-		stThreadParameters* pstParametros, memcached_st* memc) {
+		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	/*memcached_st* memc;
     iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);*/
 	stArticle stArticulo;
 	
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,memc);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->memc);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
