@@ -130,6 +130,11 @@ VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNot
  */
 unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
 
+/**
+ * Reemplaza los %20 por espacios.
+ */
+VOID formatearEspacios(char* sGrupoDeNoticias);
+
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
  ************************************************/
@@ -349,6 +354,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
 
+	formatearEspacios(sGrupoDeNoticia);
+	
 	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
 	unsigned int uiOperation;
 	if (strlen(sRecursoPedido) == 1)
@@ -528,6 +535,22 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
 }
+
+VOID formatearEspacios(char* sGrupoDeNoticias){
+	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
+	int i = 0;
+	
+	while(strcmp('\0', sGrupoDeNoticias[i]) != 0) {
+		if(strcmp('%20', sGrupoDeNoticias[i]) == 0) {
+			sGrupoDeNoticias[i] = '';
+		}
+		i++;
+	}
+	
+	
+	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
+}
+
 
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
