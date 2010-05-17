@@ -354,7 +354,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
 
-	formatearEspacios(sGrupoDeNoticia);
+	formatearEspacios(&sGrupoDeNoticia);
 	
 	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
 	unsigned int uiOperation;
