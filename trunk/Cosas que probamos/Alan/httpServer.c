@@ -513,7 +513,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sA
 
 	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
-}*/
+//}
 
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
