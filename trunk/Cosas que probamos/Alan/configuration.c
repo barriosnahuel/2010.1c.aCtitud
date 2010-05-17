@@ -77,7 +77,7 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	
 	/* Cargo las IPS y los puertos de los servidores memcached	*/
 	stConf->memcachedServer2Puerto= atoi(GetVal(MEMCACHED_SERVER2_PORT, pszAux));
-	if((stConf->uiAppPuerto) < 1 || (stConf->uiAppPuerto) > 65535 ) {
+	if((stConf->memcachedServer2Puerto) < 1 || (stConf->memcachedServer2Puerto) > 65535 ) {
 	    printf("Puerto de memcached server 2 inválido.");
 		return 0;
 	}
@@ -90,7 +90,7 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
     };
 	
 	stConf->memcachedServer1Puerto= atoi(GetVal(MEMCACHED_SERVER1_PORT, pszAux));
-	if((stConf->uiAppPuerto) < 1 || (stConf->uiAppPuerto) > 65535 ) {
+	if((stConf->memcachedServer1Puerto) < 1 || (stConf->memcachedServer1Puerto) > 65535 ) {
 	    printf("Puerto de memcached server 1 inválido.");
 		return 0;
 	}
