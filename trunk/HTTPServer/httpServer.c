@@ -354,7 +354,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
 
-	formatearEspacios(&sGrupoDeNoticia);
 	
 	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
 	unsigned int uiOperation;
@@ -362,9 +361,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		uiOperation= REQUEST_TYPE_NEWSGROUP;
 	else {
 		/* Obtengo el grupo de noticias. */
-
+		
 		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedido));
-
+		formatearEspacios(&sGrupoDeNoticia);
 		/* Me fijo si ademas del grupo de noticias viene la noticia */
 		if (llevaNoticia(sRecursoPedido)) {
 			/* Obtengo la noticia de dicho grupo. */
