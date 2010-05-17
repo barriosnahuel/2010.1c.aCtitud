@@ -542,7 +542,7 @@ VOID formatearEspacios(char* sGrupoDeNoticias){
 	
 	while(strcmp('\0', sGrupoDeNoticias[i]) != 0) {
 		if(strcmp('%20', sGrupoDeNoticias[i]) == 0) {
-			sGrupoDeNoticias[i] = '';
+			sGrupoDeNoticias[i] = 32;
 		}
 		i++;
 	}
