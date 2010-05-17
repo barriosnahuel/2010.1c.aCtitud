@@ -20,7 +20,7 @@ void iniciarClusterCache(memcached_st* memc)
   uint32_t flags;
 
   memc = memcached_create(NULL); 
-  servers = memcached_server_list_append(servers, "localhost", 11211,&rc);
+  servers = memcached_server_list_append(servers, 192.168.0.101, 11211,&rc);
   rc      = memcached_server_push(memc, servers);
   
   if (rc == MEMCACHED_SUCCESS)
