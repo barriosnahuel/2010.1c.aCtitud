@@ -150,6 +150,7 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink);
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
 int main(void) {
+	char* sLogMessage;	/*	Es la variable que uso para generar el msj para el log.	*/
 	/****************************************
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
@@ -159,12 +160,14 @@ int main(void) {
 		printf("Archivo de configuracion no valido.\n");
 		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
 		return -1;
-	} else {
-		LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
-		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
-		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
-		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
 	}
+	LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "Puerto de la aplicacion: %d.", stConf.uiAppPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "IP LDAP/OpenDS: %s.", stConf.czBDServer);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
@@ -177,9 +180,9 @@ int main(void) {
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER);
 		return -1;
-	} else
-		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer,
-				stConf.uiBDPuerto);
+	}
+	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 
 /*	Esto es prueba!!	*/
@@ -266,27 +269,25 @@ int main(void) {
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
-	int ficheroServer; /* los ficheros descriptores */
-	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
+	int ficheroServer; 			/* Fichero descriptor de nuestro server. */
+	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
 		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", APP_NAME_FOR_LOGGER);
 		return -1;
 	}
-	else{
-		strcpy(stConf.czAppServer, inet_ntoa(server.sin_addr));
-		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", stConf.czAppServer, stConf.uiAppPuerto);
-	}
-
+	strcpy(stConf.czAppServer, inet_ntoa(server.sin_addr));
+	asprintf(&sLogMessage, "Aplicacion levantada en: IP=%s; Port=%d.", stConf.czAppServer, stConf.uiAppPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	printf("* HTTPServer escuchando conexiones entrantes...\n");
 
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	while (1) {
+	/*while (1) {*/
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
-		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
-				&sin_size);
+		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
@@ -301,17 +302,17 @@ int main(void) {
 
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
-				printf(
-						"No se pudo crear un nuevo thread para procesar el request.\n");
+				LoguearError("No se pudo crear un nuevo thread para procesar el request.", APP_NAME_FOR_LOGGER);
 		} else
 			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
-		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-	}
+
+		asprintf(&sLogMessage, "Se obtuvo una conexion desde %s.", inet_ntoa(client.sin_addr));
+		LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	/*}*/
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
-	printf("Ahora cierro socket, db, etc...\n");
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
 
@@ -321,9 +322,11 @@ int main(void) {
 
 void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
+	char* sLogMessage;
+	printf("Entre a un thread!!\n");
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 
-	printf("---------------- Procesando thread xD -----------------\n");
+	LoguearInformacion("Comienzo a procesar un nueco thread.", APP_NAME_FOR_LOGGER);
 	int bytesRecibidos;
 	char sMensajeHTTPCliente[1024];/*	TODO: No pueden valer lo mismo estos dos.	*/
 
@@ -331,15 +334,17 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	lenMensajeHTTPCliente = 1024;
 	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente, lenMensajeHTTPCliente, 0);
 
-	printf("Recibi %d bytes del usuario.\n\n", bytesRecibidos);
-	printf("############################################################\n\n");
-	printf("%s", sMensajeHTTPCliente);
-	printf("############################################################\n");
+
+	asprintf(&sLogMessage, "Recibi %d bytes del usuario.", bytesRecibidos);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "El mensaje HTTP que recibimos del cliente es:\n%s", sMensajeHTTPCliente);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
-	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
+	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
@@ -353,7 +358,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedido));
 
-		printf("%s\n", sGrupoDeNoticia);
 		/* Me fijo si ademas del grupo de noticias viene la noticia */
 		if (llevaNoticia(sRecursoPedido)) {
 			/* Obtengo la noticia de dicho grupo. */
@@ -391,23 +395,18 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 
-	printf("Le respondo al cliente con el html ya armado... \n");
-	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0))
-			== -1) {
-		printf("El send no funco\n");
-	}
-	printf("El cliente recibio %d bytes\n", bytesEnviados);
+	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
+		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
 
-	printf("Voy a cerrar la conexion con el cliente\n");
-	close(stParametros.ficheroCliente);
+	printf("Estoy por salir de un thread!\n");
 
-	/*	TODO: Libero la memoria	*/
 	free(sResponse);
 
-	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
-	thr_exit(0);/*	Termino el thread.*/
+	close(stParametros.ficheroCliente);
+	LoguearInformacion("Se cerro el fichero descriptor del cliente.", APP_NAME_FOR_LOGGER);
 
-	return 0;
+	LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+	thr_exit(0);
 }
 
 int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
@@ -442,10 +441,10 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 	LoguearDebugging("--> crearConexionConSocket()", APP_NAME_FOR_LOGGER);
 
 	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		printf("Error al crear el socket.\n");
+		LoguearError("No se pudo obtener el fichero descriptor del socket.", APP_NAME_FOR_LOGGER);
 		exit(-1);
 	}
-	printf("Cree el socket bien\n");
+	LoguearInformacion("Se obtuvo el fichero descriptor correctamente.", APP_NAME_FOR_LOGGER);
 
 	(*server).sin_family = AF_INET;
 	(*server).sin_addr.s_addr = INADDR_ANY; /* INADDR_ANY coloca nuestra direccion IP automaticamente */
@@ -454,13 +453,13 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 
 	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
-		printf("Error al asociar el puerto al socket.\n");
+		LoguearError("Error al asociar el puerto al socket.", APP_NAME_FOR_LOGGER);
 		exit(-1);
 	}
-	printf("Pude bindear bien el socket\n");
+	LoguearInformacion("Se asocio bien el puerto al socket.", APP_NAME_FOR_LOGGER);
 
 	if (listen(*ficheroServer, BACKLOG) == -1) {
-		printf("Error al escuchar por el puerto.\n");
+		LoguearError("No se pudo dejar escuchando al puerto.", APP_NAME_FOR_LOGGER);
 		exit(-1);
 	}
 
@@ -486,11 +485,12 @@ void liberarRecursos(int 				ficheroServer
 	freeLDAPSession(stPLDAPSession);
 	freeLDAPContext(stPLDAPContext);
 	freeLDAPContextOperations(stPLDAPContextOperations);
-	printf("Libere LDAP/OpenDS\n");
+	LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.", APP_NAME_FOR_LOGGER);
 
 	/*	Cierro el socket	*/
 	close(ficheroServer);
-	printf("Libere el ficheroServer\n");
+	LoguearInformacion("Libere el fichero descriptor de nuestro server correctamente.", APP_NAME_FOR_LOGGER);
+
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
 
@@ -551,13 +551,11 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	printf("Entre a processRequestTypeListadoGruposDeNoticias\n");
 
 	/*	Sumo 3 por el =* y el \0	*/
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
 
-	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	int q;
 	int k;
 	unsigned int cantidadDeGrupos= 0;
@@ -566,16 +564,19 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char* listadoGrupoNoticiasSinRepetir[1000];
 	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
 	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
+	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
 	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
 	
+	/*	TODO: Esto se borra o se loguea?	*/
 	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
 	
 	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
-	
+
+	/*	TODO: Esto se borra o se loguea?	*/
 	for(k = 0; k < cantidadDeGruposSinRepetir; k++) printf("Contenido de la posicion %d del array LIMPIO es: %s\n", k, listadoGrupoNoticiasSinRepetir[k]);
 	
 	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
@@ -587,7 +588,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
 	int i;
 	int j;
-	char grupoDeNoticias[70];
+	char grupoDeNoticias[70];/*	TODO: 70???	*/
 	
 	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
 		strcpy(grupoDeNoticias, listadoGrupoNoticiasRepetidos[i]);
@@ -613,22 +614,21 @@ unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCant
 }
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
-	printf("Entre a formatearListadoDeGruposDeNoticiasAHTML\n");
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 
 	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
+	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY><P><B>Listado de grupos de noticias</B></P><OL>");
 
 	int i;
 	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
 		sprintf(sURL, "%s%s", listadoGrupoDeNoticiasSinRepetir[i], ".html");
-		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGrupoDeNoticiasSinRepetir[i]));
+		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, listadoGrupoDeNoticiasSinRepetir[i]));
 	}
 	free(sURL);
 
-	sprintf(response, "%s%s", response, "</BODY></HTML>");
+	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
 
 	LoguearDebugging("<-- formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
@@ -638,6 +638,7 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 	LoguearDebugging("--> armarLinkCon()", APP_NAME_FOR_LOGGER);
 
 	/*	+50 Porque tengo que tener en cuenta ip:puerto/grupoNoticia/noticiaID	*/
+	/*	TODO: Ver si se puede cambiar el malloc por el uso de asprintf	*/
 	char* sTag= (char*)malloc(sizeof(char)*(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50));
 	memset(sTag, 0, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50);
 	sprintf(sTag, "<A href=\"/%s\">%s</A><BR />", sURL, sNombreDelLink);
@@ -648,6 +649,7 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
+	char* sLogMessage;
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -655,8 +657,8 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias);
 
-	printf("sCriterio quedo en: %s\n", sCriterio);
-	/*	TODO: Aca hago la busqueda	*/
+	asprintf(&sLogMessage, "El criterio para buscar en OpenDS es: %s", sCriterio);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	unsigned int uiCantidadDeNoticias= 0;
@@ -681,7 +683,6 @@ char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoD
 		stArticle stArticle= listadoDeNoticias[i];
 
 		sprintf(sURL, "%s/%d%s", sGrupoDeNoticias, stArticle.uiArticleID, ".html");
-
 		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, stArticle.sHead));
 	}
 	free(sURL);
