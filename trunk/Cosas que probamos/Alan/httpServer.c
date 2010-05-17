@@ -83,7 +83,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
  * y devuelve un response en formato HTML.
  */
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
-		stThreadParameters* pstParametros, memcached_st* memc);
+		stThreadParameters* pstParametros);
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
  */
