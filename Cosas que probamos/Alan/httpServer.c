@@ -82,7 +82,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
  * y devuelve un response en formato HTML.
  */
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
-		stThreadParameters* pstParametros);
+		stThreadParameters* pstParametros, memcached_st* memc);
 /**
  * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
  */
@@ -271,7 +271,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		break;
 	case REQUEST_TYPE_NEWS:
 		LoguearInformacion("Proceso la obtencion de una noticia en particular.", APP_NAME_FOR_LOGGER);
-		sResponse = processRequestTypeUnaNoticia(sGrupoDeNoticia, sArticleID, &stParametros);
+		sResponse = processRequestTypeUnaNoticia(sGrupoDeNoticia, sArticleID, &stParametros, memc);
 		break;
 	default:
 		LoguearInformacion("Por default, obtengo el listado de grupos de noticias.", APP_NAME_FOR_LOGGER);
@@ -431,11 +431,11 @@ char* formatearArticuloAHTML(stArticle stArticulo) {
 }
 
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
-		stThreadParameters* pstParametros) {
+		stThreadParameters* pstParametros, memcached_st* memc) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
-	memcached_st* memc;
-    iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	/*memcached_st* memc;
+    iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);*/
 	stArticle stArticulo;
 	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)) {
