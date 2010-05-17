@@ -158,11 +158,7 @@ int main(void) {
 		printf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	}
 	
-	/****************************************************
-	 *	Conecto a Servidores Memcached					*
-	*/
-    iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
-	
+
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
@@ -218,8 +214,6 @@ int main(void) {
 			*/
 			iniciarClusterCache(stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
-			stParameters.mc
-
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
 				printf(
