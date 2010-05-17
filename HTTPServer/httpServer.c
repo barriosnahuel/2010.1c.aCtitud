@@ -541,8 +541,10 @@ VOID formatearEspacios(char* sGrupoDeNoticias){
 	int i = 0;
 	
 	while(strcmp('\0', sGrupoDeNoticias[i]) != 0) {
+		printf("Entre al while\n");
 		if(strcmp('%20', sGrupoDeNoticias[i]) == 0) {
-			sGrupoDeNoticias[i] = 32;
+			printf("Entre al if\n");
+			sGrupoDeNoticias[i] = ' ';
 		}
 		i++;
 	}
