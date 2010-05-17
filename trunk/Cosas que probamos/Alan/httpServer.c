@@ -151,9 +151,9 @@ int main(void) {
 		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
 		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
 		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
-		printf("\tIP memcachedServer 1: %s\n",stConf.memachedServer1);
+		printf("\tIP memcachedServer 1: %s\n",stConf.memcahedServer1);
 		printf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
-		printf("\tIP memcachedServer 2: %s\n",stConf.memachedServer2);
+		printf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
 		printf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	}
 
