@@ -13,14 +13,14 @@ typedef struct stArticle {
      char* sBody;				
 } stArticle;*/
 
-void iniciarClusterCache(memcached_st* memc)
+void iniciarClusterCache(memcached_st* memc,char memcachedServer1,int memcachedServer1Puerto,char memcachedServer2,int memcachedServer2Puerto)
 {
   memcached_server_st *servers = NULL;
   memcached_return rc;
   uint32_t flags;
 
   memc = memcached_create(NULL); 
-  servers = memcached_server_list_append(servers, "192.168.0.101", 11211,&rc);
+  servers = memcached_server_list_append(servers, memcachedServer1, memcachedServer1Puerto,&rc);
   rc      = memcached_server_push(memc, servers);
   
   if (rc == MEMCACHED_SUCCESS)
@@ -28,7 +28,7 @@ void iniciarClusterCache(memcached_st* memc)
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 	
-  servers = memcached_server_list_append(servers, "localhost", 11212,&rc);
+  servers = memcached_server_list_append(servers, memcachedServer2, memcachedServer2Puerto,&rc);
   rc      = memcached_server_push(memc, servers);
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");

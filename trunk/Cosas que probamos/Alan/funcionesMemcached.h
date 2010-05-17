@@ -13,7 +13,7 @@ typedef struct _articuloCache{
   char *body;
 }t_news;
 
-void iniciarClusterCache(memcached_st* memc);
+void iniciarClusterCache(memcached_st* memc,char memcachedServer1,int memcachedServer1Puerto,char memcachedServer2,int memcachedServer2Puerto);
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st* memc);
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st* memc);
 void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID );
