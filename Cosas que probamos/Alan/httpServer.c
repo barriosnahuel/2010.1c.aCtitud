@@ -156,7 +156,13 @@ int main(void) {
 		printf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
 		printf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	}
-
+	
+	/****************************************************
+	 *	Conecto a Servidores Memcached					*
+	 ****************************************************/
+	memcached_st* memc;
+    iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
