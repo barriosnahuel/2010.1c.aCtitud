@@ -551,6 +551,7 @@ VOID formatearEspacios(char* sRecursoPedido){
 	}
 	
 	printf("Quedo el recurso %s\n", sRecursoPedido);
+	printf("Quedo el char %c\n", sRecursoPedido[3]);
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
