@@ -347,6 +347,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
 	char sRecursoPedidoSinEspacios[1024];
+	memset(sRecursoPedidoSinEspacios, 0, 1024);
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
