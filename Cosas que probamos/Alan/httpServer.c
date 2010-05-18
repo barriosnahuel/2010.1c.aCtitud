@@ -305,6 +305,7 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
+			stParameters.memc = NULL;
 			/****************************************************
 			*	    Conecto a Servidores Memcached				*
 			*/
