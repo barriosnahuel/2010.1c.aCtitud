@@ -582,7 +582,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 	stArticle stArticulo;
 	memcached_st memc ;
-	iniciarClusterCache(&memc,"192.168.0.101",11250,"192.168.0.101",11251);
+	iniciarClusterCache(&memc,"127.0.0.1",11211,"192.168.0.101",11251);
 	printf("PASA POR ACA \n");
 	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &memc)) {
