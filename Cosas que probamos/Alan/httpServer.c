@@ -513,14 +513,13 @@ void liberarRecursos(int 				ficheroServer
 
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
-
+/*
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sArticleID) {
 	LoguearDebugging("--> buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
-}
-
+/*}*/
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
@@ -531,13 +530,13 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
-
+/*
 void guardarNoticiaEnCache(stArticle stArticulo) {
 	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return;
-}
+/*}*/
 
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
