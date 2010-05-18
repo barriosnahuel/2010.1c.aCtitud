@@ -106,7 +106,7 @@ void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
 	
 }
 
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID/*, memcached_st * memc*/)
 {
   printf("INTENTA BUSCAR LA NOTICIA EN LA CACHE");
   uint32_t flags;

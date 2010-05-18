@@ -580,12 +580,12 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
-	stArticle* stArticulo;
+	stArticle stArticulo;
 	memcached_st* memc ;
 	iniciarClusterCache(memc,"192.168.0.101",11211,"192.168.0.101",11212);
 	printf("PASA POR ACA \n");
 	
-	if (!buscarNoticiaEnCache(stArticulo, sGrupoDeNoticias, sArticleID, memc)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID/*, memc*/)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
