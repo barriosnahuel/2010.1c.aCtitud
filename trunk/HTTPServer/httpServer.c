@@ -545,7 +545,7 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	
 	while(sRecursoPedido[i] != '\0') {
 		if(sRecursoPedido[i] == '%') {
-			sRecursoPedidoSinEspacios[j] = ' ';
+			sRecursoPedidoSinEspacios[j] = '-';
 			i = i + 3;
 		}
 		else {
