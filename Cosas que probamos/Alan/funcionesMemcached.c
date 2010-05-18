@@ -125,7 +125,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   else
   {
   	printf("No se encontro el articulo en la cache\n");
-	return -1;
+	return 0;
   }  	
   
   memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
@@ -145,5 +145,5 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   
   free(claveCache);
   free(resultNoticia);
-  return 0;
+  return 1;
 };
