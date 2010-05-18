@@ -24,6 +24,11 @@
 
 char* getDNFor(int dArticleID);
 
+/**
+ * Busca en OpenDS un articulo en base a su PK, compuesta por el grupo de noticias
+ * al que pertenece la noticia, y al ID de la noticia. El criterio que finalmente
+ * arma para pasarle a LDAP es: (&(utnArticleID=999)(utnArticleGroupName=XXX))
+ */
 stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sGrupoDeNoticias
@@ -39,22 +44,35 @@ VOID selectEntries(	  char*					pczListado[]
 					, char* 				sCriterio
 					, unsigned int			uiTipoDeSelect);
 
-VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
-							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
-							, char* 				sCriterio);
-
+/**
+ * Selecciona un listado de articulos, en base al criterio que se le pasa
+ * y los agrega uno a uno en pczListado[] el cual es parametro I/O y es un array de stArticle.
+ */
 VOID selectArticles(  stArticle				pczListado[]
 					, unsigned int*			puiCantidadEntries
 					, PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sCriterio);
 
+/****************************************************************************************
+ *	De aca, para abajo, son funciones que actualmente no se usan mas que para testing.	*
+ ****************************************************************************************/
+
 /**
- * Insertar una nueva entry en base a los atributos de la estructura stArticle que le pasamos.
+ * Insertar una nueva entry en base a los atributos de la estructura stArticle
+ * que le pasamos como parametro.
  */
 VOID insertEntry(PLDAP_SESSION			stSession
 				, PLDAP_SESSION_OP		stSessionOperations
 				, stArticle 			stArticulo);
+
+/**
+ * Selecciona aquellas entradas de la BD que matcheen con el criterio sCriterio que le
+ * pasamos como parametro, y los imprime por stdout.
+ */
+VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
+							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+							, char* 				sCriterio);
 
 /**
  * Esta funcion modifica el articulo de la base que se le pasa como parametro con sus atributos ya modificados.
@@ -65,7 +83,7 @@ VOID updateEntry(PLDAP_SESSION			stSession
 				, stArticle 			stArticulo);
 
 /**
- * Eliminar una entrada existente a partir del ID del articulo.
+ * Elimina una entrada existente (una noticia) a partir del ID del articulo.
  */
 VOID deleteEntry(PLDAP_SESSION		stSession
 			, PLDAP_SESSION_OP		stSessionOperations
