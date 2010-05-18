@@ -109,7 +109,7 @@ void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
 {
   printf("INTENTA BUSCAR LA NOTICIA EN LA CACHE");
-  /*uint32_t flags;
+  uint32_t flags;
   memcached_return rc;
  
   t_news *resultNoticia = malloc(sizeof(t_news));
@@ -144,6 +144,6 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   pstArticulo->sBody	  = resultNoticia->body;
   
   free(claveCache);
-  free(resultNoticia);*/
+  free(resultNoticia);
   return 0;
 };
