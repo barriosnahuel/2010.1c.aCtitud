@@ -53,7 +53,6 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);*/
   
-  char* claveCache;
   formarClave(claveCache,sGrupoDeNoticias,article.uiArticleID);
   
   
