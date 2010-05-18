@@ -540,18 +540,21 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
+	int j = 0;
 	
 	
 	while(sRecursoPedido[i] != '\0') {
 		if(sRecursoPedido[i] == '%') {
-			sRecursoPedidoSinEspacios[i] = 32;
+			sRecursoPedidoSinEspacios[j] = 32;
 			i = i + 3;
 		}
 		else {
-			sRecursoPedidoSinEspacios[i] = sRecursoPedido[i];
+			sRecursoPedidoSinEspacios[j] = sRecursoPedido[i];
 			i++;
+			j++;
 		}
 	}
+	sRecursoPedidoSinEspacios[j] = '\0';
 	printf("El recurso pedido sin espacios es: %s\n", sRecursoPedidoSinEspacios);
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
