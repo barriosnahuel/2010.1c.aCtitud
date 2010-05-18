@@ -328,7 +328,6 @@ int main(void) {
 void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
-	printf("Entre a un thread!!\n");
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 
 	LoguearInformacion("Comienzo a procesar un nueco thread.", APP_NAME_FOR_LOGGER);
@@ -349,10 +348,20 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	char sRecursoPedidoSinEspacios[1024];
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
-	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
+	asprintf(&sLogMessage, "El usuario pidio el recurso: \"%s\".", sRecursoPedido);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	
 	formatearEspacios(sRecursoPedido, sRecursoPedidoSinEspacios);
+
+	/*	En Ubuntu/Chrome, /Firefox (no se en otras situaciones) luego de enviar el response, recibimos un
+	    request por este recurso. Decidimos no tratarlo, por lo tanto cerramos la conexion.	*/
+	if(strcmp(sRecursoPedido, "/favicon")==0){
+		close(stParametros.ficheroCliente);
+		LoguearInformacion("Se cerro el fichero descriptor del cliente porque el request pedia el recurso /favicon.ico.", APP_NAME_FOR_LOGGER);
+
+		LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+		thr_exit(0);
+	}
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
@@ -405,8 +414,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
-
-	printf("Estoy por salir de un thread!\n");
 
 	free(sResponse);
 
