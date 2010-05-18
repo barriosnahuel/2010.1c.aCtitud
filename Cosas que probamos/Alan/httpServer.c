@@ -578,13 +578,14 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	stArticle stArticulo;
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
+		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->memc);
-	}
+	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
