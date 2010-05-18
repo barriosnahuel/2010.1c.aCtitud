@@ -9,8 +9,7 @@
 #include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
-#include "funcionesMemcached.h"
-#include <libmemcached/memcached.h>
+
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define APP_NAME_FOR_LOGGER "HTTPServer"
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
@@ -36,7 +35,7 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION* pstPLDAPSession; /*	La sesion de OpenDS/LDAP */
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
-	memcached_st* memc;
+
 	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
@@ -83,14 +82,20 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
  */
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
-
+/**
+ * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
+ */
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
-
+/**
+ * Guarda la noticia que se le pasa como parametro en cache.
+ */
+void guardarNoticiaEnCache(stArticle stArticulo);
 /**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
@@ -126,9 +131,9 @@ VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNot
 unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
 
 /**
- * Reemplaza los %20 por espacios.
+ * Reemplaza los %20 por espacios y devuelve la cadena sin %20.
  */
-VOID formatearEspacios(char* sGrupoDeNoticias);
+char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -168,14 +173,7 @@ int main(void) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-    asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
-	
+
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
@@ -306,11 +304,6 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			/****************************************************
-			*	    Conecto a Servidores Memcached				*
-			*/
-			iniciarClusterCache(stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
-	
 
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -335,7 +328,6 @@ int main(void) {
 void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
-	printf("Entre a un thread!!\n");
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 
 	LoguearInformacion("Comienzo a procesar un nueco thread.", APP_NAME_FOR_LOGGER);
@@ -353,15 +345,27 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
+	char sRecursoPedidoSinEspacios[1024];
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
-	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
+	asprintf(&sLogMessage, "El usuario pidio el recurso: \"%s\".", sRecursoPedido);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	
+	formatearEspacios(sRecursoPedido, sRecursoPedidoSinEspacios);
+
+	/*	En Ubuntu/Chrome, /Firefox (no se en otras situaciones) luego de enviar el response, recibimos un
+	    request por este recurso. Decidimos no tratarlo, por lo tanto cerramos la conexion.	*/
+	if(strcmp(sRecursoPedido, "/favicon")==0){
+		close(stParametros.ficheroCliente);
+		LoguearInformacion("Se cerro el fichero descriptor del cliente porque el request pedia el recurso /favicon.ico.", APP_NAME_FOR_LOGGER);
+
+		LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+		thr_exit(0);
+	}
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
 
-	formatearEspacios(&sGrupoDeNoticia);
 	
 	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
 	unsigned int uiOperation;
@@ -369,13 +373,12 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 		uiOperation= REQUEST_TYPE_NEWSGROUP;
 	else {
 		/* Obtengo el grupo de noticias. */
-
-		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedido));
-
+		
+		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedidoSinEspacios));
 		/* Me fijo si ademas del grupo de noticias viene la noticia */
-		if (llevaNoticia(sRecursoPedido)) {
+		if (llevaNoticia(sRecursoPedidoSinEspacios)) {
 			/* Obtengo la noticia de dicho grupo. */
-			strcpy(sArticleID, obtenerNoticia(sRecursoPedido));
+			strcpy(sArticleID, obtenerNoticia(sRecursoPedidoSinEspacios));
 			uiOperation= REQUEST_TYPE_NEWS;
 		}
 		else
@@ -411,8 +414,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
-
-	printf("Estoy por salir de un thread!\n");
 
 	free(sResponse);
 
@@ -507,13 +508,13 @@ void liberarRecursos(int 				ficheroServer
 
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
-/*
+
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sArticleID) {
 	LoguearDebugging("--> buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
-/*}*/
+}
 
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
@@ -525,13 +526,13 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
-/*
+
 void guardarNoticiaEnCache(stArticle stArticulo) {
 	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return;
-}*/
+}
 
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
@@ -543,20 +544,24 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	return response;
 }
 
-VOID formatearEspacios(char* sGrupoDeNoticias){
+char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
+	int j = 0;
 	
-	printf("->>>>>>>>>> %c\n", *(sGrupoDeNoticias+i));
-	while(strcmp('\0', *(sGrupoDeNoticias+i)) != 0) {
-		printf("Entre al while\n");
-		if(strcmp('%20', sGrupoDeNoticias[i]) == 0) {
-			printf("Entre al if\n");
-			sGrupoDeNoticias[i] = ' ';
+	while(sRecursoPedido[i] != '\0') {
+		if(sRecursoPedido[i] == '%') {
+			sRecursoPedidoSinEspacios[j] = ' ';
+			i = i + 3;
+			j++;
 		}
-		i++;
+		else {
+			sRecursoPedidoSinEspacios[j] = sRecursoPedido[i];
+			i++;
+			j++;
+		}
 	}
-	
+	sRecursoPedidoSinEspacios[j] = '\0';
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
@@ -567,14 +572,14 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->memc);
+		guardarNoticiaEnCache(stArticulo);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
