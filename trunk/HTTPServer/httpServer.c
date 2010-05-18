@@ -544,7 +544,7 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	
 	while(sRecursoPedido[i] != '\0') {
 		if(sRecursoPedido[i] == '%') {
-			sRecursoPedidoSinEspacios[j] = '-';
+			sRecursoPedidoSinEspacios[j] = ' ';
 			printf("El string despues es %s\n", sRecursoPedidoSinEspacios);
 			i = i + 3;
 			j++;
