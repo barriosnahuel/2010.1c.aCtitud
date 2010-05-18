@@ -59,14 +59,14 @@ memcached_server_st *servers = NULL;
 
   uint32_t flags;
   memcached_return rc;
-  memc = memcached_create(NULL); 
+  memc2 = memcached_create(NULL); 
   servers = memcached_server_list_append(servers, "localhost", 11211,&rc);
-  rc      = memcached_server_push(memc, servers);
+  rc      = memcached_server_push(memc2, servers);
   
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
-    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc2, rc));
 
 
 
@@ -110,7 +110,7 @@ memcached_server_st *servers = NULL;
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
-  rc=memcached_set(memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,(time_t)0,(uint32_t)0);
+  rc=memcached_set(memc2,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,(time_t)0,(uint32_t)0);
 
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
