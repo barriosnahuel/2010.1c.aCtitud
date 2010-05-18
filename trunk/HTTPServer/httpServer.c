@@ -347,13 +347,12 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
 	char sRecursoPedidoSinEspacios[1024];
-	memset(sRecursoPedidoSinEspacios, 0, 1024);
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	
-	formatearEspacios(&sRecursoPedido, &sRecursoPedidoSinEspacios);
+	formatearEspacios(sRecursoPedido, sRecursoPedidoSinEspacios);
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
