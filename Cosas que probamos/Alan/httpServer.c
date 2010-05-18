@@ -175,11 +175,11 @@ int main(void) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 */
-    memcached_st * memc;
+    /* memcached_st * memc;*/
 	/****************************************************
-			*	    Conecto a Servidores Memcached				*
+ 			*	    Conecto a Servidores Memcached				*
 			*/
-	iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	/*iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);*/
 	
 
 	/****************************************************
@@ -312,7 +312,7 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			stParameters.memc = memc;
+			/*stParameters.memc = memc;*/
 			
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -581,8 +581,10 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
+	memcached_st* memc ;
+	iniciarClusterCache(memc,"192.168.0.101",11211,"192.168.0.101",11212);
 	printf("PASA POR ACA \n");
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
