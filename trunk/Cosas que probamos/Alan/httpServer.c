@@ -36,7 +36,7 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION* pstPLDAPSession; /*	La sesion de OpenDS/LDAP */
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
-	memcached_st* memc;
+	memcached_st memc;
 	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
@@ -593,7 +593,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		/*guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->memc);*/
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&memc);
 	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
