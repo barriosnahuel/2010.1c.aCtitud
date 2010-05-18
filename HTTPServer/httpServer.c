@@ -131,9 +131,9 @@ VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNot
 unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
 
 /**
- * Reemplaza los %20 por espacios.
+ * Reemplaza los %20 por espacios y devuelve la cadena sin %20.
  */
-VOID formatearEspacios(char* sRecursoPedido);
+char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -346,12 +346,13 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
+	char sRecursoPedidoSinEspacios[1024];
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	asprintf(&sLogMessage, "El usuario pidio el recurso: %s.", sRecursoPedido);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	
-	formatearEspacios(&sRecursoPedido);
+	formatearEspacios(&sRecursoPedido, &sRecursoPedidoSinEspacios);
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
@@ -536,22 +537,22 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	return response;
 }
 
-VOID formatearEspacios(char* sRecursoPedido){
+char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
 	
 	
 	while(sRecursoPedido[i] != '\0') {
-		printf("Entre al while\n");
-		if(sRecursoPedido[i] == '%20') {
-			printf("Entre al if\n");
-			sRecursoPedido[i] = 32;
+		if(sRecursoPedido[i] == '%') {
+			sRecursoPedidoSinEspacios[i] = 32;
+			i = i + 3;
+		} 
+		else {
+			sRecursoPedidoSinEspacios[i] = sRecursoPedido[i];
+			i++;
 		}
-		i++;
+		
 	}
-	
-	printf("Quedo el recurso %s\n", sRecursoPedido);
-	printf("Quedo el char %c\n", sRecursoPedido[3]);
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
