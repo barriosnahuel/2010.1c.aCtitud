@@ -55,6 +55,23 @@ void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcached
 
 void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st* memc)
 {
+memcached_server_st *servers = NULL;
+  memcached_return rc;
+  uint32_t flags;
+
+  memc = memcached_create(NULL); 
+  servers = memcached_server_list_append(servers, "localhost", 11211);
+  rc      = memcached_server_push(memc, servers);
+  
+  if (rc == MEMCACHED_SUCCESS)
+    fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
+  else
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
+
+
+
+
+
   memcached_return rc;
   t_news *articuloCache = malloc(sizeof(t_news));
   char *claveCache ;
