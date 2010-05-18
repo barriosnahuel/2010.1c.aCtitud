@@ -305,11 +305,11 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			stParameters.memc = NULL;
+			
 			/****************************************************
 			*	    Conecto a Servidores Memcached				*
 			*/
-			iniciarClusterCache(stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+			iniciarClusterCache(&stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
