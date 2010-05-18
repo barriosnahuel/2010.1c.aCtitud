@@ -52,7 +52,7 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
- 
+  printf("CLAVE CACHE %s",claveCache);
   articuloCache->body = NULL;
   articuloCache->head = NULL;
   articuloCache->datos.largoHead = strlen(article.sHead) + 1;	
