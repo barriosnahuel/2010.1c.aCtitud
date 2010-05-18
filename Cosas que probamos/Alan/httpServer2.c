@@ -437,6 +437,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	/*memcached_st* memc;
     iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);*/
 	stArticle stArticulo;
+	printf("PASA POR LA CACHE");
 	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
