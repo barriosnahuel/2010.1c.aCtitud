@@ -585,7 +585,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	iniciarClusterCache(memc,"192.168.0.101",11211,"192.168.0.101",11251);
 	printf("PASA POR ACA \n");
 	
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)) {
+	if (/*!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)*/1) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
