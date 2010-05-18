@@ -42,6 +42,7 @@ void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcached
 
 void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st* memc)
 {
+printf("INTENTA BUSCAR LA NOTICIA EN LA CACHE");
   memcached_return rc;
   t_news *articuloCache = malloc(sizeof(t_news));
   char* claveCache = NULL;
