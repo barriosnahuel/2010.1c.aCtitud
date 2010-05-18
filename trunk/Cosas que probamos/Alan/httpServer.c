@@ -175,6 +175,13 @@ int main(void) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 */
+    memcached_st * memc;
+	/****************************************************
+			*	    Conecto a Servidores Memcached				*
+			*/
+	iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	
+
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
@@ -305,12 +312,8 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
+			stParameters.memc = memc;
 			
-			/****************************************************
-			*	    Conecto a Servidores Memcached				*
-			*/
-			iniciarClusterCache(&stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
-	
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
 				LoguearError("No se pudo crear un nuevo thread para procesar el request.", APP_NAME_FOR_LOGGER);
@@ -324,7 +327,7 @@ int main(void) {
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
-	/*memcached_free(stParameters.memc);*/
+	
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
 	
