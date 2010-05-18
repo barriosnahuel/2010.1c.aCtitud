@@ -68,11 +68,6 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc2, rc));
 */
-
-
-
-
-
   t_news *articuloCache = malloc(sizeof(t_news));
   char *claveCache ;
   int largoID;
@@ -110,13 +105,13 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
-  rc=memcached_set(memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,(time_t)0,(uint32_t)0);
+  rc=memcached_set(*memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,(time_t)0,(uint32_t)0);
 
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
   printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d \n",articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead);
   
-  if(rc==MEMCACHED_SUCCESS)
+  if (rc == MEMCACHED_SUCCESS)
 	printf("Se inserto correctamente el articulo en la cache\n");
   else
 	printf("No se pudo insertar el articulo en la cache\n");	
