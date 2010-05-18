@@ -23,6 +23,7 @@ void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcached
   servers = memcached_server_list_append(servers, memcachedServer1, memcachedServer1Puerto,&rc);
   rc      = memcached_server_push(memc, servers);
   
+  printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer1,memcachedServer1Puerto);  
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
