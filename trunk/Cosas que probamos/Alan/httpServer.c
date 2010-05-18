@@ -323,9 +323,10 @@ int main(void) {
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
+	memcached_free(stParameters.memc);
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
-
+	
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
