@@ -546,13 +546,13 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 		if(sRecursoPedido[i] == '%') {
 			sRecursoPedidoSinEspacios[i] = 32;
 			i = i + 3;
-		} 
+		}
 		else {
 			sRecursoPedidoSinEspacios[i] = sRecursoPedido[i];
 			i++;
 		}
-		
 	}
+	printf("El recurso pedido sin espacios es: %s\n", sRecursoPedidoSinEspacios);
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
