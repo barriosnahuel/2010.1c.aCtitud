@@ -25,8 +25,8 @@ Article.o: Article.c Article.h
 LdapWrapperHandler.o: LdapWrapperHandler.c LdapWrapperHandler.h
 	gcc $(CFLAGS) $(OPTFLAGS) LdapWrapperHandler.o LdapWrapperHandler.c
 
-httpServer.o: httpServer2.c 
-	gcc $(CFLAGS) $(OPTFLAGS) httpServer.o httpServer2.c
+httpServer.o: httpServer.c 
+	gcc $(CFLAGS) $(OPTFLAGS) httpServer.o httpServer.c
 
 funcionesMemcached.o: funcionesMemcached.c funcionesMemcached.h
 	gcc $(CFLAGS) $(OPTFLAGS) funcionesMemcached.o funcionesMemcached.c
