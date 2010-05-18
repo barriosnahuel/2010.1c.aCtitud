@@ -365,11 +365,11 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	else {
 		/* Obtengo el grupo de noticias. */
 		
-		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedido));
+		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedidoSinEspacios));
 		/* Me fijo si ademas del grupo de noticias viene la noticia */
-		if (llevaNoticia(sRecursoPedido)) {
+		if (llevaNoticia(sRecursoPedidoSinEspacios)) {
 			/* Obtengo la noticia de dicho grupo. */
-			strcpy(sArticleID, obtenerNoticia(sRecursoPedido));
+			strcpy(sArticleID, obtenerNoticia(sRecursoPedidoSinEspacios));
 			uiOperation= REQUEST_TYPE_NEWS;
 		}
 		else
