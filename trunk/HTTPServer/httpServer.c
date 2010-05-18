@@ -541,7 +541,7 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
 	int j = 0;
-	
+	memset(sRecursoPedidoSinEspacios, 0, 1024);
 	
 	while(sRecursoPedido[i] != '\0') {
 		if(sRecursoPedido[i] == '%') {
