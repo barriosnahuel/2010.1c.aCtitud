@@ -13,6 +13,18 @@ typedef struct stArticle {
      char* sBody;				
 } stArticle;*/
 
+void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
+{
+  int largoID;
+  int largoGrupoDeNoticias;
+  largoID = sizeof(ID);
+  largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
+  claveCache = malloc(largoGrupoDeNoticias+largoID);
+  sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
+  return; 
+	
+}
+
 void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto)
 {
   memcached_server_st *servers = NULL;
@@ -44,7 +56,7 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
 {
   memcached_return rc;
   t_news *articuloCache = malloc(sizeof(t_news));
-  char* claveCache = NULL;
+  char claveCache ;
   int largoID;
   int largoGrupoDeNoticias;
   /*
@@ -53,7 +65,7 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);*/
   
-  formarClave(claveCache,sGrupoDeNoticias,article.uiArticleID);
+  formarClave(&claveCache,sGrupoDeNoticias,article.uiArticleID);
   
   
  
@@ -97,18 +109,6 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   free(articuloCache);
   free(claveCache);
   return;
-}
-
-void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
-{
-  int largoID;
-  int largoGrupoDeNoticias;
-  largoID = sizeof(ID);
-  largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
-  claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
-  return; 
-	
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
