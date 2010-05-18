@@ -545,7 +545,6 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	while(sRecursoPedido[i] != '\0') {
 		if(sRecursoPedido[i] == '%') {
 			sRecursoPedidoSinEspacios[j] = ' ';
-			printf("El string despues es %s\n", sRecursoPedidoSinEspacios);
 			i = i + 3;
 			j++;
 		}
@@ -556,7 +555,6 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 		}
 	}
 	sRecursoPedidoSinEspacios[j] = '\0';
-	printf("El recurso pedido sin espacios es: %s\n", sRecursoPedidoSinEspacios);
 	
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
