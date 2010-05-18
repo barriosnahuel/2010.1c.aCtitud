@@ -9,7 +9,8 @@
 #include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
-
+#include "funcionesMemcached.h"
+#include <libmemcached/memcached.h>
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define APP_NAME_FOR_LOGGER "HTTPServer"
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
@@ -35,7 +36,7 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION* pstPLDAPSession; /*	La sesion de OpenDS/LDAP */
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
-
+	memcached_st* memc;
 	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
@@ -83,19 +84,12 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
 /**
- * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
- */
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
-/**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
-/**
- * Guarda la noticia que se le pasa como parametro en cache.
- */
-void guardarNoticiaEnCache(stArticle stArticulo);
+
 /**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
@@ -172,8 +166,15 @@ int main(void) {
 	asprintf(&sLogMessage, "IP LDAP/OpenDS: %s.", stConf.czBDServer);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+    asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-
+	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
+*/
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
@@ -304,7 +305,11 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-
+			/****************************************************
+			*	    Conecto a Servidores Memcached				*
+			*/
+			iniciarClusterCache(stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
 				LoguearError("No se pudo crear un nuevo thread para procesar el request.", APP_NAME_FOR_LOGGER);
@@ -572,14 +577,14 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->memc);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
