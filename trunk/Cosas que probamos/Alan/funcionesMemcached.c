@@ -80,7 +80,7 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
-    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc))
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
   
   uint32_t flags;
   
