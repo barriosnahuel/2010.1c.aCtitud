@@ -31,6 +31,10 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
   memcached_return rc;
   /* Se crea el Cluster */  
   memc = memcached_create(NULL); 
+  if(*memc = NULL)
+	printf("TIENE QUE TENER NULL Y LO TIENE ! =) \n ");
+  else
+	printf("TIENE OTRA COSA =( \n ");
   /* Se agregan Servidores */
   rc = memcached_server_add(memc, memcachedServer1,memcachedServer1Puerto); 
   printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer1,memcachedServer1Puerto);  
@@ -39,6 +43,10 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 
+  if(*memc = NULL)
+	printf("NO TIENE QUE TENER NULL Y LO TIENE ! =( \n ");
+  else
+	printf("TIENE OTRA COSA =) \n ");
   
   /*memcached_server_add(memc, memcachedServer2,memcachedServer2Puerto); 
   
@@ -68,20 +76,10 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
 }
 
 
-void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st* memc)
+void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st **memc)
 {
 
   memcached_return rc;
-   
- /* memc = memcached_create(NULL); */
-  
-  rc = memcached_server_add(memc, "192.168.0.101",11211); 
-    
-  if (rc == MEMCACHED_SUCCESS)
-    fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
-  else
-    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-  
   uint32_t flags;
   
 
