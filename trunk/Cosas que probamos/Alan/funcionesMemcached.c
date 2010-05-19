@@ -26,7 +26,7 @@ void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
 	
 }
 
-void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto)
+void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto)
 {
   memcached_server_st *servers = NULL;
   memcached_return rc;
