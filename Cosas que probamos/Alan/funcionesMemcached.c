@@ -32,8 +32,8 @@ void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcached
   memcached_return rc;
   uint32_t flags;
   memc = malloc(sizeof(memcached_st));
-  
   memc = memcached_create(NULL); 
+  
   servers = memcached_server_list_append(servers, memcachedServer1, memcachedServer1Puerto,&rc);
   rc      = memcached_server_push(memc, servers);
   
@@ -57,7 +57,8 @@ void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcached
 void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st* memc)
 {
 /*memcached_server_st *servers = NULL;*/
-
+  printf("LLEGA A GUARDAR NOTICIA EN CACHE \n");
+  
   uint32_t flags;
   memcached_return rc;
   /*memc2 = memcached_create(NULL); 
