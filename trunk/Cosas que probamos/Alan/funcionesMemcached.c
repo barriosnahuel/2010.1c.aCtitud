@@ -75,8 +75,8 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   /* Se crea el Cluster */  
   memc = memcached_create(NULL); 
   /* Se agregan Servidores */
-  rc = memcached_server_add(memc, memcachedServer1,memcachedServer1Puerto); 
-  printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer1,memcachedServer1Puerto);  
+  rc = memcached_server_add(memc, "192.168.0.101",11211); 
+    
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
