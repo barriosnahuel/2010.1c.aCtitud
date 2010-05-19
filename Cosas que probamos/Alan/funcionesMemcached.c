@@ -72,9 +72,9 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
 {
 
   memcached_return rc;
-  /* Se crea el Cluster */  
-  memc = memcached_create(NULL); 
-  /* Se agregan Servidores */
+   
+ /* memc = memcached_create(NULL); */
+  
   rc = memcached_server_add(memc, "192.168.0.101",11211); 
     
   if (rc == MEMCACHED_SUCCESS)
