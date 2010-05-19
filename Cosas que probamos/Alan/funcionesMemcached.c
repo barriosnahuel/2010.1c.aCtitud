@@ -31,7 +31,7 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
   memcached_return rc;
   /* Se crea el Cluster */  
   memc = memcached_create(NULL); 
-  if(*memc = NULL)
+  if(*memc == NULL)
 	printf("TIENE QUE TENER NULL Y LO TIENE ! =) \n ");
   else
 	printf("TIENE OTRA COSA =( \n ");
@@ -43,7 +43,7 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 
-  if(*memc = NULL)
+  if(*memc == NULL)
 	printf("NO TIENE QUE TENER NULL Y LO TIENE ! =( \n ");
   else
 	printf("TIENE OTRA COSA =) \n ");
@@ -76,7 +76,7 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
 }
 
 
-void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st **memc)
+void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st *memc)
 {
 
   memcached_return rc;
