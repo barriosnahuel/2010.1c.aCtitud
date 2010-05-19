@@ -57,7 +57,7 @@ void iniciarClusterCache(memcached_st* memc,char* memcachedServer1,int memcached
 void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st* memc)
 {
 /*memcached_server_st *servers = NULL;*/
-  printf("LLEGA A GUARDAR NOTICIA EN CACHE \n");
+  
   
   uint32_t flags;
   memcached_return rc;
@@ -107,8 +107,9 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
+printf("VA A PASAR EL MEMCACHED_SET \n");
   rc=memcached_set(memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,(time_t)0,(uint32_t)0);
-
+printf("YA PASO EL MEMCACHED_SET \n");
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
   printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d \n",articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead);
