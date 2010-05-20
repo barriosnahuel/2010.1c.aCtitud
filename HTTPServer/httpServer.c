@@ -189,88 +189,6 @@ int main(void) {
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
-
-/*	Esto es prueba!!	*/
-/*
-  	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 2);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 3);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 4);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 5);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 6);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 7);
-	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 8);
-*/
-/*		stArticle stArticulo;
-
-		stArticulo.sBody = "un body para la 1";
-		stArticulo.sHead = "un head para la 1";
-		stArticulo.sNewsgroup = "Clarin";
-		stArticulo.uiArticleID = 1;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 2";
-		stArticulo.sHead = "un head para la 2";
-		stArticulo.sNewsgroup = "Clarin";
-		stArticulo.uiArticleID = 2;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 3";
-		stArticulo.sHead = "un head para la 3";
-		stArticulo.sNewsgroup = "La Nacion";
-		stArticulo.uiArticleID = 3;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 4";
-		stArticulo.sHead = "un head para la 4";
-		stArticulo.sNewsgroup = "Pagina 12";
-		stArticulo.uiArticleID = 4;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 5";
-		stArticulo.sHead = "un head para la 5";
-		stArticulo.sNewsgroup = "Clarin";
-		stArticulo.uiArticleID = 5;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 6";
-		stArticulo.sHead = "un head para la 6";
-		stArticulo.sNewsgroup = "La Nacion";
-		stArticulo.uiArticleID = 6;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 7";
-		stArticulo.sHead = "un head para la 7";
-		stArticulo.sNewsgroup = "Clarin";
-		stArticulo.uiArticleID = 7;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 8 (clarin en minuscula)";
-		stArticulo.sHead = "un head para la 8 (clarin en minuscula)";
-		stArticulo.sNewsgroup = "clarin";
-		stArticulo.uiArticleID = 8;
-
-		stArticulo.sBody = "un body para la 9";
-		stArticulo.sHead = "un head para la 9";
-		stArticulo.sNewsgroup = "Cronica";
-		stArticulo.uiArticleID = 9;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 10";
-		stArticulo.sHead = "un head para la 10";
-		stArticulo.sNewsgroup = "Fruta";
-		stArticulo.uiArticleID = 10;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		stArticulo.sBody = "un body para la 11";
-		stArticulo.sHead = "un head para la 11";
-		stArticulo.sNewsgroup = "Cronica";
-		stArticulo.uiArticleID = 11;
-		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
-
-		selectAndPrintEntries(stPLDAPSession, stPLDAPSessionOperations, "(utnArticleID=*)");
-*/
-
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
@@ -699,9 +617,6 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
-	int bytesEnviadosProtocoloListadoDeNoticias;
-	int lenProtocoloListadoDeNoticias;
-	char* cadenaProtocoloListadoDeNoticias = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -716,15 +631,6 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	unsigned int uiCantidadDeNoticias= 0;
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
-	
-	if(uiCantidadDeNoticias == 0) {
-		cadenaProtocoloListadoDeNoticias = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
-		lenProtocoloListadoDeNoticias = strlen(cadenaProtocoloListadoDeNoticias);
-		
-		if((bytesEnviadosProtocoloListadoDeNoticias = send(pstParametros.ficheroCliente, cadenaProtocoloListadoDeNoticias, lenProtocoloListadoDeNoticias, 0)) == -1) {
-			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
-		}
-	}
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
