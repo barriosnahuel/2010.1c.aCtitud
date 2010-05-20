@@ -38,7 +38,8 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-
+  
+  
     
   /*memcached_server_add(memc, memcachedServer2,memcachedServer2Puerto); 
   
@@ -140,7 +141,12 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  formarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);
+  largoID = sizeof(article.uiArticleID);
+  largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
+  claveCache = malloc(largoGrupoDeNoticias+largoID);
+  sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
+  
+  /*formarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);*/
   
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
