@@ -137,13 +137,9 @@ printf("#####################BUSQUEDA EN LA CACHE######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
-printf("LO QUE LE LLEGA A LA BUSQUEDA EN LA CACHE \n");
-printf("pstArticulo->uiArticleID: %s \n",pstArticulo->uiArticleID);
-printf("pstArticulo->sBody: %s \n", pstArticulo->sBody);
 
- 
   char* claveCache;
-  int largoID = strlen(sArticleID)+1;
+  int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
