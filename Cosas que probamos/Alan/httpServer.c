@@ -582,7 +582,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 	stArticle stArticulo;
 	memcached_st memc /*= NULL*/;
-	iniciarClusterCache(*memc,"192.168.0.101",11211,"192.168.0.101",11251);
+	iniciarClusterCache(memc,"192.168.0.101",11211,"192.168.0.101",11251);
 /*	    
 memc = memcached_create(NULL); 
 memcached_return rc;
@@ -600,7 +600,7 @@ else
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&memc);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,(memcached_st)*memc);
 	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
