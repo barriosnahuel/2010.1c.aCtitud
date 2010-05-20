@@ -71,7 +71,8 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
 
 void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st *memc)
 {
-printf("Entra a guardarNoticiaEnCache  \n");
+
+  printf("##################### GUARDAR NOTICIA ######################\n");
   memcached_return rc;
   uint32_t flags;
   t_news *articuloCache = malloc(sizeof(t_news));
@@ -131,13 +132,13 @@ printf("YA PASO EL MEMCACHED_SET \n");
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
 {
-printf("#####################BUSQUEDA EN LA CACHE######################\n");
+printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   uint32_t flags;
   memcached_return rc;
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
-
+ 
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
