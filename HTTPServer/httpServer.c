@@ -611,6 +611,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	char* sLogMessage;
 	char* cadenaProtocolo;
 	int lenProtocolo;
+	int bytesEnviadosProtocolo;
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -630,7 +631,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
 		lenProtocolo = strlen(cadenaProtocolo);
 			
-		if((bytesEnviadosProtocolo = send(pstParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+		if((bytesEnviadosProtocolo = send(pstParametros->ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
 			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
 		}
 	}
