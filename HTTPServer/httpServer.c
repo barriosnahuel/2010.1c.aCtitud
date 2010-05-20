@@ -17,14 +17,6 @@
 #define REQUEST_TYPE_NEWS 3			/*	Indica que se esta solicitando una noticia en particular.	*/
 #define MAX_CHARACTERS_FOR_RESPONSE 5000	/*	TODO: La cantidad maxima de caracteres para el response esta bien 5000?	*/
 
-/*int thr_create(void *stack_base
- , size_t stack_size
- , void *(*start_routine)(void *)
- , void *arg
- , long flags
- , thread_t* new_thread
- );*/
-
 /**
  * Estructura que contiene los parametros para cada nuevo thread.
  */
@@ -617,6 +609,8 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
+	char* cadenaProtocolo;
+	int lenProtocolo;
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -631,6 +625,15 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	unsigned int uiCantidadDeNoticias= 0;
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
+	
+	if(uiCantidadDeNoticias == 0) {
+		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+		lenProtocolo = strlen(cadenaProtocolo);
+			
+		if((bytesEnviadosProtocolo = send(pstParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
+		}
+	}
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
