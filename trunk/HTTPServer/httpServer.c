@@ -412,7 +412,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 	
-	char protocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	char* protocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	protocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
 	int lenProtocolo = 41;
 	int asd;
