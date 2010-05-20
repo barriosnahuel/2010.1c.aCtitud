@@ -411,6 +411,15 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	int len, bytesEnviados;
 	len = strlen(sResponse);
+	
+	char protocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	protocolo = "HTTP/1.1 200 OK\n Content-type: text/html\n\n";
+	int lenProtocolo = strlen(protocolo);
+	int asd;
+	
+	if((asd = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1) {
+		printf("Error en el send del protocolo\n");
+	}
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
