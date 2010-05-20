@@ -4,7 +4,7 @@ OPENDSLIBS=-L/usr/local/lib -lldap -llber
 LIBS= $(OPENDSLIBS) -lsocket -lnsl
 
 HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o 
-	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o ../Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o
+	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ./LdapWrapper.o ../../Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
