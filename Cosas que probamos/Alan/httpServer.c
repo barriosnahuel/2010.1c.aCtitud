@@ -197,7 +197,11 @@ int main(void) {
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
-
+	/****************************************************
+	 *	Conecto a cluster memcached						*
+	 ****************************************************/
+	memcached_st memc;
+	iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);
 /*	Esto es prueba!!	*/
 /*
   	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
@@ -312,7 +316,7 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			/*stParameters.memc = memc;*/
+			stParameters.memc = &memc;
 			
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -581,18 +585,9 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	memcached_st memc;/* = malloc(sizeof(memcached_st))= NULL*/;
-	iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);
-/*    
-memc = memcached_create(NULL); 
-memcached_return rc;
-rc = memcached_server_add(memc, "192.168.0.101",11211); 
-if (rc == MEMCACHED_SUCCESS)
-  fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
-else
-  fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-*/
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &memc)/*1*/) {
+	
+
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->&memc)/*1*/) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
@@ -600,7 +595,7 @@ else
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&memc);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->&memc);
 	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
