@@ -1,8 +1,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string.h>
 #include <errno.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "conexion.h"
 
 //------------------------------------------------------------------------------------
@@ -225,5 +228,48 @@ int Acepta_Conexion_Cliente (int Descriptor) {
 
 	/* Se devuelve el descriptor en el que esta "enchufado" el cliente */
 	return iSocketN;
+}
+
+/*
+ * inicializa el servidor SSL y prepara el contexto
+ */
+SSL_CTX* IniciarCTX(void) {
+    SSL_METHOD *method;
+    SSL_CTX *ctx;
+
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();		/* cargar algoritmos */
+    SSL_load_error_strings();			/* cargar mensajes de error */
+    method = SSLv23_server_method();		/* crear un instancia de método server */
+    ctx = SSL_CTX_new(method);			/* crear nuevo contexto para ese método */
+    if ( ctx == NULL ) {
+        ERR_print_errors_fp(stdout);
+        abort();
+    }
+    return ctx;
+}
+
+/*
+ * carga los certificados
+*/
+int CargarCertificados(SSL_CTX* ctx, char* CertFile, char* KeyFile) {
+
+	/* set the local certificate from CertFile */
+    if ( SSL_CTX_use_certificate_file(ctx, CertFile, SSL_FILETYPE_PEM) <= 0 ) {
+        ERR_print_errors_fp(stdout);
+        return -1;
+    }
+
+    /* set the private key from KeyFile (may be the same as CertFile) */
+    if ( SSL_CTX_use_PrivateKey_file(ctx, KeyFile, SSL_FILETYPE_PEM) <= 0 ) {
+        ERR_print_errors_fp(stdout);
+        return -1;
+    }
+
+    /* verify private key */
+    if ( !SSL_CTX_check_private_key(ctx) ) {
+        fprintf(stdout, "No concide la clave privada con el certificado publico.\n");
+        return -1;
+    }
 }
 

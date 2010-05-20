@@ -1,0 +1,3 @@
+openssl genrsa -out serverprivatekey.pem 2048
+openssl req -new -x509 -key serverprivatekey.pem -out servercert.pem -days 1095
+

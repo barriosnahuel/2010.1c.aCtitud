@@ -11,4 +11,8 @@ int Escribe_Socket (int iSocket, void *Datos, int Longitud);
 
 int Acepta_Conexion_Cliente (int Descriptor);
 
+SSL_CTX* IniciarCTX(void);
+
+int CargarCertificados(SSL_CTX* ctx, char* CertFile, char* KeyFile);
+
 #endif
