@@ -68,13 +68,12 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
 }
 
 
-void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_st *memc)
+void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st *memc)
 {
 
   memcached_return rc;
   uint32_t flags;
   
-
   t_news *articuloCache = malloc(sizeof(t_news));
   char *claveCache ;
   int largoID;
@@ -107,7 +106,7 @@ void guardarNoticiaEnCache(stArticle article, char* sGrupoDeNoticias ,memcached_
   articuloEnBytesLargo=sizeof(t_news_largos)+articuloCache->datos.largoHead+articuloCache->datos.largoBody;
   printf("Largo estructura(t_news_largos): %d \n",sizeof(t_news_largos));
   printf("Tamanio de articuloEnBytesLargo %d \n",articuloEnBytesLargo);
-  articuloEnBytes = malloc(articuloEnBytesLargo);
+  articuloEnBytes = malloc(articuloEnBytesLargo+20);
 
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
