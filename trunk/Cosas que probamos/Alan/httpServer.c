@@ -592,7 +592,7 @@ if (rc == MEMCACHED_SUCCESS)
 else
   fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 */
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)/*1*/) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, (memcached_st*)memc)/*1*/) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
