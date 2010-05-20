@@ -106,7 +106,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   articuloEnBytesLargo=sizeof(t_news_largos)+articuloCache->datos.largoHead+articuloCache->datos.largoBody;
   printf("Largo estructura(t_news_largos): %d \n",sizeof(t_news_largos));
   printf("Tamanio de articuloEnBytesLargo %d \n",articuloEnBytesLargo);
-  articuloEnBytes = malloc(articuloEnBytesLargo+20);
+  articuloEnBytes = malloc(articuloEnBytesLargo);
 
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
