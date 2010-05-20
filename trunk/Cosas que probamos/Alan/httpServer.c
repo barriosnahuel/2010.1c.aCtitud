@@ -36,7 +36,7 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION* pstPLDAPSession; /*	La sesion de OpenDS/LDAP */
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
-	memcached_st memc;
+	memcached_st *memc;
 	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
