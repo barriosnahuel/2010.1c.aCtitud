@@ -326,6 +326,7 @@ int main(void) {
 }
 
 void* procesarRequestFuncionThread(void* threadParameters) {
+	int bytesEnviadosProtocolo;
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
@@ -412,18 +413,17 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 	
-	char* protocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	protocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
+	char* cadenaProtocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	cadenaProtocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
 	int lenProtocolo = 41;
-	int asd;
 	
-	if((asd = send(stParametros.ficheroCliente, protocolo, lenProtocolo, 0)) == -1) {
-		printf("Error en el send del protocolo\n");
+	if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+		LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
 	}
 
-	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
+	/*if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
-
+*/
 	free(sResponse);
 
 	close(stParametros.ficheroCliente);
