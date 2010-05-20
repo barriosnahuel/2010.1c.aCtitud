@@ -142,7 +142,7 @@ printf("#####################BUSQUEDA EN LA CACHE######################\n");
   int largoID = sizeof(pstArticulo->uiArticleID);
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%d",sGrupoDeNoticias,pstArticulo->uiArticleID);
+  sprintf(claveCache,"%s%s",sGrupoDeNoticias,pstArticulo->uiArticleID);
 printf("Clave a buscar en la cache %s \n",claveCache);
     
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
