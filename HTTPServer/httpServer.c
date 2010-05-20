@@ -544,16 +544,6 @@ void guardarNoticiaEnCache(stArticle stArticulo) {
 	return;
 }
 
-char* formatearArticuloAHTML(stArticle* pstArticulo) {
-	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
-
-	char* response;
-	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
-
-	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
-	return response;
-}
-
 char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
 	int i = 0;
@@ -597,6 +587,17 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	return formatearArticuloAHTML(&stArticulo);
 }
 
+
+char* formatearArticuloAHTML(stArticle* pstArticulo) {
+	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
+
+	char* response;
+	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
+
+	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
+	return response;
+}
+
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 
@@ -614,15 +615,6 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
-	
-	if(cantidadDeGrupos == 0) {
-			cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
-			lenProtocolo = strlen(cadenaProtocolo);
-			
-			if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
-				LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
-			}
-	}
 	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
@@ -707,6 +699,9 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
+	int bytesEnviadosProtocoloListadoDeNoticias;
+	int lenProtocoloListadoDeNoticias;
+	char* cadenaProtocoloListadoDeNoticias = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -723,10 +718,10 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
 	
 	if(uiCantidadDeNoticias == 0) {
-		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
-		lenProtocolo = strlen(cadenaProtocolo);
+		cadenaProtocoloListadoDeNoticias = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+		lenProtocoloListadoDeNoticias = strlen(cadenaProtocoloListadoDeNoticias);
 		
-		if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+		if((bytesEnviadosProtocoloListadoDeNoticias = send(stParametros.ficheroCliente, cadenaProtocoloListadoDeNoticias, lenProtocoloListadoDeNoticias, 0)) == -1) {
 			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
 		}
 	}
