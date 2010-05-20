@@ -139,7 +139,7 @@ printf("#####################BUSQUEDA EN LA CACHE######################\n");
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  int largoID = strlen(sArticleID);
+  int largoID = strlen(sArticleID)+1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
@@ -151,7 +151,7 @@ printf("Clave a buscar en la cache %s \n",claveCache);
   else
   {
   	printf("No se encontro el articulo en la cache\n");
-	return 0;
+	//return 0;
   }  	
   
   memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
