@@ -581,7 +581,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	memcached_st *memc /*= NULL*/;
+	memcached_st *memc = malloc(size(memcached_st))/*= NULL*/;
 	iniciarClusterCache(memc,"192.168.0.101",11211,"192.168.0.101",11251);
 /*    
 memc = memcached_create(NULL); 
