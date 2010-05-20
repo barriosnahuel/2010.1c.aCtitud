@@ -581,9 +581,9 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	memcached_st memc /*= NULL*/;
-	iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);
-/*	    
+	memcached_st *memc /*= NULL*/;
+	/*iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);*/
+    
 memc = memcached_create(NULL); 
 memcached_return rc;
 rc = memcached_server_add(memc, "192.168.0.101",11211); 
@@ -591,8 +591,8 @@ if (rc == MEMCACHED_SUCCESS)
   fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
 else
   fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-*/
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &memc)/*1*/) {
+
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc)/*1*/) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
@@ -600,7 +600,7 @@ else
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&memc);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,memc);
 	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
