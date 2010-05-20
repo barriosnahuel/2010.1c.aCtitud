@@ -131,10 +131,9 @@ printf("YA PASO EL MEMCACHED_SET \n");
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st * memc)
 {
-  printf("INTENTA BUSCAR LA NOTICIA EN LA CACHE");
+printf("#####################BUSQUEDA EN LA CACHE######################\n");
   uint32_t flags;
   memcached_return rc;
- 
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
@@ -144,9 +143,8 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%d",sGrupoDeNoticias,pstArticulo->uiArticleID);
-  
-  /*formarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);*/
-  
+printf("Clave a buscar en la cache %s \n",claveCache);
+    
   resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
 	printf("Se encontro el articulo en la cache\n");
