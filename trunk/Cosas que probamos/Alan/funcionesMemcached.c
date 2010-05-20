@@ -83,7 +83,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   largoID = sizeof(article.uiArticleID);
   largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
+  sprintf(claveCache,"%s%d",sGrupoDeNoticias,article.uiArticleID);
   
   /*formarClave(claveCache,sGrupoDeNoticias,article.uiArticleID);*/
   printf("CLAVE CACHE %s \n",claveCache);
@@ -141,10 +141,10 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  int largoID = sizeof(article.uiArticleID);
+  int largoID = sizeof(pstArticulo->uiArticleID);
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
+  sprintf(claveCache,"%s%d",sGrupoDeNoticias,pstArticulo->uiArticleID);
   
   /*formarClave(claveCache,sGrupoDeNoticias,pstArticulo->uiArticleID);*/
   
