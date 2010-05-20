@@ -1,5 +1,8 @@
 #include "NNTPClientDAO.hpp"
 #include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 //Constructor
 NNTPClientDAO::NNTPClientDAO() {}
@@ -7,19 +10,19 @@ NNTPClientDAO::NNTPClientDAO() {}
 //Destructor
 NNTPClientDAO::~NNTPClientDAO() {}
 
-void NNTPClientDAO::OpenConnection(const char *hostname, int port) {
-        struct hostent *host = gethostbyname(hostname);
+void NNTPClientDAO::OpenConnection(const char *ipServer, int port) {
+/*        struct hostent *host = gethostbyname(hostname);*/
         struct sockaddr_in addr;
 
-        sdServer = socket(PF_INET, SOCK_STREAM, 0);
+        sdServer = socket(AF_INET, SOCK_STREAM, 0);
         bzero(&addr, sizeof(addr));
         addr.sin_family = AF_INET;
+        addr.sin_addr.s_addr = inet_addr(ipServer);
         addr.sin_port = htons(port);
-        addr.sin_addr.s_addr = *(long*)(host->h_addr);
         if (connect(sdServer,(const sockaddr*) &addr, sizeof(addr))!=0) {
                 cout << "Fallo en el connect del socket al servidor NNTP" << endl;
                 close(sdServer);
-                perror(hostname);
+                perror(ipServer);
                 abort();
         }
 }
@@ -43,21 +46,20 @@ void NNTPClientDAO::abrirConexion(const char *hostname, int port) {
     InitCTX();
 	cout << endl << hostname << ":" << port << endl;
 
-    // FGuerra - TODO: Obviamente, ver adonde chota nos vamos a conectar.
     OpenConnection(hostname, port);
 
     ssl = SSL_new(ctx);
 
-    /* "Bindeo" el socket con la conexi�n SSL.
-        Si no quiero enviar mensajes por SSL usar� sdServer.send().
-        Caso contrario usar� ssl. */
-        SSL_set_fd(ssl, sdServer);
+    /* "Bindeo" el socket con la conexion SSL.
+        Si no quiero enviar mensajes por SSL usara send().
+        Caso contrario usara ssl. */
+    SSL_set_fd(ssl, sdServer);
 
-        if ( SSL_connect(ssl) == -1 ) {
-                cout << "Conexion al servidor fallida." << endl;
-        } else {
-                cout << "Conectado! Usando encriptado: " << SSL_get_cipher(ssl) << endl;
-        }
+    if ( SSL_connect(ssl) == -1 ) {
+            cout << "Conexion al servidor fallida." << endl;
+    } else {
+            cout << "Conectado! Usando encriptado: " << SSL_get_cipher(ssl) << endl;
+    }
 }
 
 void NNTPClientDAO::cerrarConexion(void) {
@@ -66,18 +68,15 @@ void NNTPClientDAO::cerrarConexion(void) {
     SSL_free(ssl);
     close(sdServer);
     SSL_CTX_free(ctx);
-    cout << "Se cerr� la conexi�n con el servidor y se liberaron todos los recursos." << endl;
+    cout << "Se cerro la conexion con el servidor y se liberaron todos los recursos." << endl;
 }
 
 void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
     int bytesEscritos;
     
-    cout << "Se intentar� enviar el mensaje: " << comandoEscritoPorUsuario << " cuya longitud es: " << comandoEscritoPorUsuario.length() << endl;
-    
-    bytesEscritos = SSL_write(ssl, (const void*) &comandoEscritoPorUsuario, comandoEscritoPorUsuario.length());
+    bytesEscritos = SSL_write(ssl, comandoEscritoPorUsuario.c_str(), comandoEscritoPorUsuario.length());
     if (bytesEscritos > 0) {
-        cout << "-------- ok" << endl;
-    cout << "estos son los bytes escritos" << bytesEscritos << endl;}
+        cout << "estos son los bytes escritos " << bytesEscritos << endl;}
     else
         cout << "-------- MAL!!!" << endl;
 }
@@ -87,11 +86,7 @@ string NNTPClientDAO::recibirRespuesta() {
 
 		char cBuffer[3064];/*	TODO: Chequear este tamaño.	*/
         bytesLeidos = SSL_read(ssl, cBuffer, sizeof(cBuffer));
-
-		printf("bytesleidos: %d\n", bytesLeidos);
         cBuffer[bytesLeidos] = '\0';
-
-        printf("cBuffer vale: %s\n", cBuffer);
 
         return cBuffer;
 }

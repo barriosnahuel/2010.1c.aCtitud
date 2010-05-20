@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string>
 #include <fstream>
-#include "../Logger/logger.hpp"
+#include "logger.hpp"
 #include "Configuracion.hpp"
 #include "Comando.hpp"
 #include "NNTPClientDAO.hpp"
