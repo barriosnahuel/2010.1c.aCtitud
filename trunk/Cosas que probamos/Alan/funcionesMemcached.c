@@ -29,12 +29,8 @@ void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
 void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto)
 {
   memcached_return rc;
-  /* Se crea el Cluster */  
+ /* Se crea el Cluster */  
   memc = memcached_create(NULL); 
-  if(*memc == NULL)
-	printf("TIENE QUE TENER NULL Y LO TIENE ! =) \n ");
-  else
-	printf("TIENE OTRA COSA =( \n ");
   /* Se agregan Servidores */
   rc = memcached_server_add(memc, memcachedServer1,memcachedServer1Puerto); 
   printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer1,memcachedServer1Puerto);  
@@ -43,11 +39,7 @@ void iniciarClusterCache(memcached_st *memc,char* memcachedServer1,int memcached
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
 
-  if(*memc == NULL)
-	printf("NO TIENE QUE TENER NULL Y LO TIENE ! =( \n ");
-  else
-	printf("TIENE OTRA COSA =) \n ");
-  
+    
   /*memcached_server_add(memc, memcachedServer2,memcachedServer2Puerto); 
   
   memcached_server_st *servers = NULL;
