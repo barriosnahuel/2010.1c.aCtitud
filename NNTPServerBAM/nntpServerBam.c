@@ -10,6 +10,7 @@
 #include "logger.h"
 #include "configuration.h"
 #include "conexion.h"
+#include "funciones.h"
 
 #define STDIN 0
 #define BUFFERSIZE 1024
@@ -23,7 +24,6 @@ int main(int argn, char *argv[]){
 	int iFdmax=0, i=0, sigue=1, iBytes;
 	char letra;
 	char czMsg[BUFFERSIZE];
-	struct timeval tv; //tiempo de espera del select
 	fd_set master;
 	fd_set read_fds;
 	SSL_CTX *ctx;  //contexto ctx
@@ -35,12 +35,9 @@ int main(int argn, char *argv[]){
     strcpy(czNombreProceso,"NNTP_Server_BAM\0");
     strcpy(argv[0],czNombreProceso);
 
-    tv.tv_sec = 5;
-	tv.tv_usec = 0;
-
 	memset(czMsg, 0, BUFFERSIZE);
 	
-	//PantallaInicio();
+	PantallaInicio();
     LoguearInformacion("Iniciando NNTP Server BAM...");
 
 	if(!LoadConfiguration(argn, argv, &stConf)) {
@@ -152,6 +149,32 @@ int main(int argn, char *argv[]){
 		        	czMsg[iBytes] = '\0';
 					printf("- Mensaje recibido: %s\n", czMsg);
 					SSL_write(ssl, "recibido!\0", 10);
+					switch(SeleccionarComando(czMsg)) {
+                	    case 0:  /* LIST */
+                	        printf("0\n");
+                	    break;
+                	    case 1:  /* QUIT */
+                    	    printf("1\n");
+                	    break;
+                   	    case 2:  /* LISTGROUP */
+                       	    printf("2\n");
+                	    break;
+                   	    case 3:  /* ARTICLE */
+                       	    printf("3\n");
+                	    break;
+                   	    case 4:  /* STAT */
+                       	    printf("4\n");
+                	    break;
+                   	    case 5:  /* HEAD */
+                       	    printf("5\n");
+                	    break;
+                   	    case 6:  /* BODY */
+                       	    printf("6\n");
+                	    break;
+                   	    case 7:  /* GROUP */
+                       	    printf("7\n");
+                	    break;
+                	}
                 }
             }
 
@@ -173,7 +196,7 @@ int main(int argn, char *argv[]){
         close(stConf.iSockClient);
     SSL_CTX_free(ctx);	/* release context */
 
-    //PantallaFin();
+    PantallaFin();
     LoguearInformacion("Terminacion exitosa.");
 
     return 1;
