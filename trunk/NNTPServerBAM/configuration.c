@@ -144,11 +144,15 @@ int LoadConfiguration(int argn, char *argv[], stConfiguracion *stConf) {
 			return 0;
 			break;
 	}
+	
+	stConf->iSockServer = -1;
+	stConf->iSockClient = -1;
+
 	LoguearInformacion("Configuracion cargada correctamente.");
 
-	sprintf(szMsgLog,"IP Local: %s - Puerto Local: %u",stConf->czLocalIP,stConf->uiLocalPort);
+	sprintf(szMsgLog,"- IP Local: %s - Puerto Local: %u",stConf->czLocalIP,stConf->uiLocalPort);
 	LoguearInformacion(szMsgLog);
-	sprintf(szMsgLog,"IP Open DS: %s - Puerto Open DS: %u",stConf->czOpenDSServer,stConf->uiOpenDSPort);
+	sprintf(szMsgLog,"- IP Open DS: %s - Puerto Open DS: %u",stConf->czOpenDSServer,stConf->uiOpenDSPort);
 	LoguearInformacion(szMsgLog);
 	
 	return 1;

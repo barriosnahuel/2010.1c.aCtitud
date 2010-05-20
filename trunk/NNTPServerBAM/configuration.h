@@ -7,6 +7,8 @@ typedef struct stConfiguracion {
     unsigned int uiLocalPort;
     char czOpenDSServer[15+1];
     unsigned int uiOpenDSPort;
+   	int iSockServer;
+   	int iSockClient;
 } stConfiguracion;
 
 /* función que valida que una ip se haya ingresado correctamente */
