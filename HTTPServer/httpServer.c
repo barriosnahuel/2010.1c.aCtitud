@@ -615,6 +615,15 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
+	if(cantidadDeGrupos == 0) {
+			cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+			lenProtocolo = strlen(cadenaProtocolo);
+			
+			if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+				LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
+			}
+	}
+	
 	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
 	
 	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
@@ -712,6 +721,15 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	unsigned int uiCantidadDeNoticias= 0;
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
+	
+	if(uiCantidadDeNoticias == 0) {
+		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+		lenProtocolo = strlen(cadenaProtocolo);
+		
+		if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
+		}
+	}
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
