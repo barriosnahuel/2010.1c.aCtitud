@@ -155,7 +155,7 @@ printf("Clave a buscar en la cache %s \n",claveCache);
   else
   {
   	printf("No se encontro el articulo en la cache\n");
-	return 0
+	return 0;
   }  	
   
   memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
