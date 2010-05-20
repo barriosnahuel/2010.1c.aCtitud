@@ -492,7 +492,9 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		guardarNoticiaEnCache(stArticulo);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
-
+	printf("El head: %s", stArticulo.sHead);
+	printf("El body: %s", stArticulo.sBody);
+	printf("El articulo: %s", stArticulo);
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 	return formatearArticuloAHTML(&stArticulo);
 }
