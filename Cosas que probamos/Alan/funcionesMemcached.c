@@ -74,7 +74,6 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
 
   memcached_return rc;
   uint32_t flags;
-  
   t_news *articuloCache = malloc(sizeof(t_news));
   char *claveCache ;
   int largoID;
@@ -113,7 +112,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
 printf("VA A PASAR EL MEMCACHED_SET \n");
-  rc=memcached_set(memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,(time_t)0,(uint32_t)0);
+  rc=memcached_set(memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,0,0);
 printf("YA PASO EL MEMCACHED_SET \n");
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
