@@ -414,7 +414,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	len = strlen(sResponse);
 	
 	char* cadenaProtocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	cadenaProtocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
+	cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
 	int lenProtocolo = 41;
 	
 	if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
