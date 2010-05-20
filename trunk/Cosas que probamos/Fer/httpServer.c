@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../Logger/logger.h"
+#include "../../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 
