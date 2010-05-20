@@ -1,14 +1,4 @@
 ----------- HTTPServer -----------
-
-Compilar a mano:	
-	gcc -lsocket -lnsl httpServer.c
-Si no compila, probar con:		
-	gcc -lsocket -lnsl -lresolv httpServer.c
-	
-Ejecutar:
-	./a.out
-
---
 Compilar con makefile:
 	make
 Otra opcion:
