@@ -139,7 +139,7 @@ printf("#####################BUSQUEDA EN LA CACHE######################\n");
   int resultNoticiaEnBytes_largo, resultado;
 
   char* claveCache;
-  int largoID = strlen(sArticleID)+1;
+  int largoID = strlen(sArticleID);
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
