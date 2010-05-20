@@ -417,7 +417,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int lenProtocolo = 41;
 	int asd;
 	
-	if((asd = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1) {
+	if((asd = send(stParametros.ficheroCliente, protocolo, lenProtocolo, 0)) == -1) {
 		printf("Error en el send del protocolo\n");
 	}
 
