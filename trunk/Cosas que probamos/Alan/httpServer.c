@@ -582,7 +582,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 	stArticle stArticulo;
 	memcached_st memc /*= NULL*/;
-	iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);
+	iniciarClusterCache(*memc,"192.168.0.101",11211,"192.168.0.101",11251);
 /*	    
 memc = memcached_create(NULL); 
 memcached_return rc;
