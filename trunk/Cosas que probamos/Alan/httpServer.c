@@ -586,7 +586,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	printf("PASA POR ACA \n");
     
 memc = memcached_create(NULL); 
-  memcached_return rc;
+memcached_return rc;
 rc = memcached_server_add(memc, "192.168.0.101",11211); 
 if (rc == MEMCACHED_SUCCESS)
   fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
@@ -601,7 +601,7 @@ else
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&memc);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,memc);
 	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
