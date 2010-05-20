@@ -413,8 +413,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	len = strlen(sResponse);
 	
 	char protocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	protocolo = "HTTP/1.1 200 OK\n Content-type: text/html\n\n";
-	int lenProtocolo = strlen(protocolo);
+	protocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
+	int lenProtocolo = 41;
 	int asd;
 	
 	if((asd = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1) {
