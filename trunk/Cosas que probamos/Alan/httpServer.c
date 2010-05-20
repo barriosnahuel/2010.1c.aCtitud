@@ -581,14 +581,13 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	memcached_st memc;
+	memcached_st *memc;
 	/*iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);*/
 	printf("PASA POR ACA \n");
     
 memc = memcached_create(NULL); 
-/* Se agregan Servidores */
-rc = memcached_server_add(memc, memcachedServer1,memcachedServer1Puerto); 
-printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer1,memcachedServer1Puerto);  
+  memcached_return rc;
+rc = memcached_server_add(memc, "192.168.0.101",11211); 
 if (rc == MEMCACHED_SUCCESS)
   fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
 else
