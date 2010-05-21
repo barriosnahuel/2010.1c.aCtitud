@@ -134,53 +134,8 @@ printf("YA PASO EL MEMCACHED_SET \n");
   free(articuloEnBytes);
   free(articuloCache);
   free(claveCache);
-  /*return;*/
-  
-  
-  
-  printf("##################### BUSQUEDA EN LA CACHE ######################\n");
-  stArticle *pstArticulo;
-  t_news *resultNoticia = malloc(sizeof(t_news));
-  char *resultadoCache  = NULL; 
-  int resultNoticiaEnBytes_largo, resultado;
-
+  return;
     
-  resultadoCache=memcached_get(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
-  if(rc == MEMCACHED_SUCCESS)
-	printf("Se encontro el articulo en la cache\n");
-  else
-  {
-  	printf("No se encontro el articulo en la cache\n");
-	return;
-  }  	
-  
-  memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
-  resultNoticia->head = malloc(resultNoticia->datos.largoHead);
-  memcpy(resultNoticia->head,resultadoCache+sizeof(t_news_largos),resultNoticia->datos.largoHead);
-  printf("Resultado HEAD: %s \n",resultNoticia->head);
-  printf("Tamanio cabecera : %d \n",resultNoticia->datos.largoHead);
-
-  resultNoticia->body=malloc(resultNoticia->datos.largoBody);
-  memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->datos.largoHead,resultNoticia->datos.largoBody);
-  printf("Resultado BODY : %s \n",resultNoticia->body);
-  
-   
-  pstArticulo->sNewsgroup = sGrupoDeNoticias;
-  pstArticulo->sHead	  = resultNoticia->head;
-  pstArticulo->sBody	  = resultNoticia->body;
-  
-  free(claveCache);
-  free(resultNoticia);
-  return ;
-  
-  
-  
-  
-  
-  
-  
-  
-  
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
