@@ -30,7 +30,6 @@ public:
 	void   setRespuestaObtenida(string strRespuesta);
     int    indicaSalida(void);
     int    validacion(void);
-    int    validarParametro(void);
 };
 
 #endif /* COMANDO_H_ */
