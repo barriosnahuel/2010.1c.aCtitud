@@ -69,7 +69,7 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
 }
 
 
-void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st *memc)
+void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st **memc)
 {
 
   printf("##################### GUARDAR NOTICIA ######################\n");
