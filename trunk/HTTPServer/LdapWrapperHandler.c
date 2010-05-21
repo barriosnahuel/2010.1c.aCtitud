@@ -155,6 +155,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 		if((bytesEnviadosProtocolo = send(ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
 			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
 		}
+		printf("Sali del if\n");
 	}
 		
 
