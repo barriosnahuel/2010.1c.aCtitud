@@ -487,14 +487,11 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations, pstParametros);
-		printf("Estoy por guardar en cache\n");
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo);
-		printf("Guarde en cache\n");
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
-	printf("Estoy por formatear\n");
 	return formatearArticuloAHTML(&stArticulo);
 }
 
@@ -502,10 +499,9 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
+	printf("Articulo: %s", pstArticulo);
 	char* response;
-	printf("Estoy por hacer el asprintf\n");
 	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
-	printf("sali del asprintf\n");
 
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
