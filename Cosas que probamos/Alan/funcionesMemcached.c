@@ -85,7 +85,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   largoID = sizeof(article.uiArticleID) +1;
   ID = malloc(largoID);
 printf("PASA POR ACA \n");
-  sprintf(ID,"%s",article.uiArticleID);
+  sprintf(ID,"%d",article.uiArticleID);
   largoID = strlen(ID) + 1 ;
 printf("PASA POR ACA \n");
   largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
