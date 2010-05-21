@@ -322,7 +322,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	free(sGrupoDeNoticia);
 	free(sArticleID);
 
-	break;
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 	
