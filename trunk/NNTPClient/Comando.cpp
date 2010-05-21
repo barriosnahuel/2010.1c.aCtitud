@@ -98,10 +98,16 @@ int Comando::validarParametro() {
 int Comando::parsearParametro(string parametro) {
 	int i = 0;
 	
-	while(parametro[i] != '@' && i < parametro.length()) i++;
+	while(parametro[i] != '@' && i < parametro.length()) {
+		i = i + 1;
+	}
 	
-	if(i == parametro.length()) return 0;
-	else return 1;
+	if(i == parametro.length()) {
+		return 0;
+	}
+	else {
+		return 1;
+	}
 }
 
 
