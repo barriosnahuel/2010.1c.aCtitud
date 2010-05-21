@@ -191,7 +191,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
-printf("pasa por aca !!!!!!!!! \n");
+
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
@@ -199,7 +199,7 @@ printf("pasa por aca !!!!!!!!! \n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
 printf("Clave a buscar en la cache %s \n",claveCache);
     
-  resultadoCache=memcached_get(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
+  /*resultadoCache=*/memcached_get(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
 	printf("Se encontro el articulo en la cache\n");
   else
