@@ -41,10 +41,10 @@ void* threadInterfazDeUsuario(void* parametro){
         (*comando).init(strCadenaIngresada);
         pthread_mutex_unlock(&semConexion);
         pthread_mutex_lock(&semUI);
-        if((*comando).validacion())
+        if((*comando).validacion() && (*comando).validarParametro())
             cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
         else
-            cout << "Comando inválido." << endl;
+            cout << "Comando invalido." << endl;
     } while ((*comando).indicaSalida() != 0);
     pthread_exit(comando);
 }
