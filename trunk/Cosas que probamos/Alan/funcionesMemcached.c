@@ -86,7 +86,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   ID = malloc(largoID);
 printf("PASA POR ACA \n");
   sprintf(ID,"%d",article.uiArticleID);
-  largoID = strlen(ID) + 1 ;
+  largoID = strlen(ID);
 printf("PASA POR ACA \n");
   largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
@@ -153,7 +153,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
 printf("Clave a buscar en la cache %s \n",claveCache);
     
-  resultadoCache=memcached_get(memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
+  resultadoCache=memcached_get(memc,"groupName12345"/*claveCache*/,strlen("groupName12345")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
 	printf("Se encontro el articulo en la cache\n");
   else
