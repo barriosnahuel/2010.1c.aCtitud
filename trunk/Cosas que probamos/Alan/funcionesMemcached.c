@@ -120,7 +120,7 @@ printf("PASA POR ACA \n");
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
 printf("VA A PASAR EL MEMCACHED_SET \n");
-  rc=memcached_set(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
+  rc=memcached_set(*memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
 printf("YA PASO EL MEMCACHED_SET \n");
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
