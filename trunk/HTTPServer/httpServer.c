@@ -486,7 +486,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
-				(*pstParametros).pstPLDAPSessionOperations, stThreadParameters* pstParametros);
+				(*pstParametros).pstPLDAPSessionOperations, pstParametros);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo);
