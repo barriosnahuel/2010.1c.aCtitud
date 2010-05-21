@@ -635,7 +635,6 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 		if((bytesEnviadosProtocolo = send(pstParametros->ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
 			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
 		}
-		break;
 	}
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
