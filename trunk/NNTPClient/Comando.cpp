@@ -106,6 +106,10 @@ int Comando::parsearParametro(string parametro) {
 		i = i + 1;
 	}
 	
+	if(parametro[i] == '@') {
+		return 0;
+	}
+	
 	if(i == parametro.length()) {
 		return 0;
 	}
