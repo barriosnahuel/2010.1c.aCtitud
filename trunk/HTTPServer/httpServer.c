@@ -325,7 +325,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 	
-	/*cadenaProtocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
+	/* Si llega hasta aca se supone que encontro algo porque sino ya hubiese respondido antes un 404 */
+	cadenaProtocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
 	lenProtocolo = strlen(cadenaProtocolo);
 	
 	if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
@@ -334,7 +335,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
-*/
+
 	free(sResponse);
 
 	close(stParametros.ficheroCliente);
