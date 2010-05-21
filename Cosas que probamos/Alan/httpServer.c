@@ -585,7 +585,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	memcached_st *memc2;
+	memcached_st *memc2 = NULL;
 	iniciarClusterCache(memc2,"192.168.0.101",11211,"192.168.0.101",11251);
 	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, memc2/*pstParametros->memc*/)) {
