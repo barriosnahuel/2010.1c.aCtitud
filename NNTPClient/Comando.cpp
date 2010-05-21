@@ -100,7 +100,7 @@ int Comando::parsearParametro(string parametro) {
 	
 	while(parametro[i] != '@' || i < parametro.length()) i++;
 	
-	if(i = parametro.length()) return 0;
+	if(i == parametro.length()) return 0;
 	else return 1;
 }
 
