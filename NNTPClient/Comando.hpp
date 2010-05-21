@@ -19,6 +19,7 @@ class Comando {
     void   extraerNombreYParametro(string comandoEntero);
     int    consumeEspaciosDesde(int posicion, string cadena);
 	void   reset(void);
+	int	   parsearParametro(string parametro);
 public:
 	Comando(void);
 	~Comando(void);
@@ -29,6 +30,7 @@ public:
 	void   setRespuestaObtenida(string strRespuesta);
     int    indicaSalida(void);
     int    validacion(void);
+    int    validarParametro(void);
 };
 
 #endif /* COMANDO_H_ */

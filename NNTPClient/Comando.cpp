@@ -46,7 +46,6 @@ void Comando::inicializarComandos() {
      vectorDeComandos[4]="STAT";
      vectorDeComandos[5]="HEAD";
      vectorDeComandos[6]="BODY";
-     vectorDeComandos[7]="GROUP";
 
      vectorDeParametros[0]= 1; //NEWSGROUPS
      vectorDeParametros[1]= 0;
@@ -55,7 +54,6 @@ void Comando::inicializarComandos() {
      vectorDeParametros[4]= 1; //message-id
      vectorDeParametros[5]= 1; //message-id
      vectorDeParametros[6]= 1; //message-id
-     vectorDeParametros[7]= 0;
 }
 
 int Comando::init(string strCadena) {
@@ -70,7 +68,7 @@ int Comando::validacion() {
       int comandoOk = 0;
       int parametroOk = 0;
 
-      for(i=0;i<=7;i++)
+      for(i=0;i<=6;i++)
         if(nombreComando == vectorDeComandos[i]) {
             comandoOk = 1;
             break;
@@ -88,6 +86,22 @@ int Comando::validacion() {
         return 1;
      else
         return 0;
+}
+
+int Comando::validarParametro() {
+	if(nombreComando == vectorDeComandos[3] || nombreComando == vectorDeComandos[4] || nombreComando == vectorDeComandos[5] || nombreComando == vectorDeComandos[6]) {
+		return parsearParametro(parametro);
+	}
+	return 1;
+}
+
+int Comando::parsearParametro(string parametro) {
+	int i = 0;
+	
+	while(parametro[i] != '@' || i < parametro.length()) i++;
+	
+	if(i = parametro.length()) return 0;
+	else return 1;
 }
 
 
