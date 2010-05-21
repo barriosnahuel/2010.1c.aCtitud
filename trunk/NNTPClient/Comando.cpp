@@ -100,13 +100,12 @@ int Comando::parsearParametro(string parametro) {
 	if(parametro[i] == '@') {
 		return 0;
 	}
+	if(parametro[i-1] == '@') {
+			return 0;
+	}
 	
 	while(parametro[i] != '@' && i < parametro.length()) {
 		i = i + 1;
-	}
-	
-	if(parametro[i] == '@') {
-		return 0;
 	}
 	
 	if(i == parametro.length()) {
