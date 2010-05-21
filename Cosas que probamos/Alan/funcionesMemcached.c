@@ -76,14 +76,19 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   memcached_return rc;
   uint32_t flags;
   t_news *articuloCache = malloc(sizeof(t_news));
+  
+  char *ID;
   char *claveCache ;
   int largoID;
   int largoGrupoDeNoticias;
   
   largoID = sizeof(article.uiArticleID);
+  ID = malloc(largoID);
+  sprintf(ID,"%s",article.uiArticleID)
+  
   largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%d",sGrupoDeNoticias,article.uiArticleID);
+  sprintf(claveCache,"%s%d",sGrupoDeNoticias,ID/*article.uiArticleID*/);
   
   /*formarClave(claveCache,sGrupoDeNoticias,article.uiArticleID);*/
   printf("CLAVE CACHE %s \n",claveCache);
