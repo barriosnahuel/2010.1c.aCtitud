@@ -92,7 +92,9 @@ VOID deleteEntry(PLDAP_SESSION 			stSession
 stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sGrupoDeNoticias
-					, char* 				sArticleID){
+					, char* 				sArticleID
+					, stThreadParameters* pstParametros ){
+	
 	LoguearDebugging("--> getArticle()", APP_NAME_FOR_LOGGER);
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
 
@@ -142,8 +144,19 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 		stArticleToReturn.uiArticleID= atoi(sArticleID);
 		LoguearInformacion("Se seteo bien el articulo recuperado de OpenDS.", APP_NAME_FOR_LOGGER);
 	}
-	else
+	else {
+		char* cadenaProtocolo;
+		int lenProtocolo;
+		int bytesEnviadosProtocolo;
 		printf("No hay ninguna entry que mostrar.\n");
+		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+		lenProtocolo = strlen(cadenaProtocolo);
+					
+		if((bytesEnviadosProtocolo = send(pstParametros->ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
+		}
+	}
+		
 
 	LoguearDebugging("<-- getArticle()", APP_NAME_FOR_LOGGER);
 	return stArticleToReturn;

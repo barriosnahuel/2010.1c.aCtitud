@@ -83,7 +83,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
  */
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
-		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
+		PLDAP_SESSION_OP* pstPLDAPSessionOperations, stThreadParameters* pstParametros);
 /**
  * Guarda la noticia que se le pasa como parametro en cache.
  */
@@ -438,10 +438,10 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sA
 
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
-		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
+		PLDAP_SESSION_OP* pstPLDAPSessionOperations, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 
-	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
+	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID, pstParametros);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
@@ -486,15 +486,12 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
-				(*pstParametros).pstPLDAPSessionOperations);
+				(*pstParametros).pstPLDAPSessionOperations, stThreadParameters* pstParametros);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
-	printf("El head: %s", stArticulo.sHead);
-	printf("El body: %s", stArticulo.sBody);
-	printf("El articulo: %s", stArticulo);
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 	return formatearArticuloAHTML(&stArticulo);
 }
