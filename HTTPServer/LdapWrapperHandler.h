@@ -32,7 +32,8 @@ char* getDNFor(int dArticleID);
 stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sGrupoDeNoticias
-					, char* 				sArticleID);
+					, char* 				sArticleID
+					, int 					ficheroCliente);
 
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.
