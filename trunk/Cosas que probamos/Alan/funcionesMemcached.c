@@ -191,7 +191,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
- 
+printf("pasa por aca !!!!!!!!! \n");
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
