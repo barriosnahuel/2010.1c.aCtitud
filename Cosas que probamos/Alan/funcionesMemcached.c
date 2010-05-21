@@ -120,7 +120,7 @@ printf("PASA POR ACA \n");
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
 printf("VA A PASAR EL MEMCACHED_SET \n");
-  /*rc=*/memcached_set(memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,0,0);
+  /*rc=*/memcached_set(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
 printf("YA PASO EL MEMCACHED_SET \n");
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
@@ -153,7 +153,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
 printf("Clave a buscar en la cache %s \n",claveCache);
     
-  resultadoCache=memcached_get(memc,"groupName12345"/*claveCache*/,strlen("groupName12345")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
+  resultadoCache=memcached_get(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
 	printf("Se encontro el articulo en la cache\n");
   else
