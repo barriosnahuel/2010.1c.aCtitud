@@ -201,7 +201,7 @@ int main(void) {
 	 *	Conecto a cluster memcached						*
 	 ****************************************************/
 	memcached_st *memc;
-	iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);
+	iniciarClusterCache(&memc,"192.168.0.102",11211,"192.168.0.101",11251);
 /*	Esto es prueba!!	*/
 /*
   	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
