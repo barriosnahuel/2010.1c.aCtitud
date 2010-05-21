@@ -145,7 +145,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 		LoguearInformacion("Se seteo bien el articulo recuperado de OpenDS.", APP_NAME_FOR_LOGGER);
 	}
 	else {
-		char* cadenaProtocolo;
+		char* cadenaProtocolo = (char*)malloc(sizeof(char)*300);
 		int lenProtocolo;
 		int bytesEnviadosProtocolo;
 		printf("No hay ninguna entry que mostrar.\n");
