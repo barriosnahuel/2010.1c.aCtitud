@@ -200,8 +200,8 @@ int main(void) {
 	/****************************************************
 	 *	Conecto a cluster memcached						*
 	 ****************************************************/
-	memcached_st memc;
-	iniciarClusterCache(&memc,"192.168.0.101",11211,"192.168.0.101",11251);
+	memcached_st *memc;
+	iniciarClusterCache(memc,"192.168.0.101",11211,"192.168.0.101",11251);
 /*	Esto es prueba!!	*/
 /*
   	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
@@ -316,7 +316,7 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			stParameters.memc = &memc;
+			stParameters.memc = memc;
 			
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -586,8 +586,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 	stArticle stArticulo;
 	
-
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)/*1*/) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
