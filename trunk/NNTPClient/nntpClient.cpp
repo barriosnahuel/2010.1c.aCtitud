@@ -41,7 +41,7 @@ void* threadInterfazDeUsuario(void* parametro){
         (*comando).init(strCadenaIngresada);
         pthread_mutex_unlock(&semConexion);
         pthread_mutex_lock(&semUI);
-        if((*comando).validacion())
+        if((*comando).validacion() && !comando.validarParametro())
             cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
         else
             cout << "Comando invalido." << endl;
@@ -108,7 +108,7 @@ int main(int argn, char *argv[]){
 
     do {
         pthread_mutex_lock(&semConexion);
-        if(comando.validacion() && comando.validarParametro()) {
+        if(comando.validacion()) {
             dao.enviarMensaje(comando.cadenaIngresada());
             comando.setRespuestaObtenida(dao.recibirRespuesta());
         };
