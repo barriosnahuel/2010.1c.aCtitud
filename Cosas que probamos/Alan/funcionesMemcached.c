@@ -199,7 +199,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
 printf("Clave a buscar en la cache %s \n",claveCache);
     
-  resultadoCache=memcached_get(memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
+  resultadoCache=memcached_get(&memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
 	printf("Se encontro el articulo en la cache\n");
   else
