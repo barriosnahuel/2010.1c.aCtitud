@@ -586,7 +586,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 	stArticle stArticulo;
 	memcached_st * memc2 ;
-	iniciarClusterCache(&memc2,"192.168.0.101",11211,"192.168.0.101",11251);
+	iniciarClusterCache(&memc2,"192.168.0.102",11211,"192.168.0.101",11251);
 	
 	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
