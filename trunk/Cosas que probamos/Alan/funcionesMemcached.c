@@ -143,7 +143,7 @@ printf("YA PASO EL MEMCACHED_SET \n");
   
   
   printf("##################### BUSQUEDA EN LA CACHE ######################\n");
-  stArticle *pstArticle;
+  stArticle *pstArticulo;
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
