@@ -116,6 +116,8 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
 	stArticle stArticleToReturn;
+	stArticleToReturn.sHead = NULL;
+	stArticleToReturn.sBody = NULL;
 
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
 	iterator = resultSet->iterator;
