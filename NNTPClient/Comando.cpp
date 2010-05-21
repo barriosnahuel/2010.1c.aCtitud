@@ -75,24 +75,22 @@ int Comando::validacion() {
         }
 
      if(comandoOk) {
-        if(vectorDeParametros[i]==1 && parametro.empty()!=1)
-            parametroOk = 1;
+        if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
+        	if(nombreComando == vectorDeComandos[3] || nombreComando == vectorDeComandos[4] || nombreComando == vectorDeComandos[5] || nombreComando == vectorDeComandos[6]) {
+        	     parametroOk = parsearParametro(parametro);
+        	}
+        }
         else
             if(vectorDeParametros[i]==0 && parametro.empty()==1)
             parametroOk = 1;
      };
      
+     
+     
      if(comandoOk + parametroOk == 2)
         return 1;
      else
         return 0;
-}
-
-int Comando::validarParametro() {
-	if(nombreComando == vectorDeComandos[3] || nombreComando == vectorDeComandos[4] || nombreComando == vectorDeComandos[5] || nombreComando == vectorDeComandos[6]) {
-		return parsearParametro(parametro);
-	}
-	return 1;
 }
 
 int Comando::parsearParametro(string parametro) {
