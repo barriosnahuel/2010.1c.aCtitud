@@ -183,7 +183,7 @@ printf("YA PASO EL MEMCACHED_SET \n");
   
 }
 
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st *memc)
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st memc)
 {
 printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   uint32_t flags;
