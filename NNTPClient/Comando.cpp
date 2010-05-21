@@ -100,7 +100,7 @@ int Comando::parsearParametro(string parametro) {
 	if(parametro[i] == '@') {
 		return 0;
 	}
-	if(parametro[i-1] == '@') {
+	if(parametro[parametro.length()-1] == '@') {
 			return 0;
 	}
 	
