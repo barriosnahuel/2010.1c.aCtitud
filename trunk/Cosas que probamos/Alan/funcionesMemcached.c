@@ -133,8 +133,8 @@ printf("YA PASO EL MEMCACHED_SET \n");
   
   free(articuloEnBytes);
   free(articuloCache);
-  free(claveCache);
-  return;
+  /*free(claveCache);*/
+  /*return;*/
   
   
   
@@ -143,13 +143,11 @@ printf("YA PASO EL MEMCACHED_SET \n");
   
   
   printf("##################### BUSQUEDA EN LA CACHE ######################\n");
-  uint32_t flags;
-  memcached_return rc;
+  
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
- 
-  char* claveCache;
+
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
