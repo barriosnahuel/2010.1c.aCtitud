@@ -93,7 +93,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sGrupoDeNoticias
 					, char* 				sArticleID
-					, stThreadParameters* pstParametros ){
+					, int ficheroCliente ){
 	
 	LoguearDebugging("--> getArticle()", APP_NAME_FOR_LOGGER);
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
@@ -152,7 +152,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
 		lenProtocolo = strlen(cadenaProtocolo);
 					
-		if((bytesEnviadosProtocolo = send(pstParametros->ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
+		if((bytesEnviadosProtocolo = send(ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
 			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
 		}
 	}

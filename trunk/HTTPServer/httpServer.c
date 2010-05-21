@@ -441,7 +441,7 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 
-	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID, pstParametros);
+	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID, pstParametros->ficheroCliente);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
