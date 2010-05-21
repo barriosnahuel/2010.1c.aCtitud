@@ -499,9 +499,10 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
-	printf("Articulo: %s", pstArticulo);
 	char* response;
-	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
+	if(pstArticulo->sHead != NULL) {
+		asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
+	}
 
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
