@@ -322,6 +322,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	free(sGrupoDeNoticia);
 	free(sArticleID);
 
+	break;
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 	
@@ -335,7 +336,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
-
+	
 	free(sResponse);
 
 	close(stParametros.ficheroCliente);
