@@ -174,10 +174,10 @@ printf("LLEGA A ACAAAAAAAAA");
 	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
 	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
 	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
-/*
+
     memcached_st * memc;
-	iniciarClusterCache(&memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
-	*/
+	iniciarClusterCache(&memc,"192.168.0.102",11211,"192.168.0.102"/*stConf.memcachedServer2*/,11212/*stConf.memcachedServer2Puerto*/);
+	
 
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
