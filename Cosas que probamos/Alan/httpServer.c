@@ -149,6 +149,7 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink);
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
 int main(void) {
+	printf("LLEGA A ACAAAAAAAAA");
 	char* sLogMessage;	/*	Es la variable que uso para generar el msj para el log.	*/
 	/****************************************
 	 *	Cargo el archivo de configuracion	*
