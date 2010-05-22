@@ -518,13 +518,6 @@ void liberarRecursos(int 				ficheroServer
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
 
-
-
-
-
-
-
-
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
@@ -535,13 +528,6 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
-
-
-
-
-
-
-
 
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
