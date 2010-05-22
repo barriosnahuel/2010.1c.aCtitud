@@ -9,6 +9,8 @@
 #include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
+#include "funcionesMemcached.h"
+#include <libmemcached/memcached.h>
 
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define APP_NAME_FOR_LOGGER "HTTPServer"
@@ -16,6 +18,14 @@
 #define REQUEST_TYPE_NEWS_LIST 2	/*	Indica que se esta solicitando el listado de noticias para un newsgroup especifico. 	*/
 #define REQUEST_TYPE_NEWS 3			/*	Indica que se esta solicitando una noticia en particular.	*/
 #define MAX_CHARACTERS_FOR_RESPONSE 5000	/*	TODO: La cantidad maxima de caracteres para el response esta bien 5000?	*/
+
+/*int thr_create(void *stack_base
+ , size_t stack_size
+ , void *(*start_routine)(void *)
+ , void *arg
+ , long flags
+ , thread_t* new_thread
+ );*/
 
 /**
  * Estructura que contiene los parametros para cada nuevo thread.
@@ -28,6 +38,7 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
 
+	memcached_st* memCluster;
 	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
@@ -74,20 +85,15 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
  */
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
-/**
- * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
- */
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
+
+		
+
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
-		PLDAP_SESSION_OP* pstPLDAPSessionOperations, stThreadParameters* pstParametros);
-/**
- * Guarda la noticia que se le pasa como parametro en cache.
- */
-void guardarNoticiaEnCache(stArticle stArticulo);
+		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
 /**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
@@ -165,7 +171,17 @@ int main(void) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-
+	asprintf(&sLogMessage,"\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage,"\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage,"\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage,"\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
+	
+	memcached_st * memc;
+	iniciarClusterCache(&memc,stConf.memcachedServer2,stConf.memcachedServer2Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
@@ -180,6 +196,88 @@ int main(void) {
 	}
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+
+
+/*	Esto es prueba!!	*/
+/*
+  	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 2);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 3);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 4);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 5);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 6);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 7);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 8);
+*/
+/*		stArticle stArticulo;
+
+		stArticulo.sBody = "un body para la 1";
+		stArticulo.sHead = "un head para la 1";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 1;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 2";
+		stArticulo.sHead = "un head para la 2";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 2;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 3";
+		stArticulo.sHead = "un head para la 3";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 3;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 4";
+		stArticulo.sHead = "un head para la 4";
+		stArticulo.sNewsgroup = "Pagina 12";
+		stArticulo.uiArticleID = 4;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 5";
+		stArticulo.sHead = "un head para la 5";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 5;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 6";
+		stArticulo.sHead = "un head para la 6";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 6;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 7";
+		stArticulo.sHead = "un head para la 7";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 7;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 8 (clarin en minuscula)";
+		stArticulo.sHead = "un head para la 8 (clarin en minuscula)";
+		stArticulo.sNewsgroup = "clarin";
+		stArticulo.uiArticleID = 8;
+
+		stArticulo.sBody = "un body para la 9";
+		stArticulo.sHead = "un head para la 9";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 9;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 10";
+		stArticulo.sHead = "un head para la 10";
+		stArticulo.sNewsgroup = "Fruta";
+		stArticulo.uiArticleID = 10;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 11";
+		stArticulo.sHead = "un head para la 11";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 11;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		selectAndPrintEntries(stPLDAPSession, stPLDAPSessionOperations, "(utnArticleID=*)");
+*/
 
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
@@ -214,6 +312,7 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
+			stParameters.memCluster = memc; 
 
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -236,9 +335,6 @@ int main(void) {
 }
 
 void* procesarRequestFuncionThread(void* threadParameters) {
-	int bytesEnviadosProtocolo;
-	int lenProtocolo;
-	char* cadenaProtocolo = (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
@@ -324,18 +420,10 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 	int len, bytesEnviados;
 	len = strlen(sResponse);
-	
-	/* Si llega hasta aca se supone que encontro algo porque sino ya hubiese respondido antes un 404 */
-	cadenaProtocolo = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
-	lenProtocolo = strlen(cadenaProtocolo);
-	
-	if((bytesEnviadosProtocolo = send(stParametros.ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
-		LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
-	}
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
-	
+
 	free(sResponse);
 
 	close(stParametros.ficheroCliente);
@@ -430,29 +518,39 @@ void liberarRecursos(int 				ficheroServer
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
 
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sArticleID) {
-	LoguearDebugging("--> buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
-	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
-	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
-}
+
+
+
+
+
 
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
-		PLDAP_SESSION_OP* pstPLDAPSessionOperations, stThreadParameters* pstParametros) {
+		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 
-	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID, pstParametros->ficheroCliente);
+	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
 
-void guardarNoticiaEnCache(stArticle stArticulo) {
-	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
-	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
-	return;
+
+
+
+
+
+
+char* formatearArticuloAHTML(stArticle* pstArticulo) {
+	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
+
+	char* response;
+	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
+
+	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
+	return response;
 }
 
 char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
@@ -483,30 +581,19 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID)) {
+	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
-				(*pstParametros).pstPLDAPSessionOperations, pstParametros);
+				(*pstParametros).pstPLDAPSessionOperations);
+
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
+
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 	return formatearArticuloAHTML(&stArticulo);
-}
-
-
-char* formatearArticuloAHTML(stArticle* pstArticulo) {
-	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
-
-	char* response;
-	if(pstArticulo->sHead != NULL && pstArticulo->sBody != NULL) {
-		asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
-	}
-	
-	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
-	return response;
 }
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
@@ -610,9 +697,6 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	char* sLogMessage;
-	char* cadenaProtocolo;
-	int lenProtocolo;
-	int bytesEnviadosProtocolo;
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -627,15 +711,6 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	unsigned int uiCantidadDeNoticias= 0;
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
-	
-	if(uiCantidadDeNoticias == 0) {
-		cadenaProtocolo = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
-		lenProtocolo = strlen(cadenaProtocolo);
-			
-		if((bytesEnviadosProtocolo = send(pstParametros->ficheroCliente, cadenaProtocolo, lenProtocolo, 0)) == -1) {
-			LoguearError("No se pudo enviar el 404 Not Found al cliente.", APP_NAME_FOR_LOGGER);
-		}
-	}
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
