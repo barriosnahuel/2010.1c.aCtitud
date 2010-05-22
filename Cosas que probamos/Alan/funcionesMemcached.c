@@ -29,7 +29,7 @@ void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
 void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto)
 {
   memcached_return rc;
- /* Se crea el Cluster */  
+  /* Se crea el Cluster */  
   *memCluster = memcached_create(NULL); 
   /* Se agregan Servidores */
   rc = memcached_server_add(*memCluster, memcachedServer1,memcachedServer1Puerto); 
@@ -38,34 +38,15 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(*memCluster, rc));
-  
-  
-    
-  /*memcached_server_add(memc, memcachedServer2,memcachedServer2Puerto); 
-  
-  memcached_server_st *servers = NULL;
-  memcached_return rc;
-  uint32_t flags;
-  memc = malloc(sizeof(memcached_st));
-  memc = memcached_create(NULL); 
-  
-  servers = memcached_server_list_append(servers, memcachedServer1, memcachedServer1Puerto,&rc);
-  rc      = memcached_server_push(memc, servers);
-  
-  printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer1,memcachedServer1Puerto);  
-  if (rc == MEMCACHED_SUCCESS)
-    fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
-  else
-    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-
-  servers = memcached_server_list_append(servers, memcachedServer2, memcachedServer2Puerto,&rc);
-  rc      = memcached_server_push(memc, servers);
+  return;
+  rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
+  printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer2,memcachedServer2Puerto);  
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  2 correctamente\n");
   else
-    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(memc, rc));
-*/
+    fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(*memCluster, rc));
   return;
+ 
 }
 
 

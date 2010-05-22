@@ -180,7 +180,7 @@ int main(void) {
 	asprintf(&sLogMessage,"\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	
     memcached_st * memc;
-	iniciarClusterCache(&memc,"192.168.0.102",11211,"192.168.0.102"/*stConf.memcachedServer2*/,11212/*stConf.memcachedServer2Puerto*/);
+	iniciarClusterCache(&memc,stConf.memcachedServer2,stConf.memcachedServer2Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
