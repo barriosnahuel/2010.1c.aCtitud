@@ -8,7 +8,10 @@
 #define OPENDS_SERVER "OpenDSServer="
 #define OPENDS_PORT "OpenDSPort="
 #define APP_NAME_FOR_LOGGER "AppNameForLogger="
-
+#define MEMCACHED_SERVER1_IP "MemcachedServer1IP="
+#define MEMCACHED_SERVER1_PORT "MemcachedServer1Port="
+#define MEMCACHED_SERVER2_IP "MemcachedServer2IP="
+#define MEMCACHED_SERVER2_PORT "MemcachedServer2Port="
 
 char *GetVal(const char *sValBuff, const char *sBuff){
     char *sVal;
@@ -71,7 +74,34 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	fclose(pfsArchConfig);
 
 	/* ------ modificar de ac� para abajo los valores que se quieren guardar --------*/
+	
+	/* Cargo las IPS y los puertos de los servidores memcached	*/
+	stConf->memcachedServer2Puerto= atoi(GetVal(MEMCACHED_SERVER2_PORT, pszAux));
+	if((stConf->memcachedServer2Puerto) < 1 || (stConf->memcachedServer2Puerto) > 65535 ) {
+	    printf("Puerto de memcached server 2 inválido.");
+		return 0;
+	}
 
+	strcpy(stConf->memcachedServer2,GetVal(MEMCACHED_SERVER2_IP, pszAux));
+	/* valido la IP */
+	if(!Valida_IP(stConf->memcachedServer2)) {
+        printf("IP de memcached server 2 inválida.");
+		return 0;
+    };
+	
+	stConf->memcachedServer1Puerto= atoi(GetVal(MEMCACHED_SERVER1_PORT, pszAux));
+	if((stConf->memcachedServer1Puerto) < 1 || (stConf->memcachedServer1Puerto) > 65535 ) {
+	    printf("Puerto de memcached server 1 inválido.");
+		return 0;
+	}
+	
+	strcpy(stConf->memcachedServer1,GetVal(MEMCACHED_SERVER1_IP, pszAux));
+	/* valido la IP */
+	if(!Valida_IP(stConf->memcachedServer1)) {
+        printf("IP de memcached server 1 inválida.");
+		return 0;
+    };
+	
 	/* Cargo el puerto de OpenDS */
 	stConf->uiBDPuerto = atoi(GetVal(OPENDS_PORT, pszAux));
 	if((stConf->uiBDPuerto) < 1 || (stConf->uiBDPuerto) > 65535 ) {
@@ -93,7 +123,14 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	    printf("Puerto de la aplicacion invalido.");
 		return 0;
 	}
+     
+	
+	
+	
 
+
+	
+	
 	free(szLinea);
 	free(pszAux);
 	return 1;
