@@ -85,10 +85,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
  */
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
-/**
- * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
- */
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
+
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
