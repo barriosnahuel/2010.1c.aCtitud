@@ -168,7 +168,7 @@ int main(void) {
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
 	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
     asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
-	*/LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
 	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
 	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
 	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
