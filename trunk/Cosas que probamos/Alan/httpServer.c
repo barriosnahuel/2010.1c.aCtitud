@@ -154,7 +154,7 @@ int main(void) {
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
 	stConfiguracion stConf;
-
+printf("LLEGA A ACAAAAAAAAA");
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
 		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
