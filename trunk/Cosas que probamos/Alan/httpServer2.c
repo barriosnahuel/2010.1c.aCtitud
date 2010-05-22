@@ -5,7 +5,8 @@
 #include <thread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "Logger/logger.h"
+#include <string.h>
+#include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
 #include "funcionesMemcached.h"
@@ -35,9 +36,8 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION* pstPLDAPSession; /*	La sesion de OpenDS/LDAP */
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
-
+	memcached_st *memc;
 	stConfiguracion* pstConfiguration;
-	memcached_st* memc; 						/* Para poder pasar la conexion */
 } stThreadParameters;
 
 /************************************************************************************************************
@@ -60,7 +60,6 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-unsigned int obtenerTipoOperacionYVariables(char* sURL, char* sGrupoDeNoticias, char* sArticleID);
 void liberarRecursos( int 				ficheroServer
 					, PLDAP_CONTEXT		stPLDAPContext
 					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
@@ -85,11 +84,6 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
 /**
- * Busca la noticia en la cache, y setea el stArticulo con esa noticia.
- */
-
-/** int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID);
-
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
@@ -119,6 +113,22 @@ int llevaNoticia(char* sRecursoPedido);
  */
 char* obtenerNoticia(char* sRecursoPedido);
 
+/**
+ * Quita los elementos repetidos del array listadoGruposDeNoticias, y pone ceros en las posiciones donde se repiten.
+ */
+VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias);
+
+/**
+ * Pasa los campos que sean distintos de cero del array listadoGrupoNoticiasRepetidos a listadoGrupoNoticiasSinRepetir y retorna la cantidad de campos que posee este
+ * ultimo.
+ */
+unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
+
+/**
+ * Reemplaza los %20 por espacios y devuelve la cadena sin %20.
+ */
+char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios);
+
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
  ************************************************/
@@ -126,7 +136,8 @@ char* obtenerNoticia(char* sRecursoPedido);
  * Formatea la noticia la noticia a un char* en formato HTML para poder enviarle eso al cliente
  * y visualizar bien la pagina HTML.
  */
-char* formatearArticuloAHTML(stArticle stArticulo);
+char* formatearArticuloAHTML(stArticle* pstArticulo);
+char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias);
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len);
 /**
  * Arma un tag a de HTML con un hipervinculo al sURL que se le pasa como parametro,
@@ -138,25 +149,35 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink);
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
 int main(void) {
+	printf("LLEGA A ACAAAAAAAAA");
+	char* sLogMessage;	/*	Es la variable que uso para generar el msj para el log.	*/
 	/****************************************
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
 	stConfiguracion stConf;
-
+printf("LLEGA A ACAAAAAAAAA");
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
 		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
 		return -1;
-	} else {
-		LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
-		printf("\tPuerto de la aplicacion: %d\n", stConf.uiAppPuerto);
-		printf("\tPuerto de OpenDS: %d\n", stConf.uiBDPuerto);
-		printf("\tIP OpenDS: %s\n", stConf.czBDServer);
-		printf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
-		printf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
-		printf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
-		printf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	}
+	LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "Puerto de la aplicacion: %d.", stConf.uiAppPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "IP LDAP/OpenDS: %s.", stConf.czBDServer);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+    asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
+
+    memcached_st * memc;
+	iniciarClusterCache(&memc,"192.168.0.102",11211,"192.168.0.102"/*stConf.memcachedServer2*/,11212/*stConf.memcachedServer2Puerto*/);
 	
 
 	/****************************************************
@@ -170,34 +191,117 @@ int main(void) {
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER);
 		return -1;
-	} else
-		printf("Conectado a OpenDS en: IP=%s; Port=%d\n", stConf.czBDServer,
-				stConf.uiBDPuerto);
+	}
+	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+
+	/****************************************************
+	 *	Conecto a cluster memcached						*
+	 ****************************************************/
+
+/*	Esto es prueba!!	*/
+/*
+  	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 2);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 3);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 4);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 5);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 6);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 7);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 8);
+*/
+/*		stArticle stArticulo;
+
+		stArticulo.sBody = "un body para la 1";
+		stArticulo.sHead = "un head para la 1";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 1;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 2";
+		stArticulo.sHead = "un head para la 2";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 2;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 3";
+		stArticulo.sHead = "un head para la 3";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 3;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 4";
+		stArticulo.sHead = "un head para la 4";
+		stArticulo.sNewsgroup = "Pagina 12";
+		stArticulo.uiArticleID = 4;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 5";
+		stArticulo.sHead = "un head para la 5";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 5;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 6";
+		stArticulo.sHead = "un head para la 6";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 6;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 7";
+		stArticulo.sHead = "un head para la 7";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 7;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 8 (clarin en minuscula)";
+		stArticulo.sHead = "un head para la 8 (clarin en minuscula)";
+		stArticulo.sNewsgroup = "clarin";
+		stArticulo.uiArticleID = 8;
+
+		stArticulo.sBody = "un body para la 9";
+		stArticulo.sHead = "un head para la 9";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 9;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 10";
+		stArticulo.sHead = "un head para la 10";
+		stArticulo.sNewsgroup = "Fruta";
+		stArticulo.uiArticleID = 10;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 11";
+		stArticulo.sHead = "un head para la 11";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 11;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		selectAndPrintEntries(stPLDAPSession, stPLDAPSessionOperations, "(utnArticleID=*)");
+*/
 
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
-	int ficheroServer; /* los ficheros descriptores */
-	struct sockaddr_in server; /* para la informacion de la direccion del servidor */
+	int ficheroServer; 			/* Fichero descriptor de nuestro server. */
+	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
 		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", APP_NAME_FOR_LOGGER);
 		return -1;
 	}
-	else{
-		strcpy(stConf.czAppServer, inet_ntoa(server.sin_addr));
-		printf("Aplicacion levantada en: IP=%s; Port=%d\n\nEscuchando conexiones entrantes...\n", stConf.czAppServer, stConf.uiAppPuerto);
-	}
-
+	strcpy(stConf.czAppServer, inet_ntoa(server.sin_addr));
+	asprintf(&sLogMessage, "Aplicacion levantada en: IP=%s; Port=%d.", stConf.czAppServer, stConf.uiAppPuerto);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	printf("* HTTPServer escuchando conexiones entrantes...\n");
 
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-/*	while (1) {*/
+	while (1) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
-		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client,
-				&sin_size);
+		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
@@ -209,36 +313,35 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			/****************************************************
-			*	    Conecto a Servidores Memcached				*
-			*/
-			iniciarClusterCache(stParameters.memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
-	
+			stParameters.memc = memc;
+			
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
-				printf(
-						"No se pudo crear un nuevo thread para procesar el request.\n");
+				LoguearError("No se pudo crear un nuevo thread para procesar el request.", APP_NAME_FOR_LOGGER);
 		} else
 			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
-		printf("Se obtuvo una conexion desde %s...\n", inet_ntoa(client.sin_addr));
-/*	}*/
+
+		asprintf(&sLogMessage, "Se obtuvo una conexion desde %s.", inet_ntoa(client.sin_addr));
+		LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	}
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
-	printf("Ahora cierro socket, db, etc...\n");
+	
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
-
+	
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
 
 void* procesarRequestFuncionThread(void* threadParameters) {
 	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
+	char* sLogMessage;
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 
-	printf("---------------- Procesando thread xD -----------------\n");
+	LoguearInformacion("Comienzo a procesar un nueco thread.", APP_NAME_FOR_LOGGER);
 	int bytesRecibidos;
 	char sMensajeHTTPCliente[1024];/*	TODO: No pueden valer lo mismo estos dos.	*/
 
@@ -246,19 +349,55 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	lenMensajeHTTPCliente = 1024;
 	bytesRecibidos = recv(stParametros.ficheroCliente, sMensajeHTTPCliente, lenMensajeHTTPCliente, 0);
 
-	printf("Recibi %d bytes del usuario.\n\n", bytesRecibidos);
-	printf("############################################################\n\n");
-	printf("%s", sMensajeHTTPCliente);
-	printf("############################################################\n");
+
+	asprintf(&sLogMessage, "Recibi %d bytes del usuario.", bytesRecibidos);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	asprintf(&sLogMessage, "El mensaje HTTP que recibimos del cliente es:\n%s", sMensajeHTTPCliente);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
+	char sRecursoPedidoSinEspacios[1024];
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
-	printf("El usuario pidio el recurso: %s\n", sRecursoPedido);
+	asprintf(&sLogMessage, "El usuario pidio el recurso: \"%s\".", sRecursoPedido);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	
+	formatearEspacios(sRecursoPedido, sRecursoPedidoSinEspacios);
+
+	/*	En Ubuntu/Chrome, /Firefox (no se en otras situaciones) luego de enviar el response, recibimos un
+	    request por este recurso. Decidimos no tratarlo, por lo tanto cerramos la conexion.	*/
+	if(strcmp(sRecursoPedido, "/favicon")==0){
+		close(stParametros.ficheroCliente);
+		LoguearInformacion("Se cerro el fichero descriptor del cliente porque el request pedia el recurso /favicon.ico.", APP_NAME_FOR_LOGGER);
+
+		LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+		thr_exit(0);
+	}
 
 	char* sGrupoDeNoticia= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT);
 	char* sArticleID= (char*)malloc(sizeof(char)*OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT);
-	unsigned int uiOperation= obtenerTipoOperacionYVariables(sRecursoPedido, sGrupoDeNoticia, sArticleID);
+
+	
+	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
+	unsigned int uiOperation;
+	if (strlen(sRecursoPedido) == 1)
+		uiOperation= REQUEST_TYPE_NEWSGROUP;
+	else {
+		/* Obtengo el grupo de noticias. */
+		
+		strcpy(sGrupoDeNoticia, obtenerGrupoDeNoticias(sRecursoPedidoSinEspacios));
+		/* Me fijo si ademas del grupo de noticias viene la noticia */
+		if (llevaNoticia(sRecursoPedidoSinEspacios)) {
+			/* Obtengo la noticia de dicho grupo. */
+			strcpy(sArticleID, obtenerNoticia(sRecursoPedidoSinEspacios));
+			uiOperation= REQUEST_TYPE_NEWS;
+		}
+		else
+			/*	Como la URL no tiene el sufijo /noticiaID, el cliente me esta pidiendo
+				 el listado de noticias para un grupo de noticia dado.					*/
+			uiOperation= REQUEST_TYPE_NEWS_LIST;
+	}
+
 	char* sResponse= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	switch (uiOperation) {
 	case REQUEST_TYPE_NEWSGROUP:
@@ -284,25 +423,16 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	int len, bytesEnviados;
 	len = strlen(sResponse);
 
-	printf("Le respondo al cliente con el html ya armado... \n");
-	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0))
-			== -1) {
-		printf("El send no funco\n");
-	}
-	printf("El cliente recibio %d bytes\n", bytesEnviados);
+	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
+		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
 
-	printf("Voy a cerrar la conexion con el cliente\n");
-	close(stParametros.ficheroCliente);
-
-	/*	TODO: Libero la memoria	*/
 	free(sResponse);
 
-	printf("Cerre la conexion con el cliente y ahora Exit al thread\n");
+	close(stParametros.ficheroCliente);
+	LoguearInformacion("Se cerro el fichero descriptor del cliente.", APP_NAME_FOR_LOGGER);
 
-	LoguearDebugging("<-- procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
-	thr_exit(0);/*	Termino el thread.*/
-
-	return 0;
+	LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+	thr_exit(0);
 }
 
 int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
@@ -337,10 +467,10 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 	LoguearDebugging("--> crearConexionConSocket()", APP_NAME_FOR_LOGGER);
 
 	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		printf("Error al crear el socket.\n");
+		LoguearError("No se pudo obtener el fichero descriptor del socket.", APP_NAME_FOR_LOGGER);
 		exit(-1);
 	}
-	printf("Cree el socket bien\n");
+	LoguearInformacion("Se obtuvo el fichero descriptor correctamente.", APP_NAME_FOR_LOGGER);
 
 	(*server).sin_family = AF_INET;
 	(*server).sin_addr.s_addr = INADDR_ANY; /* INADDR_ANY coloca nuestra direccion IP automaticamente */
@@ -349,13 +479,13 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 
 	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
-		printf("Error al asociar el puerto al socket.\n");
+		LoguearError("Error al asociar el puerto al socket.", APP_NAME_FOR_LOGGER);
 		exit(-1);
 	}
-	printf("Pude bindear bien el socket\n");
+	LoguearInformacion("Se asocio bien el puerto al socket.", APP_NAME_FOR_LOGGER);
 
 	if (listen(*ficheroServer, BACKLOG) == -1) {
-		printf("Error al escuchar por el puerto.\n");
+		LoguearError("No se pudo dejar escuchando al puerto.", APP_NAME_FOR_LOGGER);
 		exit(-1);
 	}
 
@@ -381,77 +511,93 @@ void liberarRecursos(int 				ficheroServer
 	freeLDAPSession(stPLDAPSession);
 	freeLDAPContext(stPLDAPContext);
 	freeLDAPContextOperations(stPLDAPContextOperations);
-	printf("Libere LDAP/OpenDS\n");
+	LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.", APP_NAME_FOR_LOGGER);
 
 	/*	Cierro el socket	*/
 	close(ficheroServer);
-	printf("Libere el ficheroServer\n");
+	LoguearInformacion("Libere el fichero descriptor de nuestro server correctamente.", APP_NAME_FOR_LOGGER);
+
 	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
 }
-/**
+/*
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticia, char* sArticleID) {
 	LoguearDebugging("--> buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- buscarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return 0;/*	TODO: Esta hardcodeado el false para que entre a buscar a la BD	*/
-
-
-
-
+/*}*/
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
-
-	/*	Estos dos, son exclusivos para algunas operaciones	*/
-	PLDAP_ENTRY_OP entryOp = newLDAPEntryOperations();
-	PLDAP_ATTRIBUTE_OP attribOp = newLDAPAttributeOperations();
 
 	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
-/**
+/*
 void guardarNoticiaEnCache(stArticle stArticulo) {
 	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return;
-}*/
+/*}*/
 
-char* formatearArticuloAHTML(stArticle stArticulo) {
+char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 
-	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	sprintf(response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P>%s<P></BODY></HTML>", stArticulo.sHead, stArticulo.sBody);
+	char* response;
+	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
 
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
 }
 
+char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
+	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
+	int i = 0;
+	int j = 0;
+	
+	while(sRecursoPedido[i] != '\0') {
+		if(sRecursoPedido[i] == '%') {
+			sRecursoPedidoSinEspacios[j] = ' ';
+			i = i + 3;
+			j++;
+		}
+		else {
+			sRecursoPedidoSinEspacios[j] = sRecursoPedido[i];
+			i++;
+			j++;
+		}
+	}
+	sRecursoPedidoSinEspacios[j] = '\0';
+	
+	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
+}
+
+
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
-	/*memcached_st* memc;
-    iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);*/
 	stArticle stArticulo;
-	printf("PASA POR LA CACHE");
 	
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, pstParametros->memc)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
+		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,pstParametros->memc);
-	}
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memc);
+	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
-	return formatearArticuloAHTML(stArticulo);
+	return formatearArticuloAHTML(&stArticulo);
+
 }
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
@@ -461,32 +607,79 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
 
-	int len= 2;
-	char* listadoGrupoNoticias[len];
+	int q;
+	int k;
+	unsigned int cantidadDeGrupos= 0;
+	unsigned int cantidadDeGruposSinRepetir= 0;
+	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	char* listadoGrupoNoticiasSinRepetir[1000];
+	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
+	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
+	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
+	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
+	
+	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
+	
+	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
+	
+	/*	TODO: Esto se borra o se loguea?	*/
+	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
+	
+	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
 
-	/*	TODO: Aca hago la busqueda.	*/
-	listadoGrupoNoticias[0]= "Clarin";
-	listadoGrupoNoticias[1]= "La Nacion";
+	/*	TODO: Esto se borra o se loguea?	*/
+	for(k = 0; k < cantidadDeGruposSinRepetir; k++) printf("Contenido de la posicion %d del array LIMPIO es: %s\n", k, listadoGrupoNoticiasSinRepetir[k]);
+	
+	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticias, len);
+	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
-char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len){
+VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
+	int i;
+	int j;
+	char grupoDeNoticias[70];/*	TODO: 70???	*/
+	
+	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
+		strcpy(grupoDeNoticias, listadoGrupoNoticiasRepetidos[i]);
+		for(j = i+1; j < iCantidadDeGruposDeNoticias; j++) {
+			if(strcmp(grupoDeNoticias, listadoGrupoNoticiasRepetidos[j]) == 0) {
+				listadoGrupoNoticiasRepetidos[j] = "0\0";
+			}
+		}
+	}
+}
+
+unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
+	int p;
+	int l = 0;
+	
+	for(p = 0; p < iCantidadDeGruposDeNoticias; p++) {
+		if(strcmp("0", listadoGrupoNoticiasRepetidos[p]) != 0) {
+			listadoGrupoNoticiasSinRepetir[l] = listadoGrupoNoticiasRepetidos[p];
+			l++;
+		}
+	}
+	return l;
+}
+
+char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 
-	/*	1+OPEN...+5+1 = /nombreGrupoNoticia.html\0	*/
+	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
 	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
-	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY>");
+	strcpy(response, "<HTML><HEAD><TITLE>Listado de grupos de noticias</TITLE></HEAD><BODY><P><B>Listado de grupos de noticias</B></P><OL>");
 
 	int i;
-	for(i=0; i<len; i++){
-		sprintf(sURL, "%s%s", listadoGruposDeNoticias[i], ".html");
-		sprintf(response, "%s%s", response, armarLinkCon(sURL, listadoGruposDeNoticias[i]));
+	for(i=0; i<iCantidadDeGruposDeNoticias; i++){
+		sprintf(sURL, "%s%s", listadoGrupoDeNoticiasSinRepetir[i], ".html");
+		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, listadoGrupoDeNoticiasSinRepetir[i]));
 	}
 	free(sURL);
-	sprintf(response, "%s%s", response, "</BODY></HTML>");
+
+	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
 
 	LoguearDebugging("<-- formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
@@ -494,18 +687,20 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], i
 
 char* armarLinkCon(char* sURL, char* sNombreDelLink){
 	LoguearDebugging("--> armarLinkCon()", APP_NAME_FOR_LOGGER);
-printf("url vale: %s\n", sURL);
+
 	/*	+50 Porque tengo que tener en cuenta ip:puerto/grupoNoticia/noticiaID	*/
+	/*	TODO: Ver si se puede cambiar el malloc por el uso de asprintf	*/
 	char* sTag= (char*)malloc(sizeof(char)*(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50));
 	memset(sTag, 0, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50);
 	sprintf(sTag, "<A href=\"/%s\">%s</A><BR />", sURL, sNombreDelLink);
-printf("tag vale: %s\n", sTag);
+
 	LoguearDebugging("<-- armarLinkCon()", APP_NAME_FOR_LOGGER);
 	return sTag;
 }
 
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
+	char* sLogMessage;
 
 	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
 	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
@@ -513,12 +708,39 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT];
 	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias);
 
-	printf("sCriterio quedo en: %s\n", sCriterio);
-	/*	TODO: Aca hago la busqueda	*/
+	asprintf(&sLogMessage, "El criterio para buscar en OpenDS es: %s", sCriterio);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 
+	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
+	unsigned int uiCantidadDeNoticias= 0;
+	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
 
 	LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
-	return "<HTML><HEAD><TITLE>este es el titulo de la pagina</TITLE></HEAD><BODY><P>Esto ya es html, aca tendria que haber devuelto el listado de noticias para un grupo de noticias en particular.</P><TABLE><TR><TD>esta es la primer fila</TD></TR><TR><TD>esta es la segunda fila</TD></TR></TABLE></BODY></HTML>";
+	return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
+}
+
+char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias){
+	LoguearDebugging("--> formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
+
+	/*	1+OPEN...+1+OPEN...5+1 Es igual a: /nombreGrupoNoticia/noticiaID.html\0	*/
+	/*	TODO: Chequear si se puede sacar el malloc usando asprintf ;)	*/
+	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+1+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+5+1));
+	char* response= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
+	sprintf(response, "<HTML><HEAD><TITLE>Listado de noticias de %s</TITLE></HEAD><BODY><P><B>Listado de noticias de %s</B></P><OL>", sGrupoDeNoticias, sGrupoDeNoticias);
+
+	int i;
+	for(i=0; i<uiCantidadDeNoticias; i++){
+		stArticle stArticle= listadoDeNoticias[i];
+
+		sprintf(sURL, "%s/%d%s", sGrupoDeNoticias, stArticle.uiArticleID, ".html");
+		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, stArticle.sHead));
+	}
+	free(sURL);
+	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
+
+	LoguearDebugging("<-- formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
+	return response;
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
@@ -572,7 +794,11 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 		i = i + 1;
 	}
 	grupoDeNoticias[j] = '\0';
+
+	/*sprintf(sGrupoDeNoticias, "%s", grupoDeNoticias);*/
+
 	LoguearDebugging("<-- obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+
 	return grupoDeNoticias;
 }
 
@@ -585,13 +811,13 @@ char* obtenerNoticia(char* sRecursoPedido) {
 	while (sRecursoPedido[i] != '/') {
 		i = i + 1;
 	}
-	
+
 	while(sRecursoPedido[i+1] != '\0') {
 		noticia[j] = sRecursoPedido[i+1];
 		i = i + 1;
 		j = j + 1;
 	}
-	
+
 	noticia[j] = '\0';
 	LoguearDebugging("<-- obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
 	return noticia;
@@ -600,37 +826,14 @@ char* obtenerNoticia(char* sRecursoPedido) {
 int llevaNoticia(char* sRecursoPedido) {
 	LoguearDebugging("--> llevaNoticia()", APP_NAME_FOR_LOGGER);
 	int i = 1;
-	
+
 	while(sRecursoPedido[i] != '/' && sRecursoPedido[i] != '\0' ) {
 		i = i + 1;
 	}
-	
+
 	if(sRecursoPedido[i] == '\0') {
 		return 0;
 	}
 	LoguearDebugging("<-- llevaNoticia()", APP_NAME_FOR_LOGGER);
 	return 1;
-}
-
-
-unsigned int obtenerTipoOperacionYVariables(char* sURL, char* sGrupoDeNoticias, char* sArticleID){
-	unsigned int uiOperation;
-	if (strlen(sURL) == 1)
-		uiOperation= REQUEST_TYPE_NEWSGROUP;
-	else {
-		/* Obtengo el grupo de noticias. */
-		strcpy(sGrupoDeNoticias, obtenerGrupoDeNoticias(sURL));
-
-		/* Me fijo si ademas del grupo de noticias viene la noticia */
-		if (llevaNoticia(sURL)) {
-			/* Obtengo la noticia de dicho grupo. */
-			strcpy(sArticleID, obtenerNoticia(sURL));
-			uiOperation= REQUEST_TYPE_NEWS;
-		}
-		else
-			/*	Como la URL no tiene el sufijo /noticiaID, el cliente me esta pidiendo
-				 el listado de noticias para un grupo de noticia dado.					*/
-			uiOperation= REQUEST_TYPE_NEWS_LIST;
-	}
-	return uiOperation;
 }
