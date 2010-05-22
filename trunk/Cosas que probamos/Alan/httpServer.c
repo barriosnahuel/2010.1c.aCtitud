@@ -9,6 +9,8 @@
 #include "../Logger/logger.h"
 #include "configuration.h"
 #include "LdapWrapperHandler.h"
+#include "funcionesMemcached.h"
+#include <libmemcached/memcached.h>
 
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
 #define APP_NAME_FOR_LOGGER "HTTPServer"
@@ -36,6 +38,7 @@ typedef struct stThreadParameters {
 	PLDAP_SESSION_OP* pstPLDAPSessionOperations; /*	Permite realizar operaciones sobre la sesino, ej,
 													insertar/modificar/eliminar entries		*/
 
+	memcached_st* memCluster;
 	stConfiguracion* pstConfiguration;
 } stThreadParameters;
 
@@ -92,10 +95,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
-/**
- * Guarda la noticia que se le pasa como parametro en cache.
- */
-void guardarNoticiaEnCache(stArticle stArticulo);
+
 /**
  * Esta funcion es la que se ejecuta cuando se crea un nuevo thread.
  */
@@ -173,7 +173,18 @@ int main(void) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+    /*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+    asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
+	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);*/
+	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 
+    memcached_st * memc;
+	iniciarClusterCache(&memc,"192.168.0.102",11211,"192.168.0.102"/*stConf.memcachedServer2*/,11212/*stConf.memcachedServer2Puerto*/);
+	
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
 	 ****************************************************/
@@ -304,7 +315,7 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-
+            stParameters.memCluster = memc;  
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
 				LoguearError("No se pudo crear un nuevo thread para procesar el request.", APP_NAME_FOR_LOGGER);
@@ -526,13 +537,13 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
 }
-
+/*
 void guardarNoticiaEnCache(stArticle stArticulo) {
 	LoguearDebugging("--> guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 
 	LoguearDebugging("<-- guardarNoticiaEnCache()", APP_NAME_FOR_LOGGER);
 	return;
-}
+}*/
 
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
