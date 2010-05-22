@@ -170,15 +170,15 @@ int main(void) {
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-/*
-    asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
+
+    asprintf(&sLogMessage,"\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
+	asprintf(&sLogMessage,"\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
+	asprintf(&sLogMessage,"\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
-	*/
+	asprintf(&sLogMessage,"\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
+	
     memcached_st * memc;
 	iniciarClusterCache(&memc,"192.168.0.102",11211,"192.168.0.102"/*stConf.memcachedServer2*/,11212/*stConf.memcachedServer2Puerto*/);
 	
