@@ -166,7 +166,7 @@ int main(void) {
 	asprintf(&sLogMessage, "IP LDAP/OpenDS: %s.", stConf.czBDServer);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
-	/*LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
     asprintf("\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf("\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
@@ -174,12 +174,12 @@ int main(void) {
 	asprintf("\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
 	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
 	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
-*/
-    /* memcached_st * memc;*/
+
+    memcached_st * memc;
 	/****************************************************
  			*	    Conecto a Servidores Memcached				*
 			*/
-	/*iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);*/
+	iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
 
 	/****************************************************
@@ -585,10 +585,8 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	memcached_st * memc2 ;
-	iniciarClusterCache(&memc2,"192.168.0.102",11211,"192.168.0.101",11251);
 	
-	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &memc2/*&pstParametros->memc*/)) {
+	if (!buscarNoticiaEnCache(&stArticulo, sGrupoDeNoticias, sArticleID, &pstParametros->memc)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("No esta en la cache \n");
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
@@ -596,7 +594,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&memc2/*&pstParametros->memc*/);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memc);
 	}else printf("Estaba en la cache \n");
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
