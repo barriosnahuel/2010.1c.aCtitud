@@ -176,10 +176,7 @@ int main(void) {
 	asprintf("\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 
     memcached_st * memc;
-	/****************************************************
- 			*	    Conecto a Servidores Memcached				*
-			*/
-	iniciarClusterCache(memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	iniciarClusterCache(&memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
 
 	/****************************************************
