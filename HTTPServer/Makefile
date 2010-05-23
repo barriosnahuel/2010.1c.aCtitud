@@ -3,13 +3,6 @@ CFLAGS=-ansi
 OPENDSLIBS=-L/usr/local/lib -lldap -llber
 LIBS= $(OPENDSLIBS) -lsocket -lnsl -lmemcached
 
-#	Todo junto es asi:
-#HTTPServer: configuration.o LdapWrapper.o Logger.o Article.o LdapWrapperHandler.o httpServer.o 
-#	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o LdapWrapper.o ../Logger/Logger.o ./Article.o ./LdapWrapperHandler.o ./httpServer.o
-#	@echo '* Finished building target: $@'
-#	@echo ''
-
-#	Separando en carpetas es asi:
 HTTPServer: configuration.o LdapWrapper-Solaris.o Logger.o util.o Article.o LdapWrapperHandler.o httpServer.o  funcionesMemcached.o
 	gcc $(CFLAGS) $(LIBS) -o HTTPServer ./configuration.o ../util.o ../LDAP/LdapWrapper-Solaris.o ../Logger/Logger.o ../Article.o ../LDAP/LdapWrapperHandler.o ./httpServer.o ./funcionesMemcached.o
 	@echo '* Finished building target: $@'
@@ -24,11 +17,6 @@ funcionesMemcached.o: funcionesMemcached.c funcionesMemcached.h
 	gcc $(CFLAGS) $(OPTFLAGS) funcionesMemcached.o funcionesMemcached.c
 #######################################################################################
 
-#	Si esta en la misma carpeta es asi:
-#LdapWrapper.o: LdapWrapper.c LdapWrapper.h
-#	gcc $(CFLAGS) $(OPTFLAGS) LdapWrapper.o LdapWrapper.c
-
-#	Si esta en una carpeta exclusiva es asi:
 LdapWrapper-Solaris.o: ../LDAP/LdapWrapper-Solaris.c ../LDAP/LdapWrapper.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../LDAP/LdapWrapper-Solaris.o ../LDAP/LdapWrapper-Solaris.c
 #######################################################################################
@@ -37,20 +25,10 @@ Logger.o: ../Logger/logger-Solaris.c ../Logger/logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../Logger/Logger.o ../Logger/logger-Solaris.c
 #######################################################################################
 
-#	Si esta en la misma carpeta es asi:
-#Article.o: Article.c Article.h
-#	gcc $(CFLAGS) $(OPTFLAGS) Article.o Article.c
-
-#	Si esta en una carpeta exlusiva es asi:
 Article.o: ../Article.c ../Article.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../Article.o ../Article.c
 #######################################################################################
 
-#	Si esta en la misma carpeta es asi:
-#LdapWrapperHandler.o: LdapWrapperHandler.c LdapWrapperHandler.h
-#	gcc $(CFLAGS) $(OPTFLAGS) LdapWrapperHandler.o LdapWrapperHandler.c
-
-#	Si esta en una carpeta exlusiva es asi:
 LdapWrapperHandler.o: ../LDAP/LdapWrapperHandler.c ../LDAP/LdapWrapperHandler.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../LDAP/LdapWrapperHandler.o ../LDAP/LdapWrapperHandler.c
 #######################################################################################
