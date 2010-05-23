@@ -3,8 +3,6 @@
 #include <unistd.h>
 #include<stdlib.h>
 #include"funcionesMemcached.h"
-
-
 /** 
 typedef struct stArticle {
      unsigned int uiArticleID;	
@@ -40,16 +38,14 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(*memCluster, rc));
 
   rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
-  printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer2,memcachedServer2Puerto);  
+  printf("SERVIDOR 2 IP : %s  PUERTO : %d \n",memcachedServer2,memcachedServer2Puerto);  
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  2 correctamente\n");
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(*memCluster, rc));
   
   return;
- 
 }
-
 
 void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st **memc)
 {
@@ -116,7 +112,7 @@ printf("YA PASO EL MEMCACHED_SET \n");
   free(articuloCache);
   free(claveCache);
   return;
-    
+  
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
@@ -162,4 +158,4 @@ printf("Clave a buscar en la cache %s \n",claveCache);
   free(claveCache);
   free(resultNoticia);
   return 1;
-};
+}
