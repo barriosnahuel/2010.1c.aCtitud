@@ -23,10 +23,10 @@ funciones.o: funciones.c funciones.h
 logger.o: logger.c logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) logger.o logger.c
 
-LdapWrapper-Debian.o: ../LDAP-OpenDS/LdapWrapper-Debian.c ../LDAP/LdapWrapper.h
+LdapWrapper-Debian.o: ../LDAP/LdapWrapper-Debian.c ../LDAP/LdapWrapper.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../LDAP/LdapWrapper-Debian.o ../LDAP/LdapWrapper-Debian.c
 
-LdapWrapperHandler.o: ../LDAP-OpenDS/LdapWrapperHandler.c ../LDAP/LdapWrapperHandler.h
+LdapWrapperHandler.o: ../LDAP/LdapWrapperHandler.c ../LDAP/LdapWrapperHandler.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../LDAP/LdapWrapperHandler.o ../LDAP/LdapWrapperHandler.c
 
 nntpServerBam.o: nntpServerBam.c
