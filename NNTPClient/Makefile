@@ -1,12 +1,12 @@
 OPTFLAGS=-c -o
 
-NNTPClient: Logger.o Configuracion.o Comando.o NNTPClientDAO.o nntpClient.o
-	g++ -lpthread -lssl -o NNTPClient Logger.o ./Configuracion.o ./Comando.o ./NNTPClientDAO.o ./nntpClient.o
+NNTPClient: Logger-Debian.o Configuracion.o Comando.o NNTPClientDAO.o nntpClient.o
+	g++ -lpthread -lssl -o NNTPClient ../Logger/Logger-Debian.o ./Configuracion.o ./Comando.o ./NNTPClientDAO.o ./nntpClient.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
-Logger.o: logger.cpp logger.hpp
-	g++ $(OPTFLAGS) Logger.o logger.cpp
+Logger-Debian.o: ../Logger/logger-Debian.cpp ../Logger/logger.hpp
+	g++ $(OPTFLAGS) ../Logger/Logger-Debian.o ../Logger/logger-Debian.cpp
 
 Configuracion.o: Configuracion.cpp Configuracion.hpp
 	g++ $(OPTFLAGS) Configuracion.o Configuracion.cpp
