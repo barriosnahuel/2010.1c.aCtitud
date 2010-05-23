@@ -12,7 +12,7 @@
 #include "configuration.h"
 #include "conexion.h"
 #include "funciones.h"
-#include "../LDAP-OpenDS/LdapWrapperHandler.h"
+#include "../LDAP/LdapWrapperHandler.h"
 
 #define STDIN 0
 #define BUFFERSIZE 1024
