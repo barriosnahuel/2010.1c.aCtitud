@@ -6,9 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../util.h"
 #include "../Logger/logger.h"
 #include "configuration.h"
-#include "LdapWrapperHandler.h"
+#include "../LDAP/LdapWrapperHandler.h"
 #include "funcionesMemcached.h"
 #include <libmemcached/memcached.h>
 
@@ -45,13 +47,6 @@ typedef struct stThreadParameters {
 /************************************************************************************************************
  *	Aca comienzan las declaraciones de las funciones														*
  ************************************************************************************************************/
-/**
- * Se conecta a OpenDS/PLDAP y deja establecida la conexion para usarla con el LDAPWrapper
- */
-int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
-		PLDAP_CONTEXT_OP* pstPLDAPContextOperations,
-		PLDAP_SESSION* pstPLDAPSession,
-		PLDAP_SESSION_OP* pstPLDAPSessionOperations);
 /**
  * Crea el socket y lo deja listo para escuchar conexiones entrantes.
  */
@@ -117,21 +112,6 @@ int llevaNoticia(char* sRecursoPedido);
  */
 char* obtenerNoticia(char* sRecursoPedido);
 
-/**
- * Quita los elementos repetidos del array listadoGruposDeNoticias, y pone ceros en las posiciones donde se repiten.
- */
-VOID quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias);
-
-/**
- * Pasa los campos que sean distintos de cero del array listadoGrupoNoticiasRepetidos a listadoGrupoNoticiasSinRepetir y retorna la cantidad de campos que posee este
- * ultimo.
- */
-unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
-
-/**
- * Reemplaza los %20 por espacios y devuelve la cadena sin %20.
- */
-char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -189,7 +169,7 @@ int main(void) {
 	PLDAP_CONTEXT_OP stPLDAPContextOperations = newLDAPContextOperations(); /*	Me permite operar sobre un contexto	*/
 	PLDAP_SESSION stPLDAPSession;
 	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
-	if (!crearConexionLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations,
+	if (!crearConexionLDAP(stConf.czBDServer, stConf.uiBDPuerto, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER);
 		return -1;
@@ -296,7 +276,7 @@ int main(void) {
 	/********************************************************************************
 	 *	Itero de manera infinita??? recibiendo conexiones de != clientes			*
 	 *******************************************************************************/
-	while (1) {
+	/*while (1) {*/
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
@@ -312,7 +292,6 @@ int main(void) {
 			stParameters.pstPLDAPSession= &stPLDAPSession;
 			stParameters.pstPLDAPSessionOperations= &stPLDAPSessionOperations;
 			stParameters.pstConfiguration= &stConf;
-			stParameters.memCluster = memc; 
 
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
@@ -322,7 +301,7 @@ int main(void) {
 
 		asprintf(&sLogMessage, "Se obtuvo una conexion desde %s.", inet_ntoa(client.sin_addr));
 		LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-	}
+	/*}*/
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
@@ -433,30 +412,6 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	thr_exit(0);
 }
 
-int crearConexionLDAP(stConfiguracion* stConf, PLDAP_CONTEXT* pstPLDAPContext,
-		PLDAP_CONTEXT_OP* pstPLDAPContextOperations,
-		PLDAP_SESSION* pstPLDAPSession,
-		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
-	LoguearDebugging("--> crearConexionLDAP()", APP_NAME_FOR_LOGGER);
-
-	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
-	char *sOpenDSLocation;
-	asprintf(&sOpenDSLocation, "ldap://%s:%d", (*stConf).czBDServer,
-			(*stConf).uiBDPuerto);
-
-	/* Inicializamos el contexto. */
-	(*pstPLDAPContextOperations)->initialize(*pstPLDAPContext, sOpenDSLocation);
-	(*pstPLDAPSession) = (*pstPLDAPContextOperations)->newSession(
-			*pstPLDAPContext, "cn=Directory Manager", "password");
-
-	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
-	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
-
-	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
-	LoguearDebugging("<-- crearConexionLDAP()", APP_NAME_FOR_LOGGER);
-	return 1;
-}
-
 /**
  * Crea el socket, lo bindea, y lo deja listo para escuchar conexiones entrantes.
  */
@@ -523,7 +478,7 @@ int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArt
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
 	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 
-	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID,1);
+	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
 
 	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
 	return 1;
@@ -538,29 +493,6 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
 	return response;
 }
-
-char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
-	LoguearDebugging("--> formatearEspacios()", APP_NAME_FOR_LOGGER);
-	int i = 0;
-	int j = 0;
-	
-	while(sRecursoPedido[i] != '\0') {
-		if(sRecursoPedido[i] == '%') {
-			sRecursoPedidoSinEspacios[j] = ' ';
-			i = i + 3;
-			j++;
-		}
-		else {
-			sRecursoPedidoSinEspacios[j] = sRecursoPedido[i];
-			i++;
-			j++;
-		}
-	}
-	sRecursoPedidoSinEspacios[j] = '\0';
-	
-	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
-}
-
 
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
@@ -618,33 +550,6 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
-VOID quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
-	int i;
-	int j;
-	char grupoDeNoticias[70];/*	TODO: 70???	*/
-	
-	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		strcpy(grupoDeNoticias, listadoGrupoNoticiasRepetidos[i]);
-		for(j = i+1; j < iCantidadDeGruposDeNoticias; j++) {
-			if(strcmp(grupoDeNoticias, listadoGrupoNoticiasRepetidos[j]) == 0) {
-				listadoGrupoNoticiasRepetidos[j] = "0\0";
-			}
-		}
-	}
-}
-
-unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]) {
-	int p;
-	int l = 0;
-	
-	for(p = 0; p < iCantidadDeGruposDeNoticias; p++) {
-		if(strcmp("0", listadoGrupoNoticiasRepetidos[p]) != 0) {
-			listadoGrupoNoticiasSinRepetir[l] = listadoGrupoNoticiasRepetidos[p];
-			l++;
-		}
-	}
-	return l;
-}
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
 	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
