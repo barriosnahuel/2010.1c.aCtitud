@@ -29,7 +29,7 @@ public:
 	void   setRespuestaObtenida(string strRespuesta);
     int    indicaSalida(void);
     int    validacion(void);
-    int Comando::parsearParametro(string parametro);
+    int	   parsearParametro(string parametro);
 };
 
 #endif /* COMANDO_H_ */
