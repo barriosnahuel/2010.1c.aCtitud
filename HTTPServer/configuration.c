@@ -123,14 +123,7 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	    printf("Puerto de la aplicacion invalido.");
 		return 0;
 	}
-     
-	
-	
-	
 
-
-	
-	
 	free(szLinea);
 	free(pszAux);
 	return 1;

@@ -19,7 +19,6 @@ class Comando {
     void   extraerNombreYParametro(string comandoEntero);
     int    consumeEspaciosDesde(int posicion, string cadena);
 	void   reset(void);
-	int	   parsearParametro(string parametro);
 public:
 	Comando(void);
 	~Comando(void);
