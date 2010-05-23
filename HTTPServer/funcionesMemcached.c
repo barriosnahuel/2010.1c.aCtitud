@@ -38,13 +38,14 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
     fprintf(stderr,"Se agrego el servidor  1 correctamente\n");
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(*memCluster, rc));
-  return;
+
   rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
   printf("SERVIDOR 1 IP : %s  PUERTO : %d \n",memcachedServer2,memcachedServer2Puerto);  
   if (rc == MEMCACHED_SUCCESS)
     fprintf(stderr,"Se agrego el servidor  2 correctamente\n");
   else
     fprintf(stderr,"No se pudo agregar el servidor: %s\n",memcached_strerror(*memCluster, rc));
+  
   return;
  
 }
@@ -73,7 +74,6 @@ printf("PASA POR ACA \n");
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,ID/*article.uiArticleID*/);
   
-  /*formarClave(claveCache,sGrupoDeNoticias,article.uiArticleID);*/
   printf("CLAVE CACHE %s \n",claveCache);
   
   articuloCache->body = NULL;
@@ -101,7 +101,7 @@ printf("PASA POR ACA \n");
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
 printf("VA A PASAR EL MEMCACHED_SET \n");
-  rc=memcached_set(*memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
+  rc=memcached_set(*memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,0,0);
 printf("YA PASO EL MEMCACHED_SET \n");
   printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
@@ -135,7 +135,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticias,sArticleID);
 printf("Clave a buscar en la cache %s \n",claveCache);
     
-  resultadoCache=memcached_get(*memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
+  resultadoCache=memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS)
 	printf("Se encontro el articulo en la cache\n");
   else
