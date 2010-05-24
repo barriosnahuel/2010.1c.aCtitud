@@ -190,7 +190,7 @@ int main(int argn, char *argv[]){
                        	    printf("4\n");
                 	    break;
                    	    case 5:  /* HEAD */
-                       	    processArticleCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
+                       	    processHeadCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 6:  /* BODY */
                        	    printf("6\n");
