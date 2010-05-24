@@ -110,7 +110,7 @@ printf("LLEGA A LA FUNCION1! \n");
 
 	int i ;
 	int j;
-	char * grupoSinEspacios = malloc(strlen(grupo)+1);
+	char * grupoSinEspacios ;
 	printf("EL GRUPO QUE LE LLEGA A LA FUNCION : %s \n", grupo);
 	for(i=0,j=0;i<=strlen(grupo);i++){
 		if(!isspace(copiaGrupo[i])){
