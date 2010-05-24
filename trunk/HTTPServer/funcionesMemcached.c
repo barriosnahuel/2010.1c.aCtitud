@@ -132,12 +132,13 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   char *sGrupoDeNoticiasSinEspacios = NULL;
+  char* claveCache = NULL;
   int resultNoticiaEnBytes_largo, resultado;
 
   sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
-  printf("sGrupoDeNoticias: %s \n",grupoSinEspacios);
+  printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);
   
-  char* claveCache;
+  
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
