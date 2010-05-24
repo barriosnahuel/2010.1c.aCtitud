@@ -63,6 +63,7 @@ int Comando::init(string strCadena) {
 }
 
 int Comando::validacion() {
+	cout << "entre a validar" << endl;
 
       int i ;
       int comandoOk = 0;
