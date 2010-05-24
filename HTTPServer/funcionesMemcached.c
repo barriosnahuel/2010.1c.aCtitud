@@ -126,9 +126,10 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
 printf("pasa por aca ");
-  sacarEspaciosEnGrupo(&sGrupoDeNoticias);
-  printf("Grupo sin espacios %s",sGrupoDeNoticias);
   
+  /*sacarEspaciosEnGrupo(&sGrupoDeNoticias);
+  printf("Grupo sin espacios %s",sGrupoDeNoticias);
+  */
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
