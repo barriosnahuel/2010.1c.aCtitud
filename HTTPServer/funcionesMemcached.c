@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include<stdlib.h>
 #include"funcionesMemcached.h"
+#include <ctype.h>
 /** 
 typedef struct stArticle {
      unsigned int uiArticleID;	
@@ -102,16 +103,26 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   return;
   
 }
+void sacarEspaciosEnGrupo(char * grupo)
+{
+	int i ;
+	char* grupoSinEspacios;
+	for(i=0;!isspace(grupo[i]);i++)
+		strcat(grupoSinEspacios,grupo[i]);
+	grupo = grupoSinEspacios;
+	return;
+}
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
 {
 printf("##################### BUSQUEDA EN LA CACHE ######################\n");
+  
   uint32_t flags;
   memcached_return rc;
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
-
+  sacarEspaciosEnGrupo(&sGrupoDeNoticias);
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
