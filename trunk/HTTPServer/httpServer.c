@@ -509,6 +509,16 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 			/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 			guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
 			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+			
+			char* aviso200;
+			asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
+			int lenAviso200 = strlen(aviso200);
+			int bytesEnviadosDeAviso;
+				
+			if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
+				LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
+			}
+			
 			return formatearArticuloAHTML(&stArticulo);
 		}
 		else {
@@ -531,7 +541,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	int bytesEnviadosDeAviso;
 	
 	if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
-		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
 	}
 
 	/*	Sumo 3 por el =* y el \0	*/
@@ -628,6 +638,14 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 		return error404;
 	}
 	else {
+		char* aviso200;
+		asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
+		int lenAviso200 = strlen(aviso200);
+		int bytesEnviadosDeAviso;
+			
+		if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
+			LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
+		}
 		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
 		return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
 	}
