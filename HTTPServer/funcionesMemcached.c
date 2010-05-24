@@ -103,19 +103,21 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   return;
   
 }
-/*
-void sacarEspaciosEnGrupo(char ** grupo)
+
+void sacarEspaciosEnGrupo(char * grupo)
 {
 	int i ;
-	char* grupoSinEspacios;
-	for(i=0;i<=strlen(*grupo);i++){
-		if(!isspace(*grupo[i]))
-		strcat(grupoSinEspacios,*grupo[i]);
+	char * grupoSinEspacios=malloc(sizeof(grupo));
+	for(i=0;i<=strlen(grupo);i++){
+		if(!isspace(grupo[i])){
+			grupoSinEspacios[j]= grupo[i];
+			j++;
+		}	
 	}
 	grupoSinEspacios[i]='\0';
-	*grupo = grupoSinEspacios;
+	grupo = grupoSinEspacios;
 	return;
-}*/
+}
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
 {
@@ -132,9 +134,9 @@ printf("4");
   int resultNoticiaEnBytes_largo, resultado;
 printf("pasa por aca ");
   
-  /*sacarEspaciosEnGrupo(&sGrupoDeNoticias);
+  sacarEspaciosEnGrupo(sGrupoDeNoticias);
   printf("Grupo sin espacios %s",sGrupoDeNoticias);
-  */
+  
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
