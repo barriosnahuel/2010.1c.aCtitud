@@ -193,7 +193,7 @@ int main(int argn, char *argv[]){
                        	    processHeadCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 6:  /* BODY */
-                       	    printf("6\n");
+                       	    processBodyCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 7:  /* GROUP */
                        	    printf("7\n");
