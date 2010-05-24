@@ -109,6 +109,7 @@ void sacarEspaciosEnGrupo(char * grupo)
 	int i ;
 	int j;
 	char * grupoSinEspacios = malloc(strlen(grupo)+1);
+	printf("EL GRUPO QUE LE LLEGA A LA FUNCION : %s", grupo);
 	for(i=0,j=0;i<=strlen(grupo);i++){
 		if(isspace(grupo[i])){
 			printf("Habia un espacio \n");
