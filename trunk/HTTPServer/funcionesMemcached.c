@@ -103,6 +103,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   return;
   
 }
+/*
 void sacarEspaciosEnGrupo(char ** grupo)
 {
 	int i ;
@@ -114,7 +115,7 @@ void sacarEspaciosEnGrupo(char ** grupo)
 	grupoSinEspacios[i]='\0';
 	*grupo = grupoSinEspacios;
 	return;
-}
+}*/
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
 {
