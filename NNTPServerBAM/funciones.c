@@ -313,7 +313,7 @@ void parserCommand(	char* sGrupoNoticia
 	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
 
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
-	stArticulo = getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+	&stArticulo = getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
 	return;
 }
 
