@@ -86,7 +86,7 @@ printf("QUIERE GUARDAAAAAAAAAAAAAAAR EN LA CACHEEEEEEEEEEEEEEEEEEEEEEEEEE \n");
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
-  rc=memcached_set(*memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,0,0);
+  rc=memcached_set(*memc,"1"/*claveCache*/,"1"/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
 
 /*printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
@@ -145,7 +145,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,sArticleID);
   printf("Clave a buscar en la cache %s \n",claveCache);
     
-  resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
+  resultadoCache = memcached_get(*memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS){
 	LoguearInformacion("Se encontro el articulo en la cache.", APP_NAME_FOR_LOGGER);
 	printf("Se encontro el articulo en la cache\n");
