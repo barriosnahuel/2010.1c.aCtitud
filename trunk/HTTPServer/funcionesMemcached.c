@@ -103,7 +103,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   return;
   
 }
-void sacarEspaciosEnGrupo(char * grupo)
+void sacarEspaciosEnGrupo(char ** grupo)
 {
 	int i ;
 	char* grupoSinEspacios;
