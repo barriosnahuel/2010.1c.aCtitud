@@ -523,6 +523,16 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	
+	/* Apenas entro aca mando un 200 OK porque siempre se va a poder procesar el listado de grupos de noticias. */
+	char* aviso200;
+	asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
+	int lenAviso200 = strlen(aviso200);
+	int bytesEnviadosDeAviso;
+	
+	if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
+		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
+	}
 
 	/*	Sumo 3 por el =* y el \0	*/
 	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
