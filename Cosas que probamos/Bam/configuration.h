@@ -1,9 +1,9 @@
 #ifndef _CONFIGURATION_H
 #define _CONFIGURATION_H
 
-/* estructura que guarda la configuración */
+/* estructura que guarda la configuracion */
 typedef struct stConfiguracion {
-    char czLocalIP[15+1];  //se supone que es una dirección IP
+    char czLocalIP[15+1];  /*	se supone que es una direccion IP	*/
     unsigned int uiLocalPort;
     char czOpenDSServer[15+1];
     unsigned int uiOpenDSPort;
@@ -11,15 +11,15 @@ typedef struct stConfiguracion {
    	int iSockClient;
 } stConfiguracion;
 
-/* función que valida que una ip se haya ingresado correctamente */
+/* funcion que valida que una ip se haya ingresado correctamente */
 int Valida_IP(const char *ip);
 
-/* función que toma un valor del archivo del configuración */
+/* funcion que toma un valor del archivo del configuracion */
 char *GetVal(const char *sValBuff, const char *sBuff);
 
-/* función que carga el archivo indicado */
+/* funcion que carga el archivo indicado */
 int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf);
 
-/* verifica los argumentos para saber cómo cargar la conf */
+/* verifica los argumentos para saber como cargar la conf */
 int LoadConfiguration(int argn, char *argv[], stConfiguracion *stConf);
 #endif
