@@ -120,11 +120,10 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   printf("Clave a buscar en la cache %s \n",claveCache);
     
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
-  if(rc==MEMCACHED_SUCCESS)
+  if(rc==MEMCACHED_SUCCESS){
 	LoguearInformacion("Se encontro el articulo en la cache.", APP_NAME_FOR_LOGGER);
 	printf("Se encontro el articulo en la cache\n");
-  else
-  {
+  }else{
   	LoguearError("No se encontro el articulo en la cache.", APP_NAME_FOR_LOGGER);
 	printf("No se encontro el articulo en la cache\n");
 	return 0;
