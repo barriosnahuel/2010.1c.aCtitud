@@ -86,7 +86,7 @@ printf("QUIERE GUARDAAAAAAAAAAAAAAAR EN LA CACHEEEEEEEEEEEEEEEEEEEEEEEEEE \n");
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
-  rc=memcached_set(*memc,"1"/*claveCache*/,"1"/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
+  rc=memcached_set(*memc,"1"/*claveCache*/,strlen("1")/*strlen(claveCache)*/,articuloEnBytes,articuloEnBytesLargo,0,0);
 
 /*printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
@@ -132,7 +132,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   char *sGrupoDeNoticiasSinEspacios = NULL;
-  char* claveCache = NULL;
+  char* claveCache;
   int resultNoticiaEnBytes_largo, resultado;
 
   sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
