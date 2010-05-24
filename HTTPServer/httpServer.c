@@ -512,7 +512,8 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 			return formatearArticuloAHTML(&stArticulo);
 		}
 		else {
-			char error404[] = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+			char* error404;
+			asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
 			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 			return error404;
 		}
