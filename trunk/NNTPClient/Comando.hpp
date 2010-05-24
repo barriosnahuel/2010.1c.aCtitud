@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 
+#include "../Logger/logger.hpp"
+
 using namespace std;
 
 class Comando {
