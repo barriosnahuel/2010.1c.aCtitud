@@ -522,10 +522,10 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		return formatearArticuloAHTML(&stArticulo);
 	}
 	else {
-			char* error404;
-			asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
-			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
-			return error404;
+		char* error404;
+		asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
+		LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+		return error404;
 	}
 }
 
@@ -557,19 +557,9 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
 	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
 	
-	printf("La cantidad total de grupos de noticias repetidos es: %d\n", cantidadDeGrupos);
-	
 	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
 	
-	/*	TODO: Esto se borra o se loguea?	*/
-	for(q = 0; q < cantidadDeGrupos; q++) printf("Contenido de la posicion %d del array es: %s\n", q, listadoGrupoNoticiasRepetidos[q]);
-	
 	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
-
-	/*	TODO: Esto se borra o se loguea?	*/
-	for(k = 0; k < cantidadDeGruposSinRepetir; k++) printf("Contenido de la posicion %d del array LIMPIO es: %s\n", k, listadoGrupoNoticiasSinRepetir[k]);
-	
-	printf("La cantidad total de grupos de noticias SIN repetir es: %d\n", cantidadDeGruposSinRepetir);
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
 	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
