@@ -263,6 +263,7 @@ void PantallaFin() {
     printf("\e[0m\n\n");
 }
 
+
 char* processArticleCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
@@ -270,6 +271,7 @@ char* processArticleCommand(  char** sResponse
 
 	char* sGrupoNoticia;
 	char* sArticleID;
+	
 	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
 
 	int indexOfArroba= strcspn(sParametroDelComando, "@");
@@ -297,6 +299,81 @@ char* processArticleCommand(  char** sResponse
 		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
 
 }
+/*
+void parserCommand(	char* sGrupoNoticia
+					, char* sArticleID
+					, stArticle * stArticulo
+				    , PLDAP_SESSION stPLDAPSession
+					, PLDAP_SESSION_OP stPLDAPSessionOperations
+					, char* sParametroDelComando){
+					
+	int indexOfArroba= strcspn(sParametroDelComando, "@");
+	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
+	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
+	stArticulo = getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+	return;
+}*/
 
+char* processHeadCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando){
 
+	char* sGrupoNoticia;
+	char* sArticleID;
+	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
+	
+	int indexOfArroba= strcspn(sParametroDelComando, "@");
+	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
+	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
+	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+	/*parserComand(sGrupoNoticia,sArticleID,&stArticulo,&sParametroDelComando,stPLDAPSession,stPLDAPSessionOperations)*/
+	
+	if(stArticulo.uiArticleID==-1)
+		asprintf(sResponse, "430\tNo article with that message-id.");
+	else
+		/*	Este formato del response esta especificado por el RFC 3977
+			"221	0	clarin@2
+			head
+			Donde:
+			-	221 es el codigo del response.
+			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
+			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
+		 */
+		asprintf(sResponse, "221\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead);
 
+}
+
+char* processBodyCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando){
+
+	char* sGrupoNoticia;
+	char* sArticleID;
+	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
+
+	int indexOfArroba= strcspn(sParametroDelComando, "@");
+	/*	+1 porque sino entra el @ en el substring.	*/
+	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
+	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
+
+	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
+	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+
+	if(stArticulo.uiArticleID==-1)
+		asprintf(sResponse, "430\tNo article with that message-id.");
+	else
+		/*	Este formato del response esta especificado por el RFC 3977
+			"222	0	clarin@2
+			body
+			Donde:
+			-	222 es el codigo del response.
+			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
+			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
+		 */
+		asprintf(sResponse, "222\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
+
+}
