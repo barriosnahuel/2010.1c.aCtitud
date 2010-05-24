@@ -508,14 +508,16 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		if(stArticulo.uiArticleID != -1) {
 			/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 			guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
+			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 			return formatearArticuloAHTML(&stArticulo);
+		}
+		else {
+			char error404[] = "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n";
+			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+			return error404;
 		}
 		
 	}
-	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
-
-	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
-	return stArticulo;
 }
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
