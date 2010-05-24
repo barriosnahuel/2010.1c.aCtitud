@@ -27,5 +27,13 @@ char* processArticleCommand(  char** sResponse
 							, char* sParametroDelComando);
 
 
+char* processBodyCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando);
 
+char* processHeadCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando);
 #endif
