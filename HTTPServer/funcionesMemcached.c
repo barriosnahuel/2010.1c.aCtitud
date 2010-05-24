@@ -122,9 +122,13 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
 printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   
   uint32_t flags;
+printf("1");
   memcached_return rc;
+printf("2");
   t_news *resultNoticia = malloc(sizeof(t_news));
+printf("3");
   char *resultadoCache  = NULL; 
+printf("4"); 
   int resultNoticiaEnBytes_largo, resultado;
 printf("pasa por aca ");
   
