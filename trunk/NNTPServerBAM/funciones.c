@@ -319,7 +319,7 @@ char* processHeadCommand(  char** sResponse
 		asprintf(sResponse, "430\tNo article with that message-id.");
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
-			"200	0	clarin@2
+			"221	0	clarin@2
 			head
 			Donde:
 			-	221 es el codigo del response.
@@ -331,4 +331,36 @@ char* processHeadCommand(  char** sResponse
 
 }
 
+char* processBodyCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando){
+
+	char* sGrupoNoticia;
+	char* sArticleID;
+	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
+
+	int indexOfArroba= strcspn(sParametroDelComando, "@");
+	/*	+1 porque sino entra el @ en el substring.	*/
+	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
+	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
+
+	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
+	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+
+	if(stArticulo.uiArticleID==-1)
+		asprintf(sResponse, "430\tNo article with that message-id.");
+	else
+		/*	Este formato del response esta especificado por el RFC 3977
+			"222	0	clarin@2
+			body
+			Donde:
+			-	222 es el codigo del response.
+			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
+			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
+		 */
+		asprintf(sResponse, "222\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
+
+}
 
