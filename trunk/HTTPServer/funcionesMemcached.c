@@ -116,7 +116,7 @@ void sacarEspaciosEnGrupo(char * grupo)
 		}	
 	}
 	grupoSinEspacios[i]='\0';
-	grupo = grupoSinEspacios;
+	grupo = &grupoSinEspacios;
 	return;
 }
 
