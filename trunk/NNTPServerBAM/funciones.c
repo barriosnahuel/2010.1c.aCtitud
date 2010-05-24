@@ -322,17 +322,12 @@ char* processHeadCommand(  char** sResponse
 	char* sGrupoNoticia;
 	char* sArticleID;,
 	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
-	stArticle stArticulo;
 	
 	int indexOfArroba= strcspn(sParametroDelComando, "@");
-
 	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
 	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
-
-
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
-
-	parserComand(sGrupoNoticia,sArticleID,&stArticulo,&sParametroDelComando,stPLDAPSession,stPLDAPSessionOperations)
+	/*parserComand(sGrupoNoticia,sArticleID,&stArticulo,&sParametroDelComando,stPLDAPSession,stPLDAPSessionOperations)*/
 	
 	if(stArticulo.uiArticleID==-1)
 		asprintf(sResponse, "430\tNo article with that message-id.");
