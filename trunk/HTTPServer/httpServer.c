@@ -504,30 +504,28 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
-
-		if(stArticulo.uiArticleID != -1) {
-			/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-			guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
-			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+	}
+	if(stArticulo.uiArticleID != -1) {
+		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
+		LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+		
+		char* aviso200;
+		asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
+		int lenAviso200 = strlen(aviso200);
+		int bytesEnviadosDeAviso;
 			
-			char* aviso200;
-			asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
-			int lenAviso200 = strlen(aviso200);
-			int bytesEnviadosDeAviso;
-				
-			if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
-				LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
-			}
-			
-			return formatearArticuloAHTML(&stArticulo);
+		if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
+			LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
 		}
-		else {
+		
+		return formatearArticuloAHTML(&stArticulo);
+	}
+	else {
 			char* error404;
 			asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
 			LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 			return error404;
-		}
-		
 	}
 }
 
