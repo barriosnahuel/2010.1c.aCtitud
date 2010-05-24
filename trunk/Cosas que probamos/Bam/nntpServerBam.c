@@ -190,10 +190,10 @@ int main(int argn, char *argv[]){
                        	    printf("4\n");
                 	    break;
                    	    case 5:  /* HEAD */
-                       	    printf("5\n");
+                       	    processHeadCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 6:  /* BODY */
-                       	    printf("6\n");
+                       	    processBodyCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 7:  /* GROUP */
                        	    printf("7\n");
