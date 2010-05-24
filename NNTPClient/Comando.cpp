@@ -77,6 +77,9 @@ int Comando::validacion() {
 
      if(comandoOk) {
         if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
+        	if(i == 2) {
+        		parametroOk = 1;
+        	}
         	if(nombreComando == vectorDeComandos[3] || nombreComando == vectorDeComandos[4] || nombreComando == vectorDeComandos[5] || nombreComando == vectorDeComandos[6]) {
         	     parametroOk = parsearParametro(parametro);
         	}
