@@ -65,7 +65,7 @@ char* sacarEspaciosEnGrupo(char *grupo)
 
 void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st **memc)
 {
-printf("QUIERE GUARDAAAAAAAAAAAAAAAR EN LA CACHEEEEEEEEEEEEEEEEEEEEEEEEEE \n");
+printf("####################### QUIERE GUARDAR EN LA CACHE ####################### \n");
   memcached_return rc;
   uint32_t flags;
   t_news *articuloCache = malloc(sizeof(t_news));
