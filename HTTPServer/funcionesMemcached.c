@@ -107,12 +107,12 @@ void sacarEspaciosEnGrupo(char ** grupo)
 {
 	int i ;
 	char* grupoSinEspacios;
-	for(i=0;i<=strlen(grupo);i++){
-		if(!isspace(grupo[i]))
-		strcat(grupoSinEspacios,grupo[i]);
+	for(i=0;i<=strlen(*grupo);i++){
+		if(!isspace(*grupo[i]))
+		strcat(grupoSinEspacios,*grupo[i]);
 	}
 	grupoSinEspacios[i]='\0';
-	grupo = grupoSinEspacios;
+	*grupo = grupoSinEspacios;
 	return;
 }
 
