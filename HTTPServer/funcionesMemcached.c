@@ -104,10 +104,8 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   
 }
 
-void sacarEspaciosEnGrupo(char* grupo)
+char* sacarEspaciosEnGrupo(char grupo)
 { 
-printf("LLEGA A LA FUNCION1! \n");
-
 	int i ;
 	int j;
 	char* grupoSinEspacios = malloc(strlen(grupo));
@@ -122,7 +120,7 @@ printf("LLEGA A LA FUNCION1! \n");
 	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
 	grupo = grupoSinEspacios;
 	printf("Con lo que QUEDA GRUPO : %s\n",grupo);
-	return;
+	return grupoSinEspacios;
 }
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
@@ -130,18 +128,14 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
 printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   
   uint32_t flags;
-printf("1");
   memcached_return rc;
-printf("2");
   t_news *resultNoticia = malloc(sizeof(t_news));
-printf("3");
   char *resultadoCache  = NULL; 
-printf("4"); 
+  char *grupoSinEspacios = NULL;
   int resultNoticiaEnBytes_largo, resultado;
-printf("pasa por aca\n ");
-  
-  sacarEspaciosEnGrupo(sGrupoDeNoticias);
-  printf("Grupo sin espacios %s \n",sGrupoDeNoticias);
+
+  grupoSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
+  printf("sGrupoDeNoticias: %s \n",grupoSinEspacios);
   
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
