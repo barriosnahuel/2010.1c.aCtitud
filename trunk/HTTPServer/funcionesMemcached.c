@@ -59,14 +59,14 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   int largoGrupoDeNoticias;
   
   sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
-  printf("sGrupoDeNoticias: %s \n",grupoSinEspacios);
+  printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);
   largoID = sizeof(article.uiArticleID);
   ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
   largoID = strlen(ID);
-  largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
+  largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%s",sGrupoDeNoticias,ID);
+  sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,ID);
   
   printf("CLAVE CACHE %s \n",claveCache);
   
