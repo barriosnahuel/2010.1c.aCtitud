@@ -107,8 +107,9 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
 void sacarEspaciosEnGrupo(char * grupo)
 {
 	int i ;
+	int j;
 	char * grupoSinEspacios=malloc(sizeof(grupo));
-	for(i=0;i<=strlen(grupo);i++){
+	for(i=0,j=0;i<=strlen(grupo);i++){
 		if(!isspace(grupo[i])){
 			grupoSinEspacios[j]= grupo[i];
 			j++;
