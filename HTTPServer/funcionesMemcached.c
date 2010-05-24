@@ -138,7 +138,7 @@ printf("4");
   int resultNoticiaEnBytes_largo, resultado;
 printf("pasa por aca\n ");
   
-  sacarEspaciosEnGrupo(&sGrupoDeNoticias);
+  sacarEspaciosEnGrupo(sGrupoDeNoticias);
   printf("Grupo sin espacios %s \n",sGrupoDeNoticias);
   
   char* claveCache;
