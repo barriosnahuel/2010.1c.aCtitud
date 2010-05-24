@@ -299,7 +299,7 @@ char* processArticleCommand(  char** sResponse
 		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
 
 }
-
+/*
 void parserCommand(	char* sGrupoNoticia
 					, char* sArticleID
 					, stArticle * stArticulo
@@ -308,14 +308,11 @@ void parserCommand(	char* sGrupoNoticia
 					, char* sParametroDelComando){
 					
 	int indexOfArroba= strcspn(sParametroDelComando, "@");
-	/*	+1 porque sino entra el @ en el substring.	*/
 	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
 	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
-
-	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
-	&stArticulo = getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+	stArticulo = getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
 	return;
-}
+}*/
 
 char* processHeadCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
@@ -327,7 +324,6 @@ char* processHeadCommand(  char** sResponse
 	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
 	stArticle stArticulo;
 	
-/**	
 	int indexOfArroba= strcspn(sParametroDelComando, "@");
 
 	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
@@ -335,7 +331,7 @@ char* processHeadCommand(  char** sResponse
 
 
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
-**/
+
 	parserComand(sGrupoNoticia,sArticleID,&stArticulo,&sParametroDelComando,stPLDAPSession,stPLDAPSessionOperations)
 	
 	if(stArticulo.uiArticleID==-1)
