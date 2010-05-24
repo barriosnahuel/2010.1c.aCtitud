@@ -308,7 +308,8 @@ int main(void) {
 
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
-
+	memcached_free(memc);
+	memcached_free(stParameters.memCluster);
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
 	return 1;
 }
