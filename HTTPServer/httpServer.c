@@ -398,8 +398,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	free(sArticleID);
 
 	int len, bytesEnviados;
-	len = strlen(sResponse);
-
+	len = strlen(sResponse);	
+	
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
 		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
 
@@ -505,13 +505,17 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
-		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
+		if(stArticulo.uiArticleID != -1) {
+			/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
+			guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
+			return formatearArticuloAHTML(&stArticulo);
+		}
+		
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 
 	LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
-	return formatearArticuloAHTML(&stArticulo);
+	return stArticulo;
 }
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
