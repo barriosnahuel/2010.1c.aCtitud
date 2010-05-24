@@ -8,7 +8,6 @@
 #include <openssl/err.h>
 #include "conexion.h"
 
-//------------------------------------------------------------------------------------
 /* Genera el socket utilizado por el programa servidor
  * retorna:
  * 	socket del programa servidor (siempre > 0)
@@ -37,7 +36,7 @@ int AbrirSocketEscucha(char *czIp, int iPuerto) {
 	}
 
 	if((setsockopt(iSocketAux, SOL_SOCKET, SO_REUSEADDR, &iUno, sizeof(int))) == -1) {
-		//close(iSocketAux);
+		/*	close(iSocketAux);	*/
 		return -1;
 	}
 
@@ -47,7 +46,7 @@ int AbrirSocketEscucha(char *czIp, int iPuerto) {
 	memset(&(direccion.sin_zero), '\0', 8);
 
 	if (bind(iSocketAux, (struct sockaddr *)&direccion, sizeof(struct sockaddr)) == -1) {
-		//No se puede atender el puerto de escucha
+		/*	No se puede atender el puerto de escucha	*/
 		close(iSocketAux);
 		return -1;
 	}
@@ -89,7 +88,7 @@ int AbrirSocketConexion(char *czIpRemoto, int iPuertoRemoto) {
 	}
 
 	if(setsockopt(iSocket, SOL_SOCKET, SO_REUSEADDR, &iUno, sizeof(int)) == -1) {
-		//close(iSocket);
+		/*	close(iSocket);	*/
 		return -1;
 	}
 
@@ -222,7 +221,7 @@ int Acepta_Conexion_Cliente (int Descriptor) {
 	}
 
 	if((setsockopt(iSocketN, SOL_SOCKET, SO_REUSEADDR, &iUno, sizeof(int))) == -1) {
-		//close(iSocketN);
+		/*	close(iSocketN);	*/
 		return -1;
 	}
 

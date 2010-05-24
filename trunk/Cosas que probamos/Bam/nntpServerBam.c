@@ -7,10 +7,12 @@
 #include <errno.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+
 #include "logger.h"
 #include "configuration.h"
 #include "conexion.h"
 #include "funciones.h"
+#include "../LDAP/LdapWrapperHandler.h"
 
 #define STDIN 0
 #define BUFFERSIZE 1024
@@ -20,6 +22,7 @@
 char czNombreProceso[20];
 
 int main(int argn, char *argv[]){
+	char* sLogMessage;	/*	Es la variable que uso para generar el msj para el log.	*/
 
 	int iFdmax=0, i=0, sigue=1, iBytes;
 	char letra;
@@ -81,8 +84,21 @@ int main(int argn, char *argv[]){
     if(iFdmax<stConf.iSockServer)
 	    iFdmax=stConf.iSockServer;
 	
-    /* TODO intenta conectarse con el servidor open ds */
-	
+	/****************************************************
+	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
+	 ****************************************************/
+	PLDAP_CONTEXT stPLDAPContext = newLDAPContext();
+	PLDAP_CONTEXT_OP stPLDAPContextOperations = newLDAPContextOperations(); /*	Me permite operar sobre un contexto	*/
+	PLDAP_SESSION stPLDAPSession;
+	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
+	if (!crearConexionLDAP(stConf.czOpenDSServer, stConf.uiOpenDSPort, &stPLDAPContext, &stPLDAPContextOperations,
+			&stPLDAPSession, &stPLDAPSessionOperations)) {
+		LoguearError("No se pudo conectar a OpenDS.");
+		return -1;
+	}
+	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czOpenDSServer, stConf.uiOpenDSPort);
+	LoguearInformacion(sLogMessage);
+
 	
     while(sigue) {
 
@@ -148,7 +164,15 @@ int main(int argn, char *argv[]){
 		        else {
 		        	czMsg[iBytes] = '\0';
 					printf("- Mensaje recibido: %s\n", czMsg);
-					SSL_write(ssl, "recibido!\0", 10);
+
+					/*	De todo el comando que recibimos (ej: ARTICLE clarin@1) obtenemos el parametro,
+						es decir: "clarin@1".
+						Se hace +1 Asi no queda el espacio adelante de todo.
+					*/
+					char* sParametroDelComando;
+					substringFrom(&sParametroDelComando, czMsg, strcspn(czMsg, " "));
+
+					char* sResponse;
 					switch(SeleccionarComando(czMsg)) {
                 	    case 0:  /* LIST */
                 	        printf("0\n");
@@ -160,7 +184,7 @@ int main(int argn, char *argv[]){
                        	    printf("2\n");
                 	    break;
                    	    case 3:  /* ARTICLE */
-                       	    printf("3\n");
+                       	    processArticleCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 4:  /* STAT */
                        	    printf("4\n");
@@ -175,6 +199,8 @@ int main(int argn, char *argv[]){
                        	    printf("7\n");
                 	    break;
                 	}
+
+					SSL_write(ssl, sResponse, strlen(sResponse));
                 }
             }
 

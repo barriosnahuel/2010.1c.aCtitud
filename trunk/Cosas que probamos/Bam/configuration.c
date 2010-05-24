@@ -45,8 +45,8 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	FILE *pfsArchConfig;
 	char *szLinea, *pszAux, szMsgLog[100];
 
-	szLinea = (char *)malloc(100+2); // línea que se va a leer
-	pszAux = (char *)malloc(1000); // se va a guardar todo el archivo
+	szLinea = (char *)malloc(100+2); /* linea que se va a leer	*/
+	pszAux = (char *)malloc(1000); /* se va a guardar todo el archivo	*/
 
 	if((pfsArchConfig = fopen(pszNombreArchivo,"rt")) == NULL) {
 	        sprintf(szMsgLog,"No se pudo abrir el archivo de configuracion %s.",pszNombreArchivo);
@@ -55,7 +55,7 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	}
 	pszAux[0] = '\0';
 
-	// cargo todo el archivo en el buffer
+	/* cargo todo el archivo en el buffer	*/
 	while(!feof(pfsArchConfig)) {
 		fgets(szLinea, 100, pfsArchConfig);
 		if (*szLinea == '\n' || *szLinea == '#')
@@ -65,28 +65,28 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 
 	fclose(pfsArchConfig);
 
-	// cargo el puerto del servidor openDS
+	/* cargo el puerto del servidor openDS	*/
 	stConf->uiOpenDSPort = atoi(GetVal("OPENDS_PORT=", pszAux));
 	if((stConf->uiOpenDSPort) < 1 || (stConf->uiOpenDSPort) > 65535 ) {
 	    LoguearError("Puerto invalido para servidor Open DS.");
 		return 0;
 	};
 
-    // cargo la IP del servidor openDS
+    /* cargo la IP del servidor openDS	*/
 	strcpy(stConf->czOpenDSServer,GetVal("OPENDS_SERVER=", pszAux));
 	if(!Valida_IP(stConf->czOpenDSServer)) {
         LoguearError("IP invalida para servidor Open DS.");
 		return 0;
     };
 
-	// cargo el puerto local
+	/* cargo el puerto local	*/
 	stConf->uiLocalPort = atoi(GetVal("LOCAL_PORT=", pszAux));
 	if((stConf->uiLocalPort) < 1 || (stConf->uiLocalPort) > 65535 ) {
 	    LoguearError("Puerto local invalido.");
 		return 0;
 	};
 
-    // cargo la IP local
+    /* cargo la IP local	*/
 	strcpy(stConf->czLocalIP,GetVal("LOCAL_IP=", pszAux));
 	if(!Valida_IP(stConf->czLocalIP)) {
         LoguearError("IP local invalida.");
@@ -104,17 +104,17 @@ int LoadConfiguration(int argn, char *argv[], stConfiguracion *stConf) {
     LoguearInformacion("Cargando configuracion...");
 
 	switch(argn) {
-		case 1: // no se indicó archivo, se carga archivo por defecto
+		case 1: /* no se indico archivo, se carga archivo por defecto	*/
 			if(!CargaConfiguracion("server.conf", stConf)) {
 				return 0;
 			}
 			break;
-		case 2: // único parámetro: nombre de archivo de configuración
+		case 2: /* unico parametro: nombre de archivo de configuracion	*/
 			if(!CargaConfiguracion(argv[1], stConf)) {
 				return 0;
 			}
 			break;
-		case 5: // se pasaron los valores por parámetro
+		case 5: /* se pasaron los valores por parametro	*/
 			strcpy(stConf->czLocalIP,argv[1]);
 	        if(!Valida_IP(stConf->czLocalIP)) {
                 LoguearError("IP local invalida.");
