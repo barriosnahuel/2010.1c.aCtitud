@@ -105,7 +105,9 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
 }
 
 void sacarEspaciosEnGrupo(char* grupo)
-{
+{ 
+printf("LLEGA A LA FUNCION! \n");
+
 	int i ;
 	int j;
 	char * grupoSinEspacios = malloc(strlen(*grupo)+1);
