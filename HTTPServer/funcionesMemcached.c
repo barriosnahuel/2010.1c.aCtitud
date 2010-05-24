@@ -38,9 +38,9 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
   return;
   rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);
+	/*LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);*/
   else
-	LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);
+	/*LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);*/
   
   return;
 }
@@ -90,10 +90,10 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d \n",articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead);
 */  
   if (rc == MEMCACHED_SUCCESS){
-	LoguearInformacion("Se inserto correctamente el articulo en la cache.", APP_NAME_FOR_LOGGER);
+	/*LoguearInformacion("Se inserto correctamente el articulo en la cache.", APP_NAME_FOR_LOGGER);*/
 	printf("Se inserto correctamente el articulo en la cache\n");
   }else{
-	LoguearError("No se pudo insertar el articulo en la cache", APP_NAME_FOR_LOGGER);
+	/*LoguearError("No se pudo insertar el articulo en la cache", APP_NAME_FOR_LOGGER);*/
 	printf("No se pudo insertar el articulo en la cache\n");	
   }
   free(articuloEnBytes);
