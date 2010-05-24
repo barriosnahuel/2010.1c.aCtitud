@@ -106,11 +106,12 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
 
 void sacarEspaciosEnGrupo(char* grupo)
 { 
-printf("LLEGA A LA FUNCION! \n");
+printf("LLEGA A LA FUNCION1! \n");
 
 	int i ;
 	int j;
 	char * grupoSinEspacios = malloc(strlen(*grupo)+1);
+printf("LLEGA A LA FUNCION2! \n");
 	char * copiaGrupo = malloc(strlen(*grupo)+1);
 	copiaGrupo=grupo;
 	printf("EL GRUPO QUE LE LLEGA A LA FUNCION : %s \n", grupo);
@@ -142,7 +143,7 @@ printf("4");
   int resultNoticiaEnBytes_largo, resultado;
 printf("pasa por aca\n ");
   
-  sacarEspaciosEnGrupo(*sGrupoDeNoticias);
+  sacarEspaciosEnGrupo(sGrupoDeNoticias);
   printf("Grupo sin espacios %s \n",sGrupoDeNoticias);
   
   char* claveCache;
