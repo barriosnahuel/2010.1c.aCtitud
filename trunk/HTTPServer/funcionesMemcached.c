@@ -110,21 +110,18 @@ printf("LLEGA A LA FUNCION1! \n");
 
 	int i ;
 	int j;
-	char * grupoSinEspacios = malloc(strlen(*grupo)+1);
-printf("LLEGA A LA FUNCION2! \n");
-	char * copiaGrupo = malloc(strlen(*grupo)+1);
-	copiaGrupo=grupo;
+	char * grupoSinEspacios = malloc(strlen(grupo)+1);
 	printf("EL GRUPO QUE LE LLEGA A LA FUNCION : %s \n", grupo);
-	for(i=0,j=0;i<=strlen(copiaGrupo);i++){
+	for(i=0,j=0;i<=strlen(grupo);i++){
 		if(!isspace(copiaGrupo[i])){
-			grupoSinEspacios[j]= copiaGrupo[i];
+			grupoSinEspacios[j]= grupo[i];
 			j++;
 		}else printf("habia un espacio \n");	
 	}
 	grupoSinEspacios[i]='\0';
 	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
 	grupo = grupoSinEspacios;
-	printf("Con lo que QUEDA GRUPO : %s\n",*grupo);
+	printf("Con lo que QUEDA GRUPO : %s\n",grupo);
 	return;
 }
 
