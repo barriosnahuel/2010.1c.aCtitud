@@ -118,7 +118,7 @@ void sacarEspaciosEnGrupo(char * grupo)
 	}
 	grupoSinEspacios[i]='\0';
 	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
-	grupo = &grupoSinEspacios;
+	grupo = grupoSinEspacios;
 	return;
 }
 
