@@ -125,7 +125,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
-  
+printf("pasa por aca ");
   sacarEspaciosEnGrupo(&sGrupoDeNoticias);
   printf("Grupo sin espacios %s",sGrupoDeNoticias);
   
