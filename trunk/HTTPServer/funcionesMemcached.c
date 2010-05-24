@@ -32,15 +32,15 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
   /* Se agregan Servidores */
   rc = memcached_server_add(*memCluster, memcachedServer1,memcachedServer1Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	/*LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);*/
+	printf("bla");/*LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);*/
   else
-	/*LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);*/
+	printf("bla");/*LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);*/
   return;
   rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	/*LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);*/
+	printf("bla");/*LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);*/
   else
-	/*LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);*/
+	printf("bla");/*LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);*/
   
   return;
 }
