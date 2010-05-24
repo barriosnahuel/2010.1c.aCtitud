@@ -104,7 +104,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_
   
 }
 
-char* sacarEspaciosEnGrupo(char grupo)
+char* sacarEspaciosEnGrupo(char *grupo)
 { 
 	int i ;
 	int j;
