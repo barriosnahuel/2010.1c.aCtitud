@@ -109,6 +109,7 @@ void sacarEspaciosEnGrupo(char * grupo)
 	char* grupoSinEspacios;
 	for(i=0;!isspace(grupo[i]);i++)
 		strcat(grupoSinEspacios,grupo[i]);
+	grupoSinEspacios[i]='\0';
 	grupo = grupoSinEspacios;
 	return;
 }
@@ -122,8 +123,10 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
   int resultNoticiaEnBytes_largo, resultado;
+  
   sacarEspaciosEnGrupo(&sGrupoDeNoticias);
   printf("Grupo sin espacios %s",sGrupoDeNoticias);
+  
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
