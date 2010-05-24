@@ -320,7 +320,7 @@ char* processHeadCommand(  char** sResponse
 							, char* sParametroDelComando){
 
 	char* sGrupoNoticia;
-	char* sArticleID;,
+	char* sArticleID;
 	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
 	
 	int indexOfArroba= strcspn(sParametroDelComando, "@");
