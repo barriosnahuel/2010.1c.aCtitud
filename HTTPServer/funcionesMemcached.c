@@ -117,7 +117,7 @@ void sacarEspaciosEnGrupo(char * grupo)
 		}	
 	}
 	grupoSinEspacios[i]='\0';
-	printf("GRPO SIN ESPACIOS %s \n", grupoSinEspacios);
+	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
 	grupo = &grupoSinEspacios;
 	return;
 }
@@ -135,10 +135,10 @@ printf("3");
   char *resultadoCache  = NULL; 
 printf("4"); 
   int resultNoticiaEnBytes_largo, resultado;
-printf("pasa por aca ");
+printf("pasa por aca\n ");
   
   sacarEspaciosEnGrupo(&sGrupoDeNoticias);
-  printf("Grupo sin espacios %s",sGrupoDeNoticias);
+  printf("Grupo sin espacios %s \n",sGrupoDeNoticias);
   
   char* claveCache;
   int largoID = strlen(sArticleID) + 1;
