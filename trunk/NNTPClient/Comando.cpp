@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-cout<<"comnado OK ?? (si es uno esta ok):"<<comandoOk<<endl;
+cout<<"COMANDO OK ?? (si es uno esta ok):"<<comandoOk<<" POR QUE IMPRIME ESTO DOS VECES -.-???"<<endl;
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
@@ -188,8 +188,6 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 			nombreComando = nombreComando + comandoEntero[i];
 	}
 	
-	cout<<"Comando ingresado: "<<nombreComando<<endl;
-
 	// EL RESTO DE LA CADENA ES EL PARAMETRO
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
 	for( i = espaciosDpsComando;i<comandoEntero.length();i++)
