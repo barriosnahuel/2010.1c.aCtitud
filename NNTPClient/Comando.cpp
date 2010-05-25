@@ -51,7 +51,7 @@ void Comando::inicializarComandos() {
 	vectorDeComandos[5]="HEAD";
 	vectorDeComandos[6]="BODY";
 
-	vectorDeParametros[0]= 0; //NEWSGROUPS
+	vectorDeParametros[0]= 0; 
 	vectorDeParametros[1]= 0;
 	vectorDeParametros[2]= 1; //group
 	vectorDeParametros[3]= 1; //message-id
