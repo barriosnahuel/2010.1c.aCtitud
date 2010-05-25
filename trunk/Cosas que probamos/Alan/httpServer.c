@@ -606,7 +606,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
-		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
+		/*	Como no la encontreee en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
