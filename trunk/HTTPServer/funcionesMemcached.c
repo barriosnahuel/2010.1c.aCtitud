@@ -46,7 +46,7 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
   return;
 }
 
-char* sacarEspaciosEnGrupo(char *grupo)
+char* sacarEspaciosEnGrupo(const char *grupo)
 { 
 	int i ;
 	int j;
