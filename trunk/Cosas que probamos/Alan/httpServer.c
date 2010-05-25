@@ -574,20 +574,39 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
 
+char* sacarEspaciosEnGrupo(const char *grupo)
+{ 
+	int i ;
+	int j;
+	char* grupoSinEspacios = NULL;/*malloc(strlen(grupo)+1);*/
+	printf("EL GRUPO QUE LE LLEGA A LA FUNCION : %s \n", grupo);
+	for(i=0,j=0;i<=strlen(grupo);i++){
+		if(!isspace(grupo[i])){
+			grupoSinEspacios[j] = grupo[i];
+			j++;
+		}else printf("habia un espacio \n");	
+	}
+	grupoSinEspacios[j]='\0';
+	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
+	return grupoSinEspacios;
+}
+
 
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
 
 	stArticle stArticulo;
-	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,&pstParametros->memCluster)) {
+	char * grupoSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
+	
+	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,grupoSinEspacios,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
 	}
 	/*	Para este momento ya tengo la noticia que tengo que responderle al cliente seteada	*/
 

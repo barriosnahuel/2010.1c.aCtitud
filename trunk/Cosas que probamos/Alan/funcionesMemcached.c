@@ -45,7 +45,7 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
   
   return;
 }
-
+/*
 char* sacarEspaciosEnGrupo(const char *grupo)
 { 
 	int i ;
@@ -62,29 +62,28 @@ char* sacarEspaciosEnGrupo(const char *grupo)
 	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
 	return grupoSinEspacios;
 }
-
-void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias ,memcached_st **memc)
+*/
+void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias,char* grupoSinEspacios,memcached_st **memc)
 {
 printf("####################### QUIERE GUARDAR EN LA CACHE ####################### \n");
   memcached_return rc;
   uint32_t flags;
   t_news *articuloCache = malloc(sizeof(t_news));
-  char *sGrupoDeNoticiasSinEspacios = NULL;
   char *ID = NULL;
   char *claveCache = NULL ;
   int largoID;
   int largoGrupoDeNoticias;
   
-  sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
-  printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);
+  /*sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
+  printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);*/
   largoID = sizeof(article.uiArticleID);
   ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
   largoID = strlen(ID) + 1;
   printf("LargoID: %d",largoID);
-  largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios)+1;
+  largoGrupoDeNoticias = strlen(grupoSinEspacios)+1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,ID);
+  sprintf(claveCache,"%s%s",grupoSinEspacios,ID);
   
   printf("CLAVE CACHE %s \n",claveCache);
   
@@ -126,7 +125,7 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
 }
 
 
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc)
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,char* grupoSinEspacios,memcached_st **memc)
 {
 printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   
@@ -134,21 +133,15 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   memcached_return rc;
   t_news *resultNoticia = malloc(sizeof(t_news));
   char *resultadoCache  = NULL; 
-  char *sGrupoDeNoticiasSinEspacios = NULL;
   char* claveCache;
   int resultNoticiaEnBytes_largo, resultado;
-
-  sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
-  printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);
-  
-  
+  int largoGrupoDeNoticias = strlen(grupoSinEspacios) + 1;
   int largoID = strlen(sArticleID) + 1;
-  printf("LargoID: %d",largoID);
-  int largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios) + 1;
-  claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,sArticleID);
-  printf("Clave a buscar en la cache %s \n",claveCache);
   
+  printf("LargoID: %d \n",largoID);
+  claveCache = malloc(largoGrupoDeNoticias+largoID);
+  sprintf(claveCache,"%s%s",grupoSinEspacios,sArticleID);
+  printf("Clave a buscar en la cache %s \n",claveCache);
   printf("LARGO DE LA ClaveCache: %d \n ",strlen(claveCache));
   
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
