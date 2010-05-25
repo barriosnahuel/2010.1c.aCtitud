@@ -78,7 +78,7 @@ int Comando::validacion() {
 			comandoOk = 1;
 			break;
 		}
-
+cout<<"comnado OK ?? (si es uno esta ok):"<<comandoOk<<endl;
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
 			if(i == 2) {
