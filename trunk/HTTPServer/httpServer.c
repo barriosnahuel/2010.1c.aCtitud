@@ -527,7 +527,6 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	char* grupoSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
 	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,grupoSinEspacios,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
-		printf("GRUPO ANTES DE BUSCAR EN BD : %s \n", sGrupoDeNoticias);
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
