@@ -116,6 +116,7 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
 	LoguearError("No se pudo insertar el articulo en la cache.", APP_NAME_FOR_LOGGER);
 	printf("No se pudo insertar el articulo en la cache\n");	
   }
+  free(sGrupoDeNoticiasSinEspacios);
   free(articuloEnBytes);
   free(articuloCache);
   free(claveCache);
