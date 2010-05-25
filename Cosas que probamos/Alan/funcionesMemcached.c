@@ -109,12 +109,13 @@ printf("PASA POR ACA 3\n");
   printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d \n",articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead);
 */  
   if (rc == MEMCACHED_SUCCESS){
-	LoguearInformacion("Se inserto correctamente el articulo en la cache.");
+	/*LoguearInformacion("Se inserto correctamente el articulo en la cache.");*/
 	printf("Se inserto correctamente el articulo en la cache\n");
   }else{
-	LoguearError("No se pudo insertar el articulo en la cache.");
+	/*LoguearError("No se pudo insertar el articulo en la cache.");*/
 	printf("No se pudo insertar el articulo en la cache\n");	
   }
+  
   free(articuloEnBytes);
   free(articuloCache);
   free(claveCache);
