@@ -79,8 +79,6 @@ int Comando::validacion() {
 			break;
 		}
 
-printf("%s",nombreComando);
-
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
 			if(i == 2) {
@@ -183,11 +181,11 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
 	if(nombreComando=="LIST")
 	{
-		nombreComando = nombreComando + ' ';
+		//nombreComando = nombreComando + ' ';
 		for(i=espaciosDpsComando;i<comandoEntero.length()&&!isspace(comandoEntero.c_str()[i]);i++)
 			nombreComando = nombreComando + comandoEntero[i];
 	}
-cout<<"nombre del comando"<<nombreComando<<endl;
+cout<<"nombre del comando: "<<nombreComando<<endl;
 	// EL RESTO DE LA CADENA ES EL PARAMETRO.
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
 	for( i = espaciosDpsComando;i<comandoEntero.length();i++)
