@@ -146,10 +146,10 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
 	LoguearInformacion("Se encontro el articulo en la cache.");
 	printf("Se encontro el articulo en la cache\n");
   }else{
-  	LoguearError("No se encontro el articulo en la cache.");
+  	/*LoguearError("No se encontro el articulo en la cache.");*/
 	printf("No se encontro el articulo en la cache\n");
-	free(claveCache);
-	free(resultNoticia);
+	/*free(claveCache);
+	free(resultNoticia);*/
 	return 0;
   }  	
   
