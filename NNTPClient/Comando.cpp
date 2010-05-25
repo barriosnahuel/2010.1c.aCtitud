@@ -179,13 +179,13 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 
 	//ME FIJO SI ES LIST YA QUE PUEDE SEGUIR LA PALABRA NEWSGROUPS
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
-	if(nombreComando=="LIST")
+	if(nombreComando=="LIST" || nombreComando=="list")
 	{
 		//nombreComando = nombreComando + ' ';
 		for(i=espaciosDpsComando;i<comandoEntero.length()&&!isspace(comandoEntero.c_str()[i]);i++)
 			nombreComando = nombreComando + comandoEntero[i];
 	}
-cout<<"nombre del comando: "<<nombreComando<<endl;
+	
 	// EL RESTO DE LA CADENA ES EL PARAMETRO.
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
 	for( i = espaciosDpsComando;i<comandoEntero.length();i++)
