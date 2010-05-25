@@ -80,7 +80,8 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   largoID = sizeof(article.uiArticleID);
   ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
-  largoID = sizeof(ID);
+  largoID = strlen(ID) + 1;
+  printf("LargoID: %d",largoID);
   largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios)+1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,ID);
