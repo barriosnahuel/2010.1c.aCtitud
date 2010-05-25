@@ -602,10 +602,10 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	
 	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,grupoSinEspacios,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
-	/**	buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
+		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
-**/
+
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
 		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
 	}
