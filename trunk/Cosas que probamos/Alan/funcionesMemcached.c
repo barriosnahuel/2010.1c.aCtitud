@@ -74,8 +74,6 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   int largoID;
   int largoGrupoDeNoticias;
   
-  /*sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
-  printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);*/
   largoID = sizeof(article.uiArticleID);
   ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
@@ -116,7 +114,6 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
 	LoguearError("No se pudo insertar el articulo en la cache.");
 	printf("No se pudo insertar el articulo en la cache\n");	
   }
-  free(sGrupoDeNoticiasSinEspacios);
   free(articuloEnBytes);
   free(articuloCache);
   free(claveCache);
