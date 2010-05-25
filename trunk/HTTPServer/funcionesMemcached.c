@@ -12,19 +12,6 @@ typedef struct stArticle {
      char* sBody;				
 } stArticle;*/
 
-void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID )
-{
-  int largoID;
-  int largoGrupoDeNoticias;
-  largoID = sizeof(ID);
-  claveCache = NULL;
-  largoGrupoDeNoticias = strlen(sGrupoDeNoticias) + 1;
-  claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%d",sGrupoDeNoticias,largoID);
-  return; 
-	
-}
-
 void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto)
 {
   memcached_return rc;
@@ -33,15 +20,15 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
   /* Se agregan Servidores */
   rc = memcached_server_add(*memCluster, memcachedServer1,memcachedServer1Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	LoguearInformacion("Se agrego el servidor  1 correctamente.");
+	LoguearInformacion("Se agrego el servidor memcached 1 correctamente.");
   else
-	LoguearError("No se pudo agregar el servidor 1. ");
+	LoguearError("No se pudo agregar el servidor memcached 1. ");
 
   rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	LoguearInformacion("Se agrego el servidor  2 correctamente.");
+	LoguearInformacion("Se agrego el servidor memcached 2 correctamente.");
   else
-	LoguearError("No se pudo agregar el servidor 2. ");
+	LoguearError("No se pudo agregar el servidor memcached 2. ");
   
   return;
 }
@@ -58,17 +45,14 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   int largoID;
   int largoGrupoDeNoticias;
   
-
   largoID = sizeof(article.uiArticleID);
   ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
   largoID = strlen(ID) + 1;
-  printf("LargoID: %d",largoID);
   largoGrupoDeNoticias = strlen(grupoSinEspacios)+1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",grupoSinEspacios,ID);
-  printf("CLAVE CACHE %s \n",claveCache);
-  
+ 
   articuloCache->body = NULL;
   articuloCache->head = NULL;
   articuloCache->datos.largoHead = strlen(article.sHead) + 1;	
@@ -117,9 +101,6 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   int largoGrupoDeNoticias = strlen(grupoSinEspacios) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",grupoSinEspacios,sArticleID);
-  printf("Clave a buscar en la cache %s \n",claveCache);
-  
-  printf("LARGO DE LA ClaveCache %d: ",strlen(claveCache));
   
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS){
@@ -136,14 +117,13 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
   resultNoticia->head = malloc(resultNoticia->datos.largoHead);
   memcpy(resultNoticia->head,resultadoCache+sizeof(t_news_largos),resultNoticia->datos.largoHead);
-  printf("Resultado HEAD: %s \n",resultNoticia->head);
+/*printf("Resultado HEAD: %s \n",resultNoticia->head);
   printf("Tamanio cabecera : %d \n",resultNoticia->datos.largoHead);
-
+*/
   resultNoticia->body=malloc(resultNoticia->datos.largoBody);
   memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->datos.largoHead,resultNoticia->datos.largoBody);
-  printf("Resultado BODY : %s \n",resultNoticia->body);
-  
-   
+/*  printf("Resultado BODY : %s \n",resultNoticia->body);*/
+     
   pstArticulo->sNewsgroup = sGrupoDeNoticias;
   pstArticulo->sHead	  = resultNoticia->head;
   pstArticulo->sBody	  = resultNoticia->body;
