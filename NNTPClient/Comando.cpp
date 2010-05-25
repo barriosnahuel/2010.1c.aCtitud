@@ -43,7 +43,7 @@ void Comando::reset() {
 }
 
 void Comando::inicializarComandos() {
-	vectorDeComandos[0]="LIST NEWSGROUP";
+	vectorDeComandos[0]="LIST NEWSGROUPS";
 	vectorDeComandos[1]="QUIT";
 	vectorDeComandos[2]="LISTGROUP";
 	vectorDeComandos[3]="ARTICLE";
@@ -186,7 +186,7 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 			nombreComando = nombreComando + comandoEntero[i];
 	}
 	
-	cout<<"Comando ingresado"<<nombreComando;
+	cout<<"Comando ingresado: "<<nombreComando<<endl;
 
 	// EL RESTO DE LA CADENA ES EL PARAMETRO
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
