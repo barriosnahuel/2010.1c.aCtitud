@@ -77,7 +77,7 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   
   sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
   printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);
-  largoID = sizeof(article.uiArticleID) + 1;
+  largoID = sizeof(article.uiArticleID);
   /*ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
   largoID = sizeof(ID);*/
