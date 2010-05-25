@@ -35,6 +35,10 @@ char* processHeadCommand(  char** sResponse
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando);
 
+char* processStatCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando)
 /**
  * Realizo el proceso de ir a buscar a la BD el listado de grupos de noticias.
  * Arma el correspondiente String (en sResponse) para enviarlo al cliente.
