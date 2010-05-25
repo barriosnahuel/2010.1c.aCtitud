@@ -41,10 +41,7 @@ void* threadInterfazDeUsuario(void* parametro){
         (*comando).init(strCadenaIngresada);
         pthread_mutex_unlock(&semConexion);
         pthread_mutex_lock(&semUI);
-        if((*comando).validacion())
-            cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
-        else
-            cout << "Comando invalido." << endl;
+        cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
     } while ((*comando).indicaSalida() != 0);
     pthread_exit(comando);
 }
@@ -111,7 +108,9 @@ int main(int argn, char *argv[]){
         if(comando.validacion()) {
             dao.enviarMensaje(comando.cadenaIngresada());
             comando.setRespuestaObtenida(dao.recibirRespuesta());
-        };
+        }
+        else
+        	comando.setRespuestaObtenida("Comando invalido.");
         pthread_mutex_unlock(&semUI);
     } while (comando.indicaSalida() != 0);
 
