@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-printf(nombreComando);
+printf("%s"nombreComando);
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
