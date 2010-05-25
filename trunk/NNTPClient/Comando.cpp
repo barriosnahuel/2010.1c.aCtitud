@@ -43,7 +43,7 @@ void Comando::reset() {
 }
 
 void Comando::inicializarComandos() {
-	vectorDeComandos[0]="LIST";
+	vectorDeComandos[0]="LIST NEWSGROUP";
 	vectorDeComandos[1]="QUIT";
 	vectorDeComandos[2]="LISTGROUP";
 	vectorDeComandos[3]="ARTICLE";
