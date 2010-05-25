@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-cout<<"Comando que llega : "<<nombreComando<<" COMANDO OK ?? (si es uno esta ok):"<<comandoOk<<" POR QUE IMPRIME ESTO DOS VECES -.-???"<<endl;
+printf("Comando que llega %s : ",nombreComando);
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
@@ -187,7 +187,7 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 		for(i=espaciosDpsComando;i<comandoEntero.length()&&!isspace(comandoEntero.c_str()[i]);i++)
 			nombreComando = nombreComando + comandoEntero[i];
 	}
-cout<<"nombreComando :"<<nombreComando<<endl;	
+printf("nombreComando : %s",nombreComando);	
 	// EL RESTO DE LA CADENA ES EL PARAMETRO
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
 	for( i = espaciosDpsComando;i<comandoEntero.length();i++)
