@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-cout<<"COMANDO OK ?? (si es uno esta ok):"<<comandoOk<<" POR QUE IMPRIME ESTO DOS VECES -.-???"<<endl;
+cout<<"Comando que llega : "<<nombreComando<<" COMANDO OK ?? (si es uno esta ok):"<<comandoOk<<" POR QUE IMPRIME ESTO DOS VECES -.-???"<<endl;
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
