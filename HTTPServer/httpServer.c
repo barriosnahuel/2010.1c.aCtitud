@@ -26,7 +26,7 @@
  , void *(*start_routine)(void *)
  , void *arg
  , long flags
- , thread_t* new_thread
+ , thread_t* new_thread.
  );*/
 
 /**
