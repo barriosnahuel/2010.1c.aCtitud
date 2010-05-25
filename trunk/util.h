@@ -46,4 +46,13 @@ char* substringFrom(char** sDest, const char* sSource, unsigned int begin);
  */
 char* substringTill(char** sDest, const char* sSource, unsigned int till);
 
+/**
+ * Dado un string "grupoNoticia@articleID" en sParametroDelComando, se obtienen de ese string
+ * ambos valores y se los setea por separado.
+ */
+void obtenerParametrosDesdePK(	char** psGrupoNoticia
+								, char**	psArticleID
+								, char*		sParametroDelComando);
+
+
 #endif /* UTIL_H_ */

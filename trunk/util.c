@@ -73,3 +73,16 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	}
 	sRecursoPedidoSinEspacios[j] = '\0';
 }
+
+
+void obtenerParametrosDesdePK(	char**		psGrupoNoticia
+								, char**	psArticleID
+								, char*		sParametroDelComando){
+
+	int indexOfArroba= strcspn(sParametroDelComando, "@");
+
+		/*	+1 porque sino entra el @ en el substring.	*/
+	substringFrom(psArticleID, sParametroDelComando, indexOfArroba+1);
+	substringTill(psGrupoNoticia, sParametroDelComando, indexOfArroba);
+}
+
