@@ -377,7 +377,7 @@ char* processStatCommand(  char** sResponse
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "222 0 %s@%d", stArticulo.sNewsgroup, stArticulo.uiArticleID);
+		asprintf(sResponse, "223 0 %s@%d", stArticulo.sNewsgroup, stArticulo.uiArticleID);
 	LoguearDebugging("<-- processStatCommand()");
 }
 
