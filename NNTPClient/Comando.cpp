@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-cout<<"Comando que le llega"<<nombreComando<<endl;
+puts(nombreComando);
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
