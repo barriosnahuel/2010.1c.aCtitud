@@ -4,8 +4,6 @@
 #include "../Article.h"
 #include "../Logger/logger.h"
 
-#define APP_NAME_FOR_LOGGER "Memcached"
-
 typedef struct _largoArticulo{
   size_t largoHead;
   size_t largoBody;
@@ -18,8 +16,7 @@ typedef struct _articuloCache{
 }t_news;
 
 void iniciarClusterCache(memcached_st **memc,char* memcachedServer1,int memcachedServer1Puerto,char* memcachedServer2,int memcachedServer2Puerto);
-void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st** memc);
-int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc);
+void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias,char* grupoSinEspacios,memcached_st **memc);
+int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,char* grupoSinEspacios, memcached_st **memc);
 void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID );
-char* sacarEspaciosEnGrupo(const char *grupo);
 #endif 
