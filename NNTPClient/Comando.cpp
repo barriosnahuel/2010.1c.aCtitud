@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <string>
-#include <stdio>
+
 #include "Comando.hpp"
 
 using namespace std;
