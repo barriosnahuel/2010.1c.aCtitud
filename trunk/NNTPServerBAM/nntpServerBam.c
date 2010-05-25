@@ -187,9 +187,7 @@ int main(int argn, char *argv[]){
                        	    processArticleCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                        	    break;
                    	    case 4:  /* STAT */
-                       	    printf("4\n");
-printf("Esto esta puesto aca solo para probar, porque no me anda cuando ingreso el comando list newsgroups. chequear el cliente!!!!!!    una vez que el cliente acepte el comando LIST NEWSGROUPS la parte del server ya esta hecha y probada casi toda.\n");
-                       	    processListNewsgroupsCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
+                       	    processStatCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                        	    break;
                    	    case 5:  /* HEAD */
                        	    processHeadCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);

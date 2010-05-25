@@ -358,7 +358,7 @@ char* processStatCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando){
-	LoguearDebugging("--> processBodyCommand()");
+	LoguearDebugging("--> processStatCommand()");
 
 	char* sGrupoNoticia;
 	char* sArticleID;
@@ -378,7 +378,7 @@ char* processStatCommand(  char** sResponse
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
 		asprintf(sResponse, "222 0 %s@%d", stArticulo.sNewsgroup, stArticulo.uiArticleID);
-	LoguearDebugging("<-- processBodyCommand()");
+	LoguearDebugging("<-- processStatCommand()");
 }
 
 char* processListNewsgroupsCommand(	  char**			psResponse
