@@ -15,11 +15,12 @@
 #include <libmemcached/memcached.h>
 
 #define BACKLOG 3 /* El numero de conexiones permitidas  TODO: Aca no tendriamos que poner por lo menos 20? */
-#define APP_NAME_FOR_LOGGER "HTTPServer"
 #define REQUEST_TYPE_NEWSGROUP 1	/*	Indica que se esta solicitando el listado de newsgroups.	*/
 #define REQUEST_TYPE_NEWS_LIST 2	/*	Indica que se esta solicitando el listado de noticias para un newsgroup especifico. 	*/
 #define REQUEST_TYPE_NEWS 3			/*	Indica que se esta solicitando una noticia en particular.	*/
 #define MAX_CHARACTERS_FOR_RESPONSE 5000	/*	TODO: La cantidad maxima de caracteres para el response esta bien 5000?	*/
+
+char czNombreProceso[20];
 
 /*int thr_create(void *stack_base
  , size_t stack_size
@@ -132,8 +133,14 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink);
 /************************************************************************************************************
  *	Aca comienzan las definiciones de las funciones															*
  ************************************************************************************************************/
-int main(void) {
+int main(int argn, char *argv[]) {
 	char* sLogMessage;	/*	Es la variable que uso para generar el msj para el log.	*/
+
+    memset(czNombreProceso, 0, 20);
+    strcpy(czNombreProceso, "HTTPServer\0");
+    strcpy(argv[0], czNombreProceso);
+
+
 	/****************************************
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
@@ -141,22 +148,22 @@ int main(void) {
 
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
-		LoguearError("Archivo de configuracion no válido.", "HTTPServer");
+		LoguearError("Archivo de configuracion no válido.");
 		return -1;
 	}
-	LoguearInformacion("Archivo de configuracion cargado correctamente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Archivo de configuracion cargado correctamente.");
 	asprintf(&sLogMessage, "Puerto de la aplicacion: %d.", stConf.uiAppPuerto);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage, "IP LDAP/OpenDS: %s.", stConf.czBDServer);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage, "Puerto de LDAP/OpenDS: %d.", stConf.uiBDPuerto);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage,"\tIP memcachedServer 1: %s\n",stConf.memcachedServer1);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage,"\tPuerto memcachedServer 1: %d\n",stConf.memcachedServer1Puerto);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage,"\tIP memcachedServer 2: %s\n",stConf.memcachedServer2);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage,"\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	
 	memcached_st * memc;
@@ -171,11 +178,11 @@ int main(void) {
 	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 	if (!crearConexionLDAP(stConf.czBDServer, stConf.uiBDPuerto, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
-		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo conectar a OpenDS.");
 		return -1;
 	}
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 
 
 /*	Esto es prueba!!	*/
@@ -265,12 +272,12 @@ int main(void) {
 	int ficheroServer; 			/* Fichero descriptor de nuestro server. */
 	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
-		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.");
 		return -1;
 	}
 	strcpy(stConf.czAppServer, inet_ntoa(server.sin_addr));
 	asprintf(&sLogMessage, "Aplicacion levantada en: IP=%s; Port=%d.", stConf.czAppServer, stConf.uiAppPuerto);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	printf("* HTTPServer escuchando conexiones entrantes...\n");
 
 	/********************************************************************************
@@ -295,12 +302,12 @@ int main(void) {
 			stParameters.memCluster = memc;
 			if (thr_create(0, 0, (void*) &procesarRequestFuncionThread,
 					(void*) &stParameters, 0, &threadProcesarRequest) != 0)
-				LoguearError("No se pudo crear un nuevo thread para procesar el request.", APP_NAME_FOR_LOGGER);
+				LoguearError("No se pudo crear un nuevo thread para procesar el request.");
 		} else
-			LoguearError("Error al aceptar la conexion.", APP_NAME_FOR_LOGGER);
+			LoguearError("Error al aceptar la conexion.");
 
 		asprintf(&sLogMessage, "Se obtuvo una conexion desde %s.", inet_ntoa(client.sin_addr));
-		LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+		LoguearInformacion(sLogMessage);
 	}
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
@@ -314,11 +321,11 @@ int main(void) {
 }
 
 void* procesarRequestFuncionThread(void* threadParameters) {
-	LoguearDebugging("--> procesarRequestFuncionThread()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> procesarRequestFuncionThread()");
 	char* sLogMessage;
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 
-	LoguearInformacion("Comienzo a procesar un nueco thread.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Comienzo a procesar un nuevo thread.");
 	int bytesRecibidos;
 	char sMensajeHTTPCliente[1024];/*	TODO: No pueden valer lo mismo estos dos.	*/
 
@@ -328,16 +335,16 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 
 	asprintf(&sLogMessage, "Recibi %d bytes del usuario.", bytesRecibidos);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	asprintf(&sLogMessage, "El mensaje HTTP que recibimos del cliente es:\n%s", sMensajeHTTPCliente);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 
 	char sRecursoPedido[1024];/*	TODO: Esto tendria que ser menos.	*/
 	char sRecursoPedidoSinEspacios[1024];
 	strcpy(sRecursoPedido, obtenerRecursoDeCabecera(sMensajeHTTPCliente));
 
 	asprintf(&sLogMessage, "El usuario pidio el recurso: \"%s\".", sRecursoPedido);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
+	LoguearInformacion(sLogMessage);
 	
 	formatearEspacios(sRecursoPedido, sRecursoPedidoSinEspacios);
 
@@ -345,9 +352,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	    request por este recurso. Decidimos no tratarlo, por lo tanto cerramos la conexion.	*/
 	if(strcmp(sRecursoPedido, "/favicon")==0){
 		close(stParametros.ficheroCliente);
-		LoguearInformacion("Se cerro el fichero descriptor del cliente porque el request pedia el recurso /favicon.ico.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Se cerro el fichero descriptor del cliente porque el request pedia el recurso /favicon.ico.");
 
-		LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Termino el thread.");
 		thr_exit(0);
 	}
 
@@ -378,19 +385,19 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	char* sResponse= (char*)malloc(sizeof(char)*MAX_CHARACTERS_FOR_RESPONSE);
 	switch (uiOperation) {
 	case REQUEST_TYPE_NEWSGROUP:
-		LoguearInformacion("Proceso la obtencion del listado de grupos de noticias.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Proceso la obtencion del listado de grupos de noticias.");
 		sResponse = processRequestTypeListadoGruposDeNoticias(&stParametros);
 		break;
 	case REQUEST_TYPE_NEWS_LIST:
-		LoguearInformacion("Proceso la obtencion del listado de noticias para un grupo de noticias.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Proceso la obtencion del listado de noticias para un grupo de noticias.");
 		sResponse = processRequestTypeListadoDeNoticias(sGrupoDeNoticia, &stParametros);
 		break;
 	case REQUEST_TYPE_NEWS:
-		LoguearInformacion("Proceso la obtencion de una noticia en particular.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Proceso la obtencion de una noticia en particular.");
 		sResponse = processRequestTypeUnaNoticia(sGrupoDeNoticia, sArticleID, &stParametros);
 		break;
 	default:
-		LoguearInformacion("Por default, obtengo el listado de grupos de noticias.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Por default, obtengo el listado de grupos de noticias.");
 		sResponse = processRequestTypeListadoGruposDeNoticias(&stParametros);
 		break;
 	}
@@ -401,14 +408,14 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	len = strlen(sResponse);	
 	
 	if ((bytesEnviados = send(stParametros.ficheroCliente, sResponse, len, 0)) == -1)
-		LoguearError("No se pudo enviar el response al cliente.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo enviar el response al cliente.");
 
 	free(sResponse);
 
 	close(stParametros.ficheroCliente);
-	LoguearInformacion("Se cerro el fichero descriptor del cliente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se cerro el fichero descriptor del cliente.");
 
-	LoguearInformacion("Termino el thread.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Termino el thread.");
 	thr_exit(0);
 }
 
@@ -417,13 +424,13 @@ void* procesarRequestFuncionThread(void* threadParameters) {
  */
 int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		struct sockaddr_in* server) {
-	LoguearDebugging("--> crearConexionConSocket()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> crearConexionConSocket()");
 
 	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		LoguearError("No se pudo obtener el fichero descriptor del socket.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo obtener el fichero descriptor del socket.");
 		exit(-1);
 	}
-	LoguearInformacion("Se obtuvo el fichero descriptor correctamente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se obtuvo el fichero descriptor correctamente.");
 
 	(*server).sin_family = AF_INET;
 	(*server).sin_addr.s_addr = INADDR_ANY; /* INADDR_ANY coloca nuestra direccion IP automaticamente */
@@ -432,17 +439,17 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 
 	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
-		LoguearError("Error al asociar el puerto al socket.", APP_NAME_FOR_LOGGER);
+		LoguearError("Error al asociar el puerto al socket.");
 		exit(-1);
 	}
-	LoguearInformacion("Se asocio bien el puerto al socket.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se asocio bien el puerto al socket.");
 
 	if (listen(*ficheroServer, BACKLOG) == -1) {
-		LoguearError("No se pudo dejar escuchando al puerto.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo dejar escuchando al puerto.");
 		exit(-1);
 	}
 
-	LoguearDebugging("<-- crearConexionConSocket()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- crearConexionConSocket()");
 	return 1;
 }
 
@@ -456,7 +463,7 @@ void liberarRecursos(int 				ficheroServer
 					, PLDAP_SESSION 	stPLDAPSession
 					, PLDAP_SESSION_OP	stPLDAPSessionOperations
 					, stConfiguracion	stConf) {
-	LoguearDebugging("--> liberarRecursos()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> liberarRecursos()");
 
 	/*	Cierro/Libero lo relacionado a la BD	*/
 	stPLDAPSessionOperations->endSession(stPLDAPSession);
@@ -464,39 +471,39 @@ void liberarRecursos(int 				ficheroServer
 	freeLDAPSession(stPLDAPSession);
 	freeLDAPContext(stPLDAPContext);
 	freeLDAPContextOperations(stPLDAPContextOperations);
-	LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.");
 
 	/*	Cierro el socket	*/
 	close(ficheroServer);
-	LoguearInformacion("Libere el fichero descriptor de nuestro server correctamente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Libere el fichero descriptor de nuestro server correctamente.");
 
-	LoguearDebugging("<-- liberarRecursos()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- liberarRecursos()");
 }
 
 int buscarNoticiaEnBD(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,
 		PLDAP_SESSION* pstPLDAPSession,
 		PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
-	LoguearDebugging("--> buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> buscarNoticiaEnBD()");
 
 	*pstArticulo= getArticle(*pstPLDAPSession, *pstPLDAPSessionOperations, sGrupoDeNoticias, sArticleID);
 
-	LoguearDebugging("<-- buscarNoticiaEnBD()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- buscarNoticiaEnBD()");
 	return 1;
 }
 
 char* formatearArticuloAHTML(stArticle* pstArticulo) {
-	LoguearDebugging("--> formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> formatearArticuloAHTML()");
 
 	char* response;
 	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
 
-	LoguearDebugging("<-- formatearArticuloAHTML()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- formatearArticuloAHTML()");
 	return response;
 }
 
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
-	LoguearDebugging("--> processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> processRequestTypeUnaNoticia()");
 
 	stArticle stArticulo;
 	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,&pstParametros->memCluster)) {
@@ -516,22 +523,22 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		int bytesEnviadosDeAviso;
 			
 		if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
-			LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
+			LoguearError("No se pudo enviar el 200 OK al cliente.");
 		}
 
-		LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("<-- processRequestTypeUnaNoticia()");
 		return formatearArticuloAHTML(&stArticulo);
 	}
 	else {
 		char* error404;
 		asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
-		LoguearDebugging("<-- processRequestTypeUnaNoticia()", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("<-- processRequestTypeUnaNoticia()");
 		return error404;
 	}
 }
 
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
-	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()");
 	
 	/* Apenas entro aca mando un 200 OK porque siempre se va a poder procesar el listado de grupos de noticias. */
 	char* aviso200;
@@ -540,35 +547,19 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	int bytesEnviadosDeAviso;
 	
 	if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
-		LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo enviar el 200 OK al cliente.");
 	}
 
-	/*	Sumo 3 por el =* y el \0	*/
-	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
-	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
-
-	int q;
-	int k;
-	unsigned int cantidadDeGrupos= 0;
-	unsigned int cantidadDeGruposSinRepetir= 0;
-	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	char* listadoGrupoNoticiasSinRepetir[1000];
-	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
-	memset(listadoGrupoNoticiasSinRepetir, 0, 1000);
-	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
-	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio, OPENDS_SELECT_GRUPO_DE_NOTICIA);
-	
-	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
-	
-	cantidadDeGruposSinRepetir = pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, &listadoGrupoNoticiasSinRepetir);
+	unsigned int cantidadDeGruposSinRepetir= obtenerListadoGruposDeNoticias(&listadoGrupoNoticiasSinRepetir, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations));
 
-	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()");
 	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
 }
 
 
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRepetir[], int iCantidadDeGruposDeNoticias){
-	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> formatearListadoDeGruposDeNoticiasAHTML()");
 
 	/*	1+OPEN...+5+1 Es igual a: /nombreGrupoNoticia.html\0	*/
 	char* sURL= (char*)malloc(sizeof(char)*(1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+5+1));
@@ -584,12 +575,12 @@ char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGrupoDeNoticiasSinRep
 
 	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
 
-	LoguearDebugging("<-- formatearListadoDeGruposDeNoticiasAHTML()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- formatearListadoDeGruposDeNoticiasAHTML()");
 	return response;
 }
 
 char* armarLinkCon(char* sURL, char* sNombreDelLink){
-	LoguearDebugging("--> armarLinkCon()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> armarLinkCon()");
 
 	/*	+50 Porque tengo que tener en cuenta ip:puerto/grupoNoticia/noticiaID	*/
 	/*	TODO: Ver si se puede cambiar el malloc por el uso de asprintf	*/
@@ -597,33 +588,24 @@ char* armarLinkCon(char* sURL, char* sNombreDelLink){
 	memset(sTag, 0, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT+OPENDS_ATTRIBUTE_ARTICLE_ID_MAX_LENGHT+50);
 	sprintf(sTag, "<A href=\"/%s\">%s</A><BR />", sURL, sNombreDelLink);
 
-	LoguearDebugging("<-- armarLinkCon()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- armarLinkCon()");
 	return sTag;
 }
 
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParameters* pstParametros) {
-	LoguearDebugging("--> processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
-	char* sLogMessage;
+	LoguearDebugging("--> processRequestTypeListadoDeNoticias()");
 
-	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
-	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
 
-	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT];
-	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias);
-
-	asprintf(&sLogMessage, "El criterio para buscar en OpenDS es: %s", sCriterio);
-	LoguearInformacion(sLogMessage, APP_NAME_FOR_LOGGER);
-
-	LoguearDebugging("Hago el select a OpenDS", APP_NAME_FOR_LOGGER);
-	unsigned int uiCantidadDeNoticias= 0;
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
-	selectArticles(listadoNoticias, &uiCantidadDeNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sCriterio);
+
+	LoguearDebugging("Llamo al metodo obtenerListadoNoticiasParaUnGrupo() provisto por aCtitud.");
+	unsigned int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sGrupoDeNoticias);
 	
 	/* Si el diario no tiene noticias significa que no existe dicho diario. Por lo tanto es un 404. */
 	if(uiCantidadDeNoticias == 0) {
 		char* error404;
 		asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
-		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()");
 		return error404;
 	}
 	else {
@@ -633,16 +615,16 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 		int bytesEnviadosDeAviso;
 			
 		if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
-			LoguearError("No se pudo enviar el 200 OK al cliente.", APP_NAME_FOR_LOGGER);
+			LoguearError("No se pudo enviar el 200 OK al cliente.");
 		}
-		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()");
 		return formatearListadoDeNocitiasAHTML(sGrupoDeNoticias, listadoNoticias, uiCantidadDeNoticias);
 	}
 
 }
 
 char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias){
-	LoguearDebugging("--> formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> formatearListadoDeNocitiasAHTML()");
 
 	/*	1+OPEN...+1+OPEN...5+1 Es igual a: /nombreGrupoNoticia/noticiaID.html\0	*/
 	/*	TODO: Chequear si se puede sacar el malloc usando asprintf ;)	*/
@@ -660,12 +642,12 @@ char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoD
 	free(sURL);
 	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
 
-	LoguearDebugging("<-- formatearListadoDeNocitiasAHTML()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- formatearListadoDeNocitiasAHTML()");
 	return response;
 }
 
 char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
-	LoguearDebugging("--> obtenerRecursoDeCabecera()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> obtenerRecursoDeCabecera()");
 
 	int i = 0;
 	int j = 0;
@@ -697,13 +679,13 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente) {
 
 	}
 
-	LoguearDebugging("<-- obtenerRecursoDeCabecera()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- obtenerRecursoDeCabecera()");
 	return recurso;
 
 }
 
 char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
-	LoguearDebugging("--> obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> obtenerGrupoDeNoticias()");
 
 	int i = 1;
 	int j = 0;
@@ -718,13 +700,13 @@ char* obtenerGrupoDeNoticias(char* sRecursoPedido) {
 
 	/*sprintf(sGrupoDeNoticias, "%s", grupoDeNoticias);*/
 
-	LoguearDebugging("<-- obtenerGrupoDeNoticias()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- obtenerGrupoDeNoticias()");
 
 	return grupoDeNoticias;
 }
 
 char* obtenerNoticia(char* sRecursoPedido) {
-	LoguearDebugging("--> obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> obtenerDeNoticia()");
 	int i = 1;
 	int j = 0;
 	char noticia[1024];
@@ -740,12 +722,12 @@ char* obtenerNoticia(char* sRecursoPedido) {
 	}
 
 	noticia[j] = '\0';
-	LoguearDebugging("<-- obtenerDeNoticia()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- obtenerDeNoticia()");
 	return noticia;
 }
 
 int llevaNoticia(char* sRecursoPedido) {
-	LoguearDebugging("--> llevaNoticia()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> llevaNoticia()");
 	int i = 1;
 
 	while(sRecursoPedido[i] != '/' && sRecursoPedido[i] != '\0' ) {
@@ -755,6 +737,6 @@ int llevaNoticia(char* sRecursoPedido) {
 	if(sRecursoPedido[i] == '\0') {
 		return 0;
 	}
-	LoguearDebugging("<-- llevaNoticia()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- llevaNoticia()");
 	return 1;
 }

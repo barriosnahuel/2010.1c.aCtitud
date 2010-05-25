@@ -7,6 +7,7 @@
 
 #include "util.h"
 
+
 char* substringFrom(char** sDest, const char* sSource, unsigned int begin){
 	asprintf(sDest, "%s", sSource);
 	(*sDest)+= begin;
@@ -85,4 +86,63 @@ void obtenerParametrosDesdePK(	char**		psGrupoNoticia
 	substringFrom(psArticleID, sParametroDelComando, indexOfArroba+1);
 	substringTill(psGrupoNoticia, sParametroDelComando, indexOfArroba);
 }
+
+
+int obtenerListadoNoticiasParaUnGrupo( stArticle			pstArticleListado[]
+										, PLDAP_SESSION 	stPLDAPSession
+										, PLDAP_SESSION_OP	stPLDAPSessionOperations
+										, char* 			sGrupoDeNoticias
+										){
+	LoguearDebugging("--> obtenerListadoNoticiasParaUnGrupo()");
+	char* sLogMessage;
+
+	/*	El limite impuesto por la bd, mas el largo del nombre del atributo, mas el igual.	*/
+	unsigned int uiNumberOfCharacters= strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT;
+
+	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME_MAX_LENGHT];
+	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias);
+
+	asprintf(&sLogMessage, "El criterio para buscar en OpenDS es: %s", sCriterio);
+	LoguearInformacion(sLogMessage);
+
+	LoguearDebugging("Hago el select a OpenDS");
+	unsigned int uiCantidadDeNoticias= 0;
+	selectArticles(pstArticleListado, &uiCantidadDeNoticias, stPLDAPSession, stPLDAPSessionOperations, sCriterio);
+
+	LoguearDebugging("<-- obtenerListadoNoticiasParaUnGrupo()");
+	return uiCantidadDeNoticias;
+}
+
+
+
+int obtenerListadoGruposDeNoticias(
+							char*					pListadoGruposDeNoticias[]
+							, PLDAP_SESSION 		stPLDAPSession
+							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+							){
+	LoguearDebugging("--> obtenerListadoGruposDeNoticias()");
+	char* sLogMessage;
+
+	/*	Sumo 3 por el =* y el \0	*/
+	char sCriterio[strlen(OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)+1+1+1];
+	sprintf(sCriterio, "%s=%s", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, "*");
+
+	unsigned int cantidadDeGrupos= 0;
+	unsigned int uiCantidadDeGruposSinRepetir= 0;
+
+
+	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
+	memset(pListadoGruposDeNoticias, 0, 1000);/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+
+	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, stPLDAPSession, stPLDAPSessionOperations, sCriterio);
+
+	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
+
+	uiCantidadDeGruposSinRepetir= pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, pListadoGruposDeNoticias);
+
+	LoguearDebugging("<-- obtenerListadoNoticiasParaUnGrupo()");
+	return uiCantidadDeGruposSinRepetir;
+}
+
 

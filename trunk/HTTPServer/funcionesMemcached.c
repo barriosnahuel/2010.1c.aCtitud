@@ -33,15 +33,15 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
   /* Se agregan Servidores */
   rc = memcached_server_add(*memCluster, memcachedServer1,memcachedServer1Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	LoguearInformacion("Se agrego el servidor  1 correctamente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se agrego el servidor  1 correctamente.");
   else
-	LoguearError("No se pudo agregar el servidor 1. ", APP_NAME_FOR_LOGGER);
+	LoguearError("No se pudo agregar el servidor 1. ");
 
   rc = memcached_server_add(*memCluster, memcachedServer2,memcachedServer2Puerto); 
   if (rc == MEMCACHED_SUCCESS)
-	LoguearInformacion("Se agrego el servidor  2 correctamente.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se agrego el servidor  2 correctamente.");
   else
-	LoguearError("No se pudo agregar el servidor 2. ", APP_NAME_FOR_LOGGER);
+	LoguearError("No se pudo agregar el servidor 2. ");
   
   return;
 }
@@ -110,10 +110,10 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d \n",articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead);
 */  
   if (rc == MEMCACHED_SUCCESS){
-	LoguearInformacion("Se inserto correctamente el articulo en la cache.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se inserto correctamente el articulo en la cache.");
 	printf("Se inserto correctamente el articulo en la cache\n");
   }else{
-	LoguearError("No se pudo insertar el articulo en la cache.", APP_NAME_FOR_LOGGER);
+	LoguearError("No se pudo insertar el articulo en la cache.");
 	printf("No se pudo insertar el articulo en la cache\n");	
   }
   free(sGrupoDeNoticiasSinEspacios);
@@ -151,10 +151,10 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS){
-	LoguearInformacion("Se encontro el articulo en la cache.", APP_NAME_FOR_LOGGER);
+	LoguearInformacion("Se encontro el articulo en la cache.");
 	printf("Se encontro el articulo en la cache\n");
   }else{
-  	LoguearError("No se encontro el articulo en la cache.", APP_NAME_FOR_LOGGER);
+  	LoguearError("No se encontro el articulo en la cache.");
 	printf("No se encontro el articulo en la cache\n");
 	free(claveCache);
 	free(resultNoticia);

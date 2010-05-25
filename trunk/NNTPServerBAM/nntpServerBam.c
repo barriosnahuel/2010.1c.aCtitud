@@ -8,7 +8,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#include "logger.h"
+#include "../Logger/logger.h"
 #include "configuration.h"
 #include "conexion.h"
 #include "funciones.h"
@@ -174,14 +174,14 @@ int main(int argn, char *argv[]){
 
 					char* sResponse;
 					switch(SeleccionarComando(czMsg)) {
-                	    case 0:  /* LIST */
+                	    case 0:  /* LIST 	o	LIST NEWSGROUPS	*/
                 	        printf("0\n");
                 	    break;
                 	    case 1:  /* QUIT */
                     	    printf("1\n");
                 	    break;
                    	    case 2:  /* LISTGROUP */
-                       	    printf("2\n");
+                   	    	processListGroupCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
                    	    case 3:  /* ARTICLE */
                        	    processArticleCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
@@ -195,8 +195,8 @@ int main(int argn, char *argv[]){
                    	    case 6:  /* BODY */
                        	    processBodyCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
-                   	    case 7:  /* GROUP o LIST NEWSGROUPS */
-                       	    processListNewsgroupsCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
+                   	    case 7:  /* GROUP o LIST NEWSGROUPS	"Este no va, son 7 nomas!!?? */
+                   	    	printf("7\n");
                 	    break;
                 	}
 

@@ -3,8 +3,8 @@ CFLAGS=-ansi
 OPENDSLIBS=-L/usr/local/lib -lldap -llber
 LIBS= $(OPENDSLIBS) -lssl
 
-nntpServerBam: logger.o configuration.o conexion.o util.o funciones.o Article.o LdapWrapper-Debian.o LdapWrapperHandler.o nntpServerBam.o
-	gcc $(CFLAGS) $(LIBS) -o nntpServerBam ./logger.o ../util.o ../Article.o ../LDAP/LdapWrapper-Debian.o ../LDAP/LdapWrapperHandler.o ./configuration.o ./conexion.o ./funciones.o ./nntpServerBam.o
+NNTPServerBam: logger-Debian-C.o configuration.o conexion.o util.o funciones.o Article.o LdapWrapper-Debian.o LdapWrapperHandler.o nntpServerBam.o
+	gcc $(CFLAGS) $(LIBS) -o NNTPServerBam ../Logger/logger-Debian-C.o ../Article.o ../LDAP/LdapWrapper-Debian.o ../LDAP/LdapWrapperHandler.o ../util.o ./configuration.o ./conexion.o ./funciones.o ./nntpServerBam.o
 	@echo '* Finished building target: $@'
 	@echo ''
 
@@ -14,14 +14,14 @@ Article.o: ../Article.c ../Article.h
 conexion.o: conexion.c conexion.h
 	gcc $(CFLAGS) $(OPTFLAGS) conexion.o conexion.c
 
-configuration.o: configuration.c configuration.h logger.h
+configuration.o: configuration.c configuration.h ../Logger/logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) configuration.o configuration.c
 
 funciones.o: funciones.c funciones.h
 	gcc $(OPTFLAGS) funciones.o funciones.c
 
-logger.o: logger.c logger.h
-	gcc $(CFLAGS) $(OPTFLAGS) logger.o logger.c
+logger-Debian-C.o: ../Logger/logger-Debian.c ../Logger/logger.h
+	gcc $(CFLAGS) $(OPTFLAGS) ../Logger/logger-Debian-C.o ../Logger/logger-Debian.c
 
 LdapWrapper-Debian.o: ../LDAP/LdapWrapper-Debian.c ../LDAP/LdapWrapper.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../LDAP/LdapWrapper-Debian.o ../LDAP/LdapWrapper-Debian.c

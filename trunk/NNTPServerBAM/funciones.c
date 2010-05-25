@@ -355,37 +355,22 @@ char* processBodyCommand(  char** sResponse
 	LoguearDebugging("<-- processBodyCommand()");
 }
 
-char* processListNewsgroupsCommand(  char** sResponse
+char* processListGroupCommand(  char** sResponse
 									, PLDAP_SESSION stPLDAPSession
-									, PLDAP_SESSION_OP stPLDAPSessionOperations){
+									, PLDAP_SESSION_OP stPLDAPSessionOperations
+									, char* sGrupoDeNoticias){
 	LoguearDebugging("--> processListNewsgroupsCommand()");
+	char* sLogMessage;
+
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
-	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, "clarin", "1");
 
-	if(stArticulo.uiArticleID==-1)
-		asprintf(sResponse, "frutaaaa");
-	else
-		/*	Este formato del response esta especificado por el RFC 3977
-			"200	0	clarin@2
-			head
+	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	unsigned int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, stPLDAPSession, stPLDAPSessionOperations, sGrupoDeNoticias);
 
-			body"
-			Donde:
-			-	200 es el codigo del response.
-			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
-			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
-			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
-		 */
-		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
+	asprintf(sResponse, "hola!!");
+
 	LoguearDebugging("<-- processListNewsgroupsCommand()");
 }
-
-
-
-
-
-
-
 
 
 char* getMessageForResponseCode(unsigned int uiResponseCode){

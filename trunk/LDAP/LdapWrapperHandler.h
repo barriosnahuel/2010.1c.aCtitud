@@ -49,8 +49,7 @@ stArticle getArticle(PLDAP_SESSION stPLDAPSession,
  */
 VOID selectEntries(char* pczListado[], unsigned int* puiCantidadEntries,
 		PLDAP_SESSION stPLDAPSession,
-		PLDAP_SESSION_OP stPLDAPSessionOperations, char* sCriterio,
-		unsigned int uiTipoDeSelect);
+		PLDAP_SESSION_OP stPLDAPSessionOperations, char* sCriterio);
 
 /**
  * Selecciona un listado de articulos, en base al criterio que se le pasa

@@ -7,8 +7,6 @@
 
 #include "LdapWrapperHandler.h"
 
-#define APP_NAME_FOR_LOGGER "HTTPServer"
-
 /*	Constantes de OpenDS	*/
 #define OPENDS_SCHEMA "ou=so,dn=utn,dn=edu"
 #define OPENDS_ATTRIBUTE_OBJECT_CLASS "objectClass"
@@ -24,7 +22,7 @@ int crearConexionLDAP(	char* sIp
 						, PLDAP_CONTEXT_OP* pstPLDAPContextOperations
 						, PLDAP_SESSION* pstPLDAPSession
 						, PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
-	LoguearDebugging("--> crearConexionLDAP()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> crearConexionLDAP()");
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
 	char *sOpenDSLocation;
@@ -39,7 +37,7 @@ int crearConexionLDAP(	char* sIp
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
 	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
-	LoguearDebugging("<-- crearConexionLDAP()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- crearConexionLDAP()");
 	return 1;
 }
 
@@ -120,7 +118,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sGrupoDeNoticias
 					, char* 				sArticleID){
-	LoguearDebugging("--> getArticle()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("--> getArticle()");
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
 
 	unsigned int uiMaxNumberOfCharacters=
@@ -132,9 +130,9 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 	memset(sCriterio, 0, uiMaxNumberOfCharacters);
 	sprintf(sCriterio, "(&(%s= %s)(%s= %s))", OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME, sGrupoDeNoticias, OPENDS_ATTRIBUTE_ARTICLE_ID, sArticleID);
 
-	char* sDebugMessage;
-	asprintf(&sDebugMessage, "El criterio por el que se busco en OpenDS es: %s", sCriterio);
-	LoguearDebugging(sDebugMessage, APP_NAME_FOR_LOGGER);
+	char* sLogMessage;
+	asprintf(&sLogMessage, "El criterio por el que se va a buscar en OpenDS es: %s", sCriterio);
+	LoguearInformacion(sLogMessage);
 
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
 	PLDAP_ITERATOR iterator         = NULL;
@@ -145,13 +143,13 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
 	iterator = resultSet->iterator;
 	if(iterator->hasNext(resultSet)) {
-		LoguearDebugging("Se encontro un articulo con la condicion especificada.", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("Se encontro un articulo con la condicion especificada.");
 
 		PLDAP_RECORD record = iterator->next(resultSet);
 
 		/* Itero sobre los campos de cada uno de los record */
 		while(recordOp->hasNextField(record)) {
-			LoguearDebugging("Itero por un campo de un articulo.", APP_NAME_FOR_LOGGER);
+			LoguearDebugging("Itero por un campo de un articulo.");
 
 			PLDAP_FIELD field = recordOp->nextField(record);
 			if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
@@ -167,17 +165,17 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 
 		asprintf(&(stArticleToReturn.sNewsgroup), "%s", sGrupoDeNoticias);
 		stArticleToReturn.uiArticleID= atoi(sArticleID);
-		LoguearInformacion("Se seteo bien el articulo recuperado de OpenDS.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("Se seteo bien el articulo recuperado de OpenDS.");
 	}
 	else{
-		LoguearDebugging("No hay ninguna entry que mostrar.", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("No hay ninguna entry que mostrar.");
 		/*	Seteo en -1 el ID del articulo para ver si se encontro
 			un articulo con las condiciones especificadas o no.
 		 */
 		stArticleToReturn.uiArticleID= -1;
 	}
 
-	LoguearDebugging("<-- getArticle()", APP_NAME_FOR_LOGGER);
+	LoguearDebugging("<-- getArticle()");
 	return stArticleToReturn;
 }
 
@@ -192,19 +190,23 @@ VOID selectEntries(	  char*					pczListado[]
 					, unsigned int*			puiCantidadEntries
 					, PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
-					, char* 				sCriterio
-					, unsigned int			uiTipoDeSelect){
+					, char* 				sCriterio){
+	LoguearDebugging("--> selectEntries()");
+
+	char* sLogMessage;
+	asprintf(&sLogMessage, "El criterio por el que se va a buscar en OpenDS es: %s", sCriterio);
+	LoguearInformacion(sLogMessage);
 
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
-
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
+
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
 	iterator = resultSet->iterator;
 	if(!(iterator->hasNext(resultSet)))
-		LoguearInformacion("No hay ninguna entry para el criterio especificado.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("No hay ninguna entry para el criterio especificado.");
 	for(*puiCantidadEntries= 0; iterator->hasNext(resultSet); (*puiCantidadEntries)++) {
 		PLDAP_RECORD record = iterator->next(resultSet);
 
@@ -226,6 +228,8 @@ VOID selectEntries(	  char*					pczListado[]
     /* libero los recursos */
     freeLDAPIterator(iterator);
     freeLDAPRecordOperations(recordOp);
+
+    LoguearDebugging("<-- selectEntries()");
 }
 
 /**
@@ -235,14 +239,18 @@ VOID selectEntries(	  char*					pczListado[]
  * 		1:	sGrupoDeNoticia
  * 		2:	sBody, sHead
  */
-VOID selectArticles(  stArticle			pczListado[]
+VOID selectArticles(  stArticle				pczListado[]
 					, unsigned int*			puiCantidadEntries
 					, PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 					, char* 				sCriterio){
+	LoguearDebugging("--> selectArticles()");
+
+	char* sLogMessage;
+	asprintf(&sLogMessage, "El criterio por el que se va a buscar en OpenDS es: %s", sCriterio);
+	LoguearInformacion(sLogMessage);
 
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
-
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
@@ -250,16 +258,16 @@ VOID selectArticles(  stArticle			pczListado[]
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
 	iterator = resultSet->iterator;
 	if(!(iterator->hasNext(resultSet)))
-		LoguearInformacion("No hay ninguna entry para el criterio especificado.", APP_NAME_FOR_LOGGER);
+		LoguearInformacion("No hay ninguna entry para el criterio especificado.");
 	for(*puiCantidadEntries= 0; iterator->hasNext(resultSet); (*puiCantidadEntries)++) {
-		LoguearDebugging("Itero por un articulo.", APP_NAME_FOR_LOGGER);
+		LoguearDebugging("Itero por un articulo.");
 		PLDAP_RECORD record = iterator->next(resultSet);
 		stArticle stArticle;
 
 		/* Itero sobre los campos de cada uno de los record */
 		unsigned int i;
 		while(recordOp->hasNextField(record)) {
-			LoguearDebugging("Itero por un campo de un articulo.", APP_NAME_FOR_LOGGER);
+			LoguearDebugging("Itero por un campo de un articulo.");
 
 			PLDAP_FIELD field = recordOp->nextField(record);
 			if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
@@ -283,6 +291,8 @@ VOID selectArticles(  stArticle			pczListado[]
     /* libero los recursos */
     freeLDAPIterator(iterator);
     freeLDAPRecordOperations(recordOp);
+
+    LoguearDebugging("<-- selectArticles()");
 }
 
 /**

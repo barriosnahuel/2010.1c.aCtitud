@@ -6,26 +6,27 @@
 #include <sys/syscall.h>
 #include "logger.h"
 
-void LoguearInformacion(char *czData, char *czNombreProceso) {
-	EscribirLog(1,czData,czNombreProceso);
+void LoguearInformacion(char *czData) {
+	EscribirLog(1,czData);
 };
 
-void LoguearWarning(char *czData, char *czNombreProceso) {
-	EscribirLog(2,czData,czNombreProceso);
+void LoguearWarning(char *czData) {
+	EscribirLog(2,czData);
 };
 
-void LoguearError(char *czData, char *czNombreProceso) {
-	EscribirLog(3,czData,czNombreProceso);
+void LoguearError(char *czData) {
+	EscribirLog(3,czData);
 };
 
-void LoguearDebugging(char *czData, char *czNombreProceso) {
-    EscribirLog(4,czData,czNombreProceso);
+void LoguearDebugging(char *czData) {
+    EscribirLog(4,czData);
 };
 
-void EscribirLog(char cTipoLog, char *czData, char *czNombreProceso) {
+void EscribirLog(char cTipoLog, char *czData) {
 
    FILE *arch;
    time_t tiempoActual;
+   extern char czNombreProceso[20];
    char *czNombreArch;
    char czFecha[50];
    pid_t tid;
@@ -61,6 +62,7 @@ void EscribirLog(char cTipoLog, char *czData, char *czNombreProceso) {
 			break;
 		case _ERROR:
             fprintf(stderr, "%s:\t%s\n","ERROR",czData);
+            printf("%s:\t%s\n","ERROR",czData);
 			break;
 		case _DEBUG:
             fprintf(stderr, "%s:\t%s\n","DEBUG",czData);
