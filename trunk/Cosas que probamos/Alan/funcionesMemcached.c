@@ -149,7 +149,7 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,sArticleID);
   printf("Clave a buscar en la cache %s \n",claveCache);
   
-  printf("LARGO DE LA ClaveCache %d: ",strlen(claveCache));
+  printf("LARGO DE LA ClaveCache: %d \n ",strlen(claveCache));
   
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS){
