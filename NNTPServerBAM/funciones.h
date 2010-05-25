@@ -26,7 +26,6 @@ char* processArticleCommand(  char** sResponse
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando);
 
-
 char* processBodyCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
@@ -36,4 +35,11 @@ char* processHeadCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando);
+
+char* processListNewsgroupsCommand(  char** sResponse
+									, PLDAP_SESSION stPLDAPSession
+									, PLDAP_SESSION_OP stPLDAPSessionOperations);
+
+
+
 #endif

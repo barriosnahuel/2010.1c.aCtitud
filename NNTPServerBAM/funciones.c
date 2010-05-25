@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+
 #include "funciones.h"
 
 /* recibe un comando y devuelve un número asociado */
@@ -22,7 +23,7 @@ int SeleccionarComando(char *czBuf) {
     strcpy(czComandos[4],"STAT");
     strcpy(czComandos[5],"HEAD");
     strcpy(czComandos[6],"BODY");
-    strcpy(czComandos[7],"GROUP");
+    strcpy(czComandos[7],"GROUP");/*	TODO: Esto que es? Me parece que no va.	*/
     
     i=0;
     while((czBuf[i] != ' ') && (czBuf[i] != '\0')) {
@@ -263,7 +264,6 @@ void PantallaFin() {
     printf("\e[0m\n\n");
 }
 
-
 char* processArticleCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
@@ -271,13 +271,7 @@ char* processArticleCommand(  char** sResponse
 
 	char* sGrupoNoticia;
 	char* sArticleID;
-	
-	/*	TODO: Parseo el comando recibido y obtengo los parametros, en este caso: newsgroup name y article id	*/
-
-	int indexOfArroba= strcspn(sParametroDelComando, "@");
-	/*	+1 porque sino entra el @ en el substring.	*/
-	substringFrom(&sArticleID, sParametroDelComando, indexOfArroba+1);
-	substringTill(&sGrupoNoticia, sParametroDelComando, indexOfArroba);
+	obtenerParametrosDesdePK(&sGrupoNoticia, &sArticleID, sParametroDelComando);
 
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
@@ -297,7 +291,6 @@ char* processArticleCommand(  char** sResponse
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
 		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
-
 }
 /*
 void parserCommand(	char* sGrupoNoticia
@@ -377,3 +370,28 @@ char* processBodyCommand(  char** sResponse
 		asprintf(sResponse, "222\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
 
 }
+
+char* processListNewsgroupsCommand(  char** sResponse
+									, PLDAP_SESSION stPLDAPSession
+									, PLDAP_SESSION_OP stPLDAPSessionOperations){
+
+	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
+	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, "clarin", "1");
+
+	if(stArticulo.uiArticleID==-1)
+		asprintf(sResponse, "430\tNo article with that message-id.");
+	else
+		/*	Este formato del response esta especificado por el RFC 3977
+			"200	0	clarin@2
+			head
+
+			body"
+			Donde:
+			-	200 es el codigo del response.
+			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
+			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
+		 */
+		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
+}
+

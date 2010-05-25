@@ -195,8 +195,8 @@ int main(int argn, char *argv[]){
                    	    case 6:  /* BODY */
                        	    processBodyCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                 	    break;
-                   	    case 7:  /* GROUP */
-                       	    printf("7\n");
+                   	    case 7:  /* GROUP o LIST NEWSGROUPS */
+                       	    processListNewsgroupsCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
                 	    break;
                 	}
 
