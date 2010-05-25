@@ -18,7 +18,7 @@ configuration.o: configuration.c configuration.h ../Logger/logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) configuration.o configuration.c
 
 funciones.o: funciones.c funciones.h
-	gcc $(OPTFLAGS) funciones.o funciones.c
+	gcc $(CFLAGS) $(OPTFLAGS) funciones.o funciones.c
 
 logger-Debian-C.o: ../Logger/logger-Debian.c ../Logger/logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../Logger/logger-Debian-C.o ../Logger/logger-Debian.c
