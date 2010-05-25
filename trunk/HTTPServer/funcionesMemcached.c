@@ -58,7 +58,7 @@ char* sacarEspaciosEnGrupo(char *grupo)
 			j++;
 		}else printf("habia un espacio \n");	
 	}
-	grupoSinEspacios[i]='\0';
+	grupoSinEspacios[j]='\0';
 	printf("GRUPO SIN ESPACIOS %s \n", grupoSinEspacios);
 	return grupoSinEspacios;
 }
