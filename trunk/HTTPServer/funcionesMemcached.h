@@ -21,5 +21,5 @@ void iniciarClusterCache(memcached_st **memc,char* memcachedServer1,int memcache
 void guardarNoticiaEnCache(stArticle stArticulo, char* sGrupoDeNoticias, memcached_st** memc);
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID, memcached_st **memc);
 void formarClave(char* claveCache,char* sGrupoDeNoticias, int ID );
-char* sacarEspaciosEnGrupo(char *grupo);
+char* sacarEspaciosEnGrupo(const char *grupo);
 #endif 
