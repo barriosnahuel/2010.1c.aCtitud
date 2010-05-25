@@ -51,7 +51,7 @@ void Comando::inicializarComandos() {
 	vectorDeComandos[5]="HEAD";
 	vectorDeComandos[6]="BODY";
 
-	vectorDeParametros[0]= 1; //NEWSGROUPS
+	vectorDeParametros[0]= 0; //NEWSGROUPS
 	vectorDeParametros[1]= 0;
 	vectorDeParametros[2]= 1; //group
 	vectorDeParametros[3]= 1; //message-id
@@ -73,11 +73,11 @@ int Comando::validacion() {
 	int comandoOk = 0;
 	int parametroOk = 0;
 
-	for(i=0;i<=6;i++){
+	for(i=0;i<=6;i++)
 		if(nombreComando == vectorDeComandos[i]) {
 			comandoOk = 1;
 			break;
-		}}
+		}
 
 cout<<"comnado OK ?? (si es uno esta ok):"<<comandoOk<<endl;
 
