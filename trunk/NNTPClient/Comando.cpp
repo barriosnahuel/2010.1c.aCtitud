@@ -186,7 +186,7 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 			nombreComando = nombreComando + comandoEntero[i];
 	}
 	
-	cout<<"Comando ingresado"<<nombrecomando;
+	cout<<"Comando ingresado"<<nombreComando;
 
 	// EL RESTO DE LA CADENA ES EL PARAMETRO
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
