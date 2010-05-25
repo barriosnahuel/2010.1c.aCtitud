@@ -106,6 +106,7 @@ char* obtenerRecursoDeCabecera(char* sMensajeHTTPCliente);
  */
 char* obtenerGrupoDeNoticias(char* sRecursoPedido);
 
+char* sacarEspaciosEnGrupo(char* grupo);
 /**
  * Funcion que devuelve 1 en caso de que el recurso sea del estilo /grupoDeNoticias/Noticia. Devolver� 0 si es /grupoDeNoticias nomas.
  */
@@ -574,7 +575,7 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	LoguearDebugging("<-- formatearEspacios()", APP_NAME_FOR_LOGGER);
 }
 
-char* sacarEspaciosEnGrupo(const char *grupo)
+char* sacarEspaciosEnGrupo(char* grupo)
 { 
 	int i ;
 	int j;
