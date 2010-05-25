@@ -115,11 +115,10 @@ int obtenerListadoNoticiasParaUnGrupo( stArticle			pstArticleListado[]
 
 
 
-int obtenerListadoGruposDeNoticias(
-							char*					pListadoGruposDeNoticias[]
-							, PLDAP_SESSION 		stPLDAPSession
-							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
-							){
+int obtenerListadoGruposDeNoticias(	  char*					pListadoGruposDeNoticias[]
+									, PLDAP_SESSION 		stPLDAPSession
+									, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+									){
 	LoguearDebugging("--> obtenerListadoGruposDeNoticias()");
 	char* sLogMessage;
 
@@ -130,18 +129,22 @@ int obtenerListadoGruposDeNoticias(
 	unsigned int cantidadDeGrupos= 0;
 	unsigned int uiCantidadDeGruposSinRepetir= 0;
 
-
 	/* Este memset es importantisimo, ya que si no le seteamos ceros al array, y queremos ingresar a una posicion que no tiene nada tira Seg Fault */
 	memset(pListadoGruposDeNoticias, 0, 1000);/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 
 	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, stPLDAPSession, stPLDAPSessionOperations, sCriterio);
 
-	quitarRepetidos(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
+	asprintf(&sLogMessage, "Se encontraron %d grupos de noticias (contando repetidos).", cantidadDeGrupos);
+	LoguearInformacion(sLogMessage);
 
-	uiCantidadDeGruposSinRepetir= pasarArrayEnLimpio(&listadoGrupoNoticiasRepetidos, cantidadDeGrupos, pListadoGruposDeNoticias);
+	quitarRepetidos(listadoGrupoNoticiasRepetidos, cantidadDeGrupos);
+	uiCantidadDeGruposSinRepetir= pasarArrayEnLimpio(listadoGrupoNoticiasRepetidos, cantidadDeGrupos, pListadoGruposDeNoticias);
 
-	LoguearDebugging("<-- obtenerListadoNoticiasParaUnGrupo()");
+	asprintf(&sLogMessage, "Hay %d grupos de noticias (sin repetir).", uiCantidadDeGruposSinRepetir);
+	LoguearInformacion(sLogMessage);
+
+	LoguearDebugging("<-- obtenerListadoGruposDeNoticias()");
 	return uiCantidadDeGruposSinRepetir;
 }
 

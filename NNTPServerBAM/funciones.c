@@ -291,7 +291,7 @@ char* processArticleCommand(  char** sResponse
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
+		asprintf(sResponse, "200 0 %s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
 
 	LoguearDebugging("<-- processArticleCommand()");
 }
@@ -321,7 +321,7 @@ char* processHeadCommand(  char** sResponse
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "221\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead);
+		asprintf(sResponse, "221 0 %s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead);
 
 	LoguearDebugging("<-- processHeadCommand()");
 }
@@ -351,15 +351,55 @@ char* processBodyCommand(  char** sResponse
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "222\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
+		asprintf(sResponse, "222 0 %s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
 	LoguearDebugging("<-- processBodyCommand()");
 }
 
-char* processListGroupCommand(  char** sResponse
-									, PLDAP_SESSION stPLDAPSession
-									, PLDAP_SESSION_OP stPLDAPSessionOperations
-									, char* sGrupoDeNoticias){
+char* processListNewsgroupsCommand(	  char**			psResponse
+									, PLDAP_SESSION 	stPLDAPSession
+									, PLDAP_SESSION_OP 	stPLDAPSessionOperations){
+	char* sLogMessage;
 	LoguearDebugging("--> processListNewsgroupsCommand()");
+
+	char* listadoGruposNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
+	unsigned int uiCantidadGruposNoticias= obtenerListadoGruposDeNoticias(listadoGruposNoticias, stPLDAPSession, stPLDAPSessionOperations);
+
+	asprintf(&sLogMessage, "La cantidad de grupos de noticias encontrados es de: %d", uiCantidadGruposNoticias);
+	LoguearInformacion(sLogMessage);
+
+	asprintf(psResponse, "%s", getMessageForResponseCode(215));
+	if(uiCantidadGruposNoticias==0)
+		asprintf(psResponse, "%s\n.", *psResponse);
+	else{
+		char* sListadoParaResponse;
+		asprintf(&sListadoParaResponse, "");
+		int index;
+		for(index= 0; index<uiCantidadGruposNoticias; index++)
+			asprintf(&sListadoParaResponse, "%s\n%s", sListadoParaResponse, listadoGruposNoticias[index]);
+
+		/**
+		 * "
+		 * 215 Information follows
+		 * newsgroupName	newsgroupShortDescript
+		 * ...
+		 * newsgroupName	newsgroupShortDescript
+		 * .
+		 * "
+		 * - 215					El codigo del response.
+		 * - newsgroupName			El nombre del grupo de noticias.
+		 * - newsgroupShortDescript	Una descripcion corta del grupo de noticias (En nuestra BD no existe).
+		 */
+		asprintf(psResponse, "%s%s\n.", *psResponse, sListadoParaResponse);
+	}
+
+	LoguearDebugging("<-- processListNewsgroupsCommand()");
+}
+
+char* processListGroupCommand(	  char**			psResponse
+								, PLDAP_SESSION 	stPLDAPSession
+								, PLDAP_SESSION_OP 	stPLDAPSessionOperations
+								, char* 			sGrupoDeNoticias){
+	LoguearDebugging("--> processListGroupCommand()");
 	char* sLogMessage;
 
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
@@ -367,20 +407,67 @@ char* processListGroupCommand(  char** sResponse
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 	unsigned int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, stPLDAPSession, stPLDAPSessionOperations, sGrupoDeNoticias);
 
-	asprintf(sResponse, "hola!!");
+	asprintf(&sLogMessage, "La cantidad de noticias encontradas para el grupo \"%s\" es de: %d", sGrupoDeNoticias, uiCantidadDeNoticias);
+	LoguearInformacion(sLogMessage);
 
-	LoguearDebugging("<-- processListNewsgroupsCommand()");
+	if(uiCantidadDeNoticias==0)
+		asprintf(psResponse, getMessageForResponseCode(411));
+	else{
+		unsigned int uiArticleIDMasChico= 9999999999;	/*	El maximo decidimos que son 10 digitos.	*/
+		unsigned int uiArticleIDMasGrande= 0;			/*	Los ID son >=0	*/
+
+		char* sListadoParaResponse;
+		asprintf(&sListadoParaResponse, "");
+		int index;
+		for(index= 0; index<uiCantidadDeNoticias; index++){
+			unsigned int uiArticleID= listadoNoticias[index].uiArticleID;
+
+			if(uiArticleID<uiArticleIDMasChico)
+				uiArticleIDMasChico= uiArticleID;
+
+			if(uiArticleID>uiArticleIDMasGrande)
+				uiArticleIDMasGrande= uiArticleID;
+
+			asprintf(&sListadoParaResponse, "%s\n%d", sListadoParaResponse, uiArticleID);
+		}
+
+		/**
+		 * "
+		 * 211 number low high group
+		 * articleNumber
+		 * ...
+		 * articleNumber
+		 * .
+		 * "
+		 * - 211	El codigo del response.
+		 * - number	La cantidad de articulos pertenecientes al newsgroup elegido.
+		 * - low	El articleID (articleNumber en realidad) mas chico para el grupo de noticias.
+		 * - high	El articleID (articleNumber en realidad) mas grande para el grupo de noticias.
+		 * - group	El nombre del grupo
+		 * Nota: Por las dudas, se usan espacios en lugares de tabs.
+		 */
+		asprintf(psResponse, "211 %d %d %d %s%s\n.", uiCantidadDeNoticias, uiArticleIDMasChico, uiArticleIDMasGrande, sGrupoDeNoticias, sListadoParaResponse);
+	}
+
+	LoguearDebugging("<-- processListGroupCommand()");
 }
+
 
 
 char* getMessageForResponseCode(unsigned int uiResponseCode){
 	LoguearDebugging("--> getMessageForResponseCode()");
 
 	switch (uiResponseCode) {
+		case 215:
+			return "215 Information follows";
+		case 411:
+			return "411 No such newsgroup.";
+		case 412:	/*	TODO: Chequear si este hay que mandarlo o no.	*/
+			return "412 No newsgroup selected.";
 		case 430:
-			return "430\tNo article with that message-id.";
+			return "430 No article with that message-id.";
 		default:
-			return "WTF!!";
+			return "Codigo de response invalido.";
 			break;
 	}
 

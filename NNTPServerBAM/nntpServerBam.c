@@ -175,29 +175,31 @@ int main(int argn, char *argv[]){
 					char* sResponse;
 					switch(SeleccionarComando(czMsg)) {
                 	    case 0:  /* LIST 	o	LIST NEWSGROUPS	*/
-                	        printf("0\n");
-                	    break;
+                	    	processListNewsgroupsCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
+                	    	break;
                 	    case 1:  /* QUIT */
-                    	    printf("1\n");
-                	    break;
+                	    	printf("1	Hay que hacer algo con quit????\n");
+                	    	break;
                    	    case 2:  /* LISTGROUP */
                    	    	processListGroupCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
-                	    break;
+                   	    	break;
                    	    case 3:  /* ARTICLE */
                        	    processArticleCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
-                	    break;
+                       	    break;
                    	    case 4:  /* STAT */
                        	    printf("4\n");
-                	    break;
+printf("Esto esta puesto aca solo para probar, porque no me anda cuando ingreso el comando list newsgroups. chequear el cliente!!!!!!    una vez que el cliente acepte el comando LIST NEWSGROUPS la parte del server ya esta hecha y probada casi toda.\n");
+                       	    processListNewsgroupsCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
+                       	    break;
                    	    case 5:  /* HEAD */
                        	    processHeadCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
-                	    break;
+                       	    break;
                    	    case 6:  /* BODY */
                        	    processBodyCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
-                	    break;
-                   	    case 7:  /* GROUP o LIST NEWSGROUPS	"Este no va, son 7 nomas!!?? */
+                       	    break;
+                   	    case 7:  /* GROUP 		Este no va, son 7 nomas!!?? */
                    	    	printf("7\n");
-                	    break;
+                   	    	break;
                 	}
 
 					SSL_write(ssl, sResponse, strlen(sResponse));

@@ -551,7 +551,7 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
 	}
 
 	char* listadoGrupoNoticiasSinRepetir[1000];
-	unsigned int cantidadDeGruposSinRepetir= obtenerListadoGruposDeNoticias(&listadoGrupoNoticiasSinRepetir, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations));
+	unsigned int cantidadDeGruposSinRepetir= obtenerListadoGruposDeNoticias(listadoGrupoNoticiasSinRepetir, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations));
 
 	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()");
 	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
