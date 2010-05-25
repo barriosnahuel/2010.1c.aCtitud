@@ -73,7 +73,7 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   char *claveCache = NULL ;
   int largoID;
   int largoGrupoDeNoticias;
-  article.uiArticleID = 999;
+
   largoID = sizeof(article.uiArticleID);
   ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
