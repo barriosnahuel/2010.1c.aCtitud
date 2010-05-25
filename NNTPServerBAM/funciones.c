@@ -335,7 +335,6 @@ char* processBodyCommand(  char** sResponse
 	char* sGrupoNoticia;
 	char* sArticleID;
 	obtenerParametrosDesdePK(&sGrupoNoticia, &sArticleID, sParametroDelComando);
-
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
 
@@ -352,6 +351,33 @@ char* processBodyCommand(  char** sResponse
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
 		asprintf(sResponse, "222 0 %s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
+	LoguearDebugging("<-- processBodyCommand()");
+}
+
+char* processStatCommand(  char** sResponse
+							, PLDAP_SESSION stPLDAPSession
+							, PLDAP_SESSION_OP stPLDAPSessionOperations
+							, char* sParametroDelComando){
+	LoguearDebugging("--> processBodyCommand()");
+
+	char* sGrupoNoticia;
+	char* sArticleID;
+	obtenerParametrosDesdePK(&sGrupoNoticia, &sArticleID, sParametroDelComando);
+	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
+	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+
+	if(stArticulo.uiArticleID==-1)
+		asprintf(sResponse, getMessageForResponseCode(430));
+	else
+		/*	Este formato del response esta especificado por el RFC 3977
+			"223	0	clarin@2
+			Donde:
+			-	223 es el codigo del response.
+			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
+			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
+		 */
+		asprintf(sResponse, "222 0 %s@%d", stArticulo.sNewsgroup, stArticulo.uiArticleID);
 	LoguearDebugging("<-- processBodyCommand()");
 }
 
