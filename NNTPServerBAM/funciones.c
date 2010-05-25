@@ -268,6 +268,7 @@ char* processArticleCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando){
+	LoguearDebugging("--> processArticleCommand()");
 
 	char* sGrupoNoticia;
 	char* sArticleID;
@@ -277,7 +278,7 @@ char* processArticleCommand(  char** sResponse
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
 
 	if(stArticulo.uiArticleID==-1)
-		asprintf(sResponse, "430\tNo article with that message-id.");
+		asprintf(sResponse, getMessageForResponseCode(430));
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
 			"200	0	clarin@2
@@ -291,19 +292,25 @@ char* processArticleCommand(  char** sResponse
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
 		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
+
+	LoguearDebugging("<-- processArticleCommand()");
 }
 
 char* processHeadCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando){
+	LoguearDebugging("--> processHeadCommand()");
 
 	char* sGrupoNoticia;
 	char* sArticleID;
 	obtenerParametrosDesdePK(&sGrupoNoticia, &sArticleID, sParametroDelComando);
 	
+	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
+	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
+
 	if(stArticulo.uiArticleID==-1)
-		asprintf(sResponse, "430\tNo article with that message-id.");
+		asprintf(sResponse, getMessageForResponseCode(430));
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
 			"221	0	clarin@2
@@ -316,12 +323,14 @@ char* processHeadCommand(  char** sResponse
 		 */
 		asprintf(sResponse, "221\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead);
 
+	LoguearDebugging("<-- processHeadCommand()");
 }
 
 char* processBodyCommand(  char** sResponse
 							, PLDAP_SESSION stPLDAPSession
 							, PLDAP_SESSION_OP stPLDAPSessionOperations
 							, char* sParametroDelComando){
+	LoguearDebugging("--> processBodyCommand()");
 
 	char* sGrupoNoticia;
 	char* sArticleID;
@@ -331,7 +340,7 @@ char* processBodyCommand(  char** sResponse
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, sGrupoNoticia, sArticleID);
 
 	if(stArticulo.uiArticleID==-1)
-		asprintf(sResponse, "430\tNo article with that message-id.");
+		asprintf(sResponse, getMessageForResponseCode(430));
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
 			"222	0	clarin@2
@@ -343,18 +352,18 @@ char* processBodyCommand(  char** sResponse
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
 		asprintf(sResponse, "222\t0\t%s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
-
+	LoguearDebugging("<-- processBodyCommand()");
 }
 
 char* processListNewsgroupsCommand(  char** sResponse
 									, PLDAP_SESSION stPLDAPSession
 									, PLDAP_SESSION_OP stPLDAPSessionOperations){
-
+	LoguearDebugging("--> processListNewsgroupsCommand()");
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
 	stArticle stArticulo= getArticle(stPLDAPSession, stPLDAPSessionOperations, "clarin", "1");
 
 	if(stArticulo.uiArticleID==-1)
-		asprintf(sResponse, "430\tNo article with that message-id.");
+		asprintf(sResponse, "frutaaaa");
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
 			"200	0	clarin@2
@@ -368,5 +377,27 @@ char* processListNewsgroupsCommand(  char** sResponse
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
 		asprintf(sResponse, "200\t0\t%s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
+	LoguearDebugging("<-- processListNewsgroupsCommand()");
 }
 
+
+
+
+
+
+
+
+
+char* getMessageForResponseCode(unsigned int uiResponseCode){
+	LoguearDebugging("--> getMessageForResponseCode()");
+
+	switch (uiResponseCode) {
+		case 430:
+			return "430\tNo article with that message-id.";
+		default:
+			return "WTF!!";
+			break;
+	}
+
+	LoguearDebugging("<-- getMessageForResponseCode()");
+}

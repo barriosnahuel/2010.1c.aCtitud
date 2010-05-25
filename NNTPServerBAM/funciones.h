@@ -2,7 +2,7 @@
 #define _FUNCIONES_H
 
 #include "../LDAP/LdapWrapperHandler.h"
-#include "../Logger/logger.h"
+#include "logger.h"
 #include "../util.h"
 
 void PantallaInicio(void);
@@ -40,6 +40,11 @@ char* processListNewsgroupsCommand(  char** sResponse
 									, PLDAP_SESSION stPLDAPSession
 									, PLDAP_SESSION_OP stPLDAPSessionOperations);
 
-
+/**
+ * En base al response code (del protocolo NNTP, RFC 3977) obtiene un char*
+ * con el mensaje correspondiente. Esta funcion la usamos para los mensajes
+ * constantes como el 430 - no article with that message-id.
+ */
+char* getMessageForResponseCode(unsigned int uiResponseCode);
 
 #endif
