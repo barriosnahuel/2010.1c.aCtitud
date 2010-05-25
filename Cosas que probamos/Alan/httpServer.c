@@ -180,7 +180,7 @@ int main(void) {
 	asprintf(&sLogMessage,"\tPuerto memcachedServer2: %d\n",stConf.memcachedServer2Puerto);
 	
     memcached_st * memc;
-	iniciarClusterCache(&memc,stConf.memcachedServer2,stConf.memcachedServer2Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
+	iniciarClusterCache(&memc,stConf.memcachedServer1,stConf.memcachedServer1Puerto,stConf.memcachedServer2,stConf.memcachedServer2Puerto);
 	
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
@@ -191,7 +191,7 @@ int main(void) {
 	PLDAP_SESSION_OP stPLDAPSessionOperations = newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 	if (!crearConexionLDAP(&stConf, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
-		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER);
+		LoguearError("No se pudo conectar a OpenDS.", APP_NAME_FOR_LOGGER); 
 		return -1;
 	}
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
@@ -325,7 +325,7 @@ int main(void) {
 
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
-
+	memcached_free(memc);
 	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
 
