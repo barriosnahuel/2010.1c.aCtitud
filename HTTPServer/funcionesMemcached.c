@@ -154,6 +154,8 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   }else{
   	LoguearError("No se encontro el articulo en la cache.", APP_NAME_FOR_LOGGER);
 	printf("No se encontro el articulo en la cache\n");
+	free(claveCache);
+	free(resultNoticia);
 	return 0;
   }  	
   
