@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <string>
-
+#include <stdio>
 #include "Comando.hpp"
 
 using namespace std;
@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-puts(nombreComando);
+printf(nombreComando);
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
