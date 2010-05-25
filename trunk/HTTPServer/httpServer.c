@@ -505,6 +505,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
+		printf("LLEGA HASTA ACA \n");
 		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
 	}
 	if(stArticulo.uiArticleID != -1) {
