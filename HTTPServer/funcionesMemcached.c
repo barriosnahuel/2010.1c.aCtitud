@@ -76,7 +76,6 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
 	printf("Se inserto correctamente el articulo en la cache\n");
   }else{
 	LoguearError("No se pudo insertar el articulo en la cache.");
-	printf("No se pudo insertar el articulo en la cache\n");	
   }
   free(articuloEnBytes);
   free(articuloCache);
