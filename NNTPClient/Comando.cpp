@@ -73,12 +73,14 @@ int Comando::validacion() {
 	int comandoOk = 0;
 	int parametroOk = 0;
 
-	for(i=0;i<=6;i++)
+	for(i=0;i<=6;i++){
 		if(nombreComando == vectorDeComandos[i]) {
 			comandoOk = 1;
 			break;
-		}
+		}}
+
 cout<<"comnado OK ?? (si es uno esta ok):"<<comandoOk<<endl;
+
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
 			if(i == 2) {
