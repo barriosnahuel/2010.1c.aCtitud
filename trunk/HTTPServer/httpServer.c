@@ -82,8 +82,10 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros);
 
-		
-
+/**
+ * Saca los espacios del grupo para poder insertarlo en la clave de la cache		
+ */
+char* sacarEspaciosEnGrupo(char* grupo)
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
@@ -501,19 +503,36 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	return response;
 }
 
+char* sacarEspaciosEnGrupo(char* grupo)
+{ 
+	int i ;
+	int j;
+	char* grupoSinEspacios = malloc(strlen(grupo)+1);
+	for(i=0,j=0;i<=strlen(grupo);i++){
+		if(!isspace(grupo[i])){
+			grupoSinEspacios[j] = grupo[i];
+			j++;
+		}
+	}
+	grupoSinEspacios[j]='\0';
+	return grupoSinEspacios;
+}
+
+
 char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeUnaNoticia()");
 
 	stArticle stArticulo;
-	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,&pstParametros->memCluster)) {
+	char* grupoSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
+	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,grupoSinEspacios,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("GRUPO ANTES DE BUSCAR EN BD : %s \n", sGrupoDeNoticias);
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
 	}
 	if(stArticulo.uiArticleID != -1) {
 		
