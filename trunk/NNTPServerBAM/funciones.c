@@ -413,7 +413,7 @@ char* processListGroupCommand(	  char**			psResponse
 	if(uiCantidadDeNoticias==0)
 		asprintf(psResponse, getMessageForResponseCode(411));
 	else{
-		unsigned int uiArticleIDMasChico= 9999999999;	/*	El maximo decidimos que son 10 digitos.	*/
+		unsigned int uiArticleIDMasChico= 99999999;		/*	El maximo decidimos que son 10 digitos.	*/
 		unsigned int uiArticleIDMasGrande= 0;			/*	Los ID son >=0	*/
 
 		char* sListadoParaResponse;
