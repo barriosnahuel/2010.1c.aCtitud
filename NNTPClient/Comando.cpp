@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <string>
-#include <stdio>
+
 #include "Comando.hpp"
 
 using namespace std;
@@ -79,7 +79,7 @@ int Comando::validacion() {
 			break;
 		}
 
-printf("Comando que llega %s : ",nombreComando);
+cout<<"Comando que le llega"<<nombreComando<<endl;
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
@@ -187,7 +187,7 @@ void Comando::extraerNombreYParametro(string comandoEntero){
 		for(i=espaciosDpsComando;i<comandoEntero.length()&&!isspace(comandoEntero.c_str()[i]);i++)
 			nombreComando = nombreComando + comandoEntero[i];
 	}
-printf("nombreComando : %s",nombreComando);	
+cout<<"nombre del comando"<<nombreComando<<endl;
 	// EL RESTO DE LA CADENA ES EL PARAMETRO
 	espaciosDpsComando = consumeEspaciosDesde(i,comandoEntero);
 	for( i = espaciosDpsComando;i<comandoEntero.length();i++)
