@@ -91,18 +91,19 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   articuloCache->datos.largoBody = strlen(article.sBody) +1;
   articuloCache->head= malloc(articuloCache->datos.largoHead);
   articuloCache->body=malloc(articuloCache->datos.largoBody);
+printf("PASA POR ACA 1 \n");
   strcpy(articuloCache->head,article.sHead);
   strcpy(articuloCache->body,article.sBody);
   char * articuloEnBytes;
   size_t  articuloEnBytesLargo;
   articuloEnBytesLargo=sizeof(t_news_largos)+articuloCache->datos.largoHead+articuloCache->datos.largoBody;
   articuloEnBytes = malloc(articuloEnBytesLargo);
-
+printf("PASA POR ACA 2 \n");
   memcpy(articuloEnBytes,(char*)&articuloCache->datos,sizeof(t_news_largos));
   memcpy(articuloEnBytes+sizeof(t_news_largos),articuloCache->head,articuloCache->datos.largoHead);
   memcpy(articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead,articuloCache->body,articuloCache->datos.largoBody);
   rc=memcached_set(*memc,claveCache,strlen(claveCache),articuloEnBytes,articuloEnBytesLargo,0,0);
-
+printf("PASA POR ACA 3\n");
 /*printf("articuloEnBytes:%d \n",articuloEnBytes);
   printf("articuloEnBytes+sizeof(t_news_largos):%d \n",articuloEnBytes+sizeof(t_news_largos));
   printf("articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead:%d \n",articuloEnBytes+sizeof(t_news_largos)+articuloCache->datos.largoHead);
