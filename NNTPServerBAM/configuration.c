@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "logger.h"
+
 #include "configuration.h"
+#include "../Logger/logger.h"
 
 char *GetVal(const char *sValBuff, const char *sBuff){
     char *sVal;

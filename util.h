@@ -8,6 +8,8 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include "LDAP/LdapWrapperHandler.h"
+
 /**
  * Quita los elementos repetidos del array listadoGruposDeNoticias, y pone ceros en las posiciones donde se repiten.
  */
@@ -19,19 +21,10 @@ void quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNot
  */
 unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias, char* listadoGrupoNoticiasSinRepetir[]);
 
-
-
-
-
-
 /**
  * Reemplaza los %20 por espacios y devuelve la cadena sin %20.
  */
 char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios);
-
-
-
-
 
 /**
  * Setea en sDest un substring de sSource a partir de la posicion begin (hasta el final).
@@ -53,6 +46,27 @@ char* substringTill(char** sDest, const char* sSource, unsigned int till);
 void obtenerParametrosDesdePK(	char** psGrupoNoticia
 								, char**	psArticleID
 								, char*		sParametroDelComando);
+
+/**
+ * Setea en pListadoGruposDeNoticias[] un listado de char* con los grupos de noticias
+ * disponibles en la BD. Retorna la cantidad total de grupos.
+ * Nota: Esta funcion retorna un listado SIN repetir.
+ */
+int obtenerListadoGruposDeNoticias(  char*					pListadoGruposDeNoticias[]
+									, PLDAP_SESSION 		stPLDAPSession
+									, PLDAP_SESSION_OP 		stPLDAPSessionOperations
+									);
+
+/**
+ * Setea en pstArticleListado[] un listado de stArticle con los articulos disponibles
+ * para un grupo de noticia dado (sGrupoDeNoticias). Retorna la cantidad total de noticias.
+ */
+int obtenerListadoNoticiasParaUnGrupo( stArticle			pstArticleListado[]
+										, PLDAP_SESSION 	stPLDAPSession
+										, PLDAP_SESSION_OP	stPLDAPSessionOperations
+										, char* 			sGrupoDeNoticias
+										);
+
 
 
 #endif /* UTIL_H_ */

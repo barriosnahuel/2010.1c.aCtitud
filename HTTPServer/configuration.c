@@ -7,7 +7,6 @@
 #define APP_PORT "AppPort="
 #define OPENDS_SERVER "OpenDSServer="
 #define OPENDS_PORT "OpenDSPort="
-#define APP_NAME_FOR_LOGGER "AppNameForLogger="
 #define MEMCACHED_SERVER1_IP "MemcachedServer1IP="
 #define MEMCACHED_SERVER1_PORT "MemcachedServer1Port="
 #define MEMCACHED_SERVER2_IP "MemcachedServer2IP="
