@@ -502,6 +502,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		printf("LLEGA HASTA ACA 1 \n");
+		printf("GRUPO ANTES DE BUSCAR EN BD : %s", sGrupoDeNoticias);
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
