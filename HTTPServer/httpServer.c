@@ -85,7 +85,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 /**
  * Saca los espacios del grupo para poder insertarlo en la clave de la cache		
  */
-char* sacarEspaciosEnGrupo(char* grupo)
+char* sacarEspaciosEnGrupo(char* grupo);
 /**
  * Busca la noticia en la BD, y setea el stArticulo con esa noticia.
  */
