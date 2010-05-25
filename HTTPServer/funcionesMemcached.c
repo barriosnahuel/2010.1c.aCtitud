@@ -78,12 +78,12 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
   sGrupoDeNoticiasSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
   printf("sGrupoDeNoticias: %s \n",sGrupoDeNoticiasSinEspacios);
   largoID = sizeof(article.uiArticleID);
-  ID = malloc(largoID);
+  /*ID = malloc(largoID);
   sprintf(ID,"%d",article.uiArticleID);
-  largoID = strlen(ID);
-  largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios) + 1;
+  largoID = sizeof(ID);*/
+  largoGrupoDeNoticias = strlen(sGrupoDeNoticiasSinEspacios)+1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,ID);
+  sprintf(claveCache,"%s%s",sGrupoDeNoticiasSinEspacios,article.uiArticleID);
   
   printf("CLAVE CACHE %s \n",claveCache);
   

@@ -501,13 +501,11 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	stArticle stArticulo;
 	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
-		printf("LLEGA HASTA ACA 1 \n");
-		printf("GRUPO ANTES DE BUSCAR EN BD : %s", sGrupoDeNoticias);
+		printf("GRUPO ANTES DE BUSCAR EN BD : %s \n", sGrupoDeNoticias);
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		printf("LLEGA HASTA ACA 2\n");
 		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,&pstParametros->memCluster);
 	}
 	if(stArticulo.uiArticleID != -1) {
