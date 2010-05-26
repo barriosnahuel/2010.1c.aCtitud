@@ -421,6 +421,14 @@ char* processListNewsgroupsCommand(	  char**			psResponse
 	LoguearDebugging("<-- processListNewsgroupsCommand()");
 }
 
+char* processQuitCommand(char** psResponse) {
+	LoguearDebugging("--> processQuitCommand()");
+
+	asprintf(psResponse, "%s", getMessageForResponseCode(205));
+	
+	LoguearDebugging("<-- processQuitCommand()");
+}
+
 char* processListGroupCommand(	  char**			psResponse
 								, PLDAP_SESSION 	stPLDAPSession
 								, PLDAP_SESSION_OP 	stPLDAPSessionOperations
@@ -484,6 +492,8 @@ char* getMessageForResponseCode(unsigned int uiResponseCode){
 	LoguearDebugging("--> getMessageForResponseCode()");
 
 	switch (uiResponseCode) {
+		case 205:
+			return "205 Connection closing";
 		case 215:
 			return "215 Information follows";
 		case 411:

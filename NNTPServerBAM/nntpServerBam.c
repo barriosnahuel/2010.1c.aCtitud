@@ -178,7 +178,7 @@ int main(int argn, char *argv[]){
                 	    	processListNewsgroupsCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
                 	    	break;
                 	    case 1:  /* QUIT */
-                	    	printf("1	Hay que hacer algo con quit????\n");
+                	    	processQuitCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
                 	    	break;
                    	    case 2:  /* LISTGROUP */
                    	    	processListGroupCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
