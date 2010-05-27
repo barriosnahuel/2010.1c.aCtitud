@@ -19,19 +19,37 @@ char* substringTill(char** sDest, const char* sSource, unsigned int till){
 }
 
 
+void pasarAMayusculas(char* sCadena){
+	LoguearDebugging("--> pasarAMayusculas()");
+
+	unsigned int uiCantCaracteres= strlen(sCadena);
+	int index;
+	for(index= 0; index<uiCantCaracteres; index++){
+		*(sCadena+index)= toupper(*(sCadena+index));
+	}
+
+	LoguearDebugging("<-- pasarAMayusculas()");
+}
 
 
-
-void quitarRepetidos(char* listadoGrupoNoticiasRepetidos[], int iCantidadDeGruposDeNoticias) {
+void quitarRepetidos(char* unListadoDeCadenas[], int iCantidadDeElementos) {
 	int i;
 	int j;
 	char grupoDeNoticias[70];/*	TODO: 70???	*/
 
-	for(i = 0; i < iCantidadDeGruposDeNoticias; i++) {
-		strcpy(grupoDeNoticias, listadoGrupoNoticiasRepetidos[i]);
-		for(j = i+1; j < iCantidadDeGruposDeNoticias; j++) {
-			if(strcmp(grupoDeNoticias, listadoGrupoNoticiasRepetidos[j]) == 0) {
-				listadoGrupoNoticiasRepetidos[j] = "0\0";
+	char* listadoEnMayusculas[iCantidadDeElementos];
+	for(i = 0; i < iCantidadDeElementos; i++) {
+		char* sCadena;
+		asprintf(&sCadena, "%s", unListadoDeCadenas[i]);
+		pasarAMayusculas(sCadena);
+		listadoEnMayusculas[i]= sCadena;
+	}
+
+	for(i = 0; i < iCantidadDeElementos; i++) {
+		strcpy(grupoDeNoticias, listadoEnMayusculas[i]);
+		for(j = i+1; j < iCantidadDeElementos; j++) {
+			if(strcmp(grupoDeNoticias, listadoEnMayusculas[j]) == 0) {
+				unListadoDeCadenas[j] = "0\0";
 			}
 		}
 	}
@@ -49,12 +67,6 @@ unsigned int pasarArrayEnLimpio(char* listadoGrupoNoticiasRepetidos[], int iCant
 	}
 	return l;
 }
-
-
-
-
-
-
 
 char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios) {
 	int i = 0;

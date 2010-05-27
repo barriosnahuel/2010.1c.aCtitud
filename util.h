@@ -11,9 +11,10 @@
 #include "LDAP/LdapWrapperHandler.h"
 
 /**
- * Quita los elementos repetidos del array listadoGruposDeNoticias, y pone ceros en las posiciones donde se repiten.
+ * Quita los elementos repetidos del array unListadoDeCadenas, y pone ceros en las posiciones donde se repiten.
+ * Importante: Esta funcion NO es case sensitive.
  */
-void quitarRepetidos(char* listadoGruposDeNoticias[], int iCantidadDeGruposDeNoticias);
+void quitarRepetidos(char* unListadoDeCadenas[], int iCantidadDeElementos);
 
 /**
  * Pasa los campos que sean distintos de cero del array listadoGrupoNoticiasRepetidos a listadoGrupoNoticiasSinRepetir y retorna la cantidad de campos que posee este
@@ -67,6 +68,9 @@ int obtenerListadoNoticiasParaUnGrupo( stArticle			pstArticleListado[]
 										, char* 			sGrupoDeNoticias
 										);
 
-
+/**
+ * Pasa a mayusculas la cadena de texto que se le pasa como parametro.
+ */
+void pasarAMayusculas(char* sCadena);
 
 #endif /* UTIL_H_ */
