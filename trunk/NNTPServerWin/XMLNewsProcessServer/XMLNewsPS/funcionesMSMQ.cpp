@@ -46,17 +46,17 @@ void MsmqProcess::leerMensajes()
   return;
 }
 
-void MsmqProcess::insertarMensajes()
+void MsmqProcess::insertarMensaje(IMSMQMessagePtr pMsg)
 {	
   OleInitialize(NULL);                                   // Hay que inicializar OLE//
   IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
   IMSMQQueuePtr qSend;
-  IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
+  //IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
   qInfo->PathName = ".\\Private$\\colaDeNoticias";
   //Abro la Cola de Mensajería con derechos de escritura
   qSend = qInfo->Open(MQ_SEND_ACCESS, MQ_DENY_NONE);         
-  pMsg->Label = "Probando el Label";                     //Agrego el Label y Body y envío el mensaje
-  pMsg->Body = "Este TP lo aprobamos";
+  //pMsg->Label = "Probando el Label";                     //Agrego el Label y Body y envío el mensaje
+  //pMsg->Body = "Este TP lo aprobamos";
   pMsg->Send(qSend);   //enviamos el mensaje
   qSend->Close();    //Cerramos la cola de mensajería
   CoUninitialize();
