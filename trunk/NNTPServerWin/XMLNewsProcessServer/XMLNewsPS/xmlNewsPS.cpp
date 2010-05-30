@@ -52,16 +52,24 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
-	//RECIBE EL XML, LA APLICACION QUE LO GUARDA EN OPENDS ES LA ENCARGADA DE PARSEAR EL XML
+	int bytesRecibidos;
+	int lenXML;
+	char* xml;
+	//TODO - FGUERRA: ¡¡ DESHARDCODEAR ESTO !!
+	lenXML = 3064;
 
-	//GUARDA EL XML EN LA MSMQ
-	string xmlRecibido =  "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?> <news> <newsgroup>Minuto.com</newsgroup> <idNoticia>12345</idNoticia> <HEAD>Head Noticia</HEAD> <BODY>Body Noticia</BODY> </news>";
+	bytesRecibidos = recv(stParametros.ficheroCliente, xml, lenXML, 0);
+	cout << "Recibi el xml: " << xml << endl;
 	
-	
+	// Paso el xml a un msj para meter en la cola.
+	// TODO - FGUERRA: Por ahora meto todo el xml en el body. ¿Es correcto esto? :S
+	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
+	pMsg->Body = xml;
 
-	
+	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
+	stParametros.colaMsmq.insertarMensaje(pMsg);
 
-
+	// Si pude insertar el mensaje correctamente cierro todo al carajo.
 	_endthreadex(0);
     return 0;
 }
@@ -74,6 +82,7 @@ int main(){
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
 
+	/* Prueba de insersion de 1 msj 
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 	pMsg->Label = "Label de la prueba de Fer";                     //Agrego el Label y Body y envío el mensaje
 	pMsg->Body = "Body de la prueba de Fer";
@@ -83,7 +92,7 @@ int main(){
 
 	cout << "Voy a leer los msjs" << endl;
 	colaMsmq.leerMensajes();
-
+	*/
 
 	//Se inicializa la biblioteca winsock.
 	WSADATA WsaData;
@@ -92,13 +101,13 @@ int main(){
 	SOCKET ficheroServer;
 	struct sockaddr_in server;
 	
-	/*if(crearConexionSocket(&ficheroServer,&server)==1){
+	/* Se crea el socket que quedara a la escucha de conexiones */
+	if(crearConexionSocket(&ficheroServer,&server)==1){
 		cout<<"No se pudo crear la conexion"<<endl;
 		return EXIT_FAILURE;
 	}
 	
-	//Queda a la escucha de conexiones
-	//while(1){ (??)
+	//while(1){
 		int  addrlen = sizeof(struct sockaddr_in);
 		struct sockaddr_in cliente;
 		SOCKET ficheroCliente = accept(ficheroServer,(sockaddr*)&cliente,&addrlen);
@@ -108,6 +117,7 @@ int main(){
 		    //Le seteo los parametros al nuevo thread
 			
 			stThreadParameters stParameters;
+			stParameters.ficheroCliente= ficheroCliente;
 			stParameters.colaMsmq = colaMsmq;;
 
 			unsigned threadProcesarRequest;
