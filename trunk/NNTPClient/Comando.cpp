@@ -67,6 +67,7 @@ int Comando::init(string strCadena) {
 }
 
 int Comando::validacion() {
+	cout << "entre a validacion" << endl;
 	logger.LoguearDebugging("--> Comando::validacion()", APP_NAME_FOR_LOGGER);
 
 	int i ;
