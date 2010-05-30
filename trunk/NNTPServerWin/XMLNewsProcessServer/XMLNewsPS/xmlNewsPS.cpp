@@ -70,17 +70,15 @@ unsigned __stdcall clientFunction(void* threadParameters)
 int main(){
 	
 
-	//Creo la cola MSMQ.
-	// TODO - FGUERRA: Que pasa si la cola ya existe? (ahi ni la puede crear). Lo correcto seria que la cree 1 vez sola (la primera).
+	//Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
-	cout << "Cola creada correctamente" << endl;
 
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 	pMsg->Label = "Label de la prueba de Fer";                     //Agrego el Label y Body y envío el mensaje
 	pMsg->Body = "Body de la prueba de Fer";
 	cout << "pMsg creado correctamente" << endl;
-	colaMsmq.insertarMensaje(pMsg);
+	//colaMsmq.insertarMensaje(pMsg);
 	cout << "Inserte el mensaje en la cola" << endl;
 
 	cout << "Voy a leer los msjs" << endl;

@@ -7,9 +7,6 @@ HRESULT MsmqProcess::crearCola()
 	OleInitialize(NULL);    // Hay que inicializar OLE para usar el COM de MSMQ//
 	IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
 	qInfo->PathName = ".\\Private$\\colaDeNoticias";
-	// TODO - FGUERRA: Esto lo agregue simplemente para que cree la cola cada vez que corremos el programa. 
-	// ¡¡¡¡ NO ES LO CORRECTO !!!!
-	qInfo->Delete();
 	try
 	{
 	  cout<<"Se intentara crear la cola de mensajes"<<endl;
@@ -18,8 +15,8 @@ HRESULT MsmqProcess::crearCola()
 	}
 	catch (_com_error comerr)
 	{
-	  cout<<"Ya existia una cola con el mismo nombre!!"<<endl;
-	  CoUninitialize();
+		/* En caso de que la cola ya exista, ignoro el error y uso la que ya existe. */
+		cout<<"Ya existe una cola con dicho nombre, por lo tanto no sera necesaria su creacion."<<endl;
 	}
 	CoUninitialize();
 	return 0;
