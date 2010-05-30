@@ -9,6 +9,6 @@ class MsmqProcess{
 public:
 	HRESULT crearCola(void);
 	void leerMensajes(void);
-	void insertarMensajes(void);
+	void insertarMensaje(IMSMQMessagePtr pMsg);
 };
 #endif

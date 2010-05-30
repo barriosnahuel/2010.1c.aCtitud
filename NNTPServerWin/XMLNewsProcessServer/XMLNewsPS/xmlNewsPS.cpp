@@ -74,6 +74,15 @@ int main(){
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
 
+	IMSMQMessagePtr pMsg;
+	pMsg->Label = "Label de la prueba de Fer";                     //Agrego el Label y Body y envío el mensaje
+	pMsg->Body = "Body de la prueba de Fer";
+	colaMsmq.insertarMensaje(pMsg);
+	cout << "Inserte el mensaje en la cola" << endl;
+
+	cout << "Voy a leer los msjs" << endl;
+	colaMsmq.leerMensajes();
+
 
 	//Se inicializa la biblioteca winsock.
 	WSADATA WsaData;
@@ -82,7 +91,7 @@ int main(){
 	SOCKET ficheroServer;
 	struct sockaddr_in server;
 	
-	if(crearConexionSocket(&ficheroServer,&server)==1){
+	/*if(crearConexionSocket(&ficheroServer,&server)==1){
 		cout<<"No se pudo crear la conexion"<<endl;
 		return EXIT_FAILURE;
 	}
@@ -115,7 +124,7 @@ int main(){
 		else{
 			cout<<"Problemas al aceptar conexion cliente."<<endl;
 		}
-	//}
+	//}*/
 	system("PAUSE");
 	return 0;
 }
