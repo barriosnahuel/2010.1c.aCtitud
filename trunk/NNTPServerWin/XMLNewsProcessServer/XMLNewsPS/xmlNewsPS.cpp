@@ -3,20 +3,16 @@
 #include<iostream>
 #include<cstdlib>
 #include<process.h>
+#include "funcionesMSMQ.hpp"
 using namespace std;
 /*
 #include<libxml/tree.h>
 #include<libxml/parser.h>
-
-
 class xmlProcess
 {
 	//Lo privado
-
 public:
-	
 }*/
-
 int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
 {
 	if((*ficheroServer = socket (AF_INET, SOCK_STREAM, 0))== INVALID_SOCKET){
@@ -52,15 +48,18 @@ unsigned __stdcall clientFunction(void* pArguments)
 	//RECIBE EL XML, LA APLICACION QUE LO GUARDA EN OPENDS ES LA ENCARGADA DE PARSEAR EL XML
 
 	//GUARDA EL XML EN LA MSMQ
+	string xmlRecibido =  "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?> <news> <newsgroup>Minuto.com</newsgroup> <idNoticia>12345</idNoticia> <HEAD>Head Noticia</HEAD> <BODY>Body Noticia</BODY> </news>";
 	
-	
-
 	_endthreadex(0);
     return 0;
 }
 
 
 int main(){
+
+	//Creo la cola MSMQ 
+	MsmqProcess colaMsmq;
+	colaMsmq.crearCola();
 
 
 	//Se inicializa la biblioteca winsock.
