@@ -13,6 +13,11 @@ class xmlProcess
 	//Lo privado
 public:
 }*/
+typedef struct stThreadParameters {
+	int ficheroCliente;    /*el file descriptor de la conexion con el nuevo cliente.	*/
+	MsmqProcess colaMsmq; /*Cola MSMQ*/
+} stThreadParameters;
+
 int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
 {
 	if((*ficheroServer = socket (AF_INET, SOCK_STREAM, 0))== INVALID_SOCKET){
@@ -39,9 +44,11 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
 };
 
 
-unsigned __stdcall clientFunction(void* pArguments)
+unsigned __stdcall clientFunction(void* threadParameters)
 {
 	cout<<"Entro al threadCliente"<<endl;
+	
+	stThreadParameters stParametros = *((stThreadParameters*) threadParameters); //Esto es raro xD, lo saque del HHTPServer
 	
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
@@ -50,12 +57,18 @@ unsigned __stdcall clientFunction(void* pArguments)
 	//GUARDA EL XML EN LA MSMQ
 	string xmlRecibido =  "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?> <news> <newsgroup>Minuto.com</newsgroup> <idNoticia>12345</idNoticia> <HEAD>Head Noticia</HEAD> <BODY>Body Noticia</BODY> </news>";
 	
+	
+
+	
+
+
 	_endthreadex(0);
     return 0;
 }
 
 
 int main(){
+	
 
 	//Creo la cola MSMQ 
 	MsmqProcess colaMsmq;
@@ -81,12 +94,23 @@ int main(){
 		SOCKET ficheroCliente = accept(ficheroServer,(sockaddr*)&cliente,&addrlen);
 		if(ficheroCliente != -1){
 			cout<<"Conexion entrante.."<<endl;
+			
+		    //Le seteo los parametros al nuevo thread
+			
+			stThreadParameters stParameters;
+			stParameters.colaMsmq = colaMsmq;;
+
 			unsigned threadProcesarRequest;
 			HANDLE threadCliente;
-			threadCliente = (HANDLE)_beginthreadex(NULL, 0,&clientFunction,
-							 NULL, 0, &threadProcesarRequest);
+			if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&clientFunction,
+				(void*)&stParameters, 0, &threadProcesarRequest))!=0){
 			
-			CloseHandle(threadCliente);
+			
+				CloseHandle(threadCliente);
+			}else{
+				cout<<"No se pudo crear el thread para procesar el request"<<endl;
+			}
+			
 		}
 		else{
 			cout<<"Problemas al aceptar conexion cliente."<<endl;
