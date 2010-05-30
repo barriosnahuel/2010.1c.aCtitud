@@ -55,8 +55,9 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	int bytesRecibidos;
 	int lenXML;
 	char* xml;
+	xml = new char[1024];
 	//TODO - FGUERRA: ¡¡ DESHARDCODEAR ESTO !!
-	lenXML = 3064;
+	lenXML = 1024;
 
 	bytesRecibidos = recv(stParametros.ficheroCliente, xml, lenXML, 0);
 	cout << "Recibi el xml: " << xml << endl;
@@ -64,12 +65,15 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// Paso el xml a un msj para meter en la cola.
 	// TODO - FGUERRA: Por ahora meto todo el xml en el body. ¿Es correcto esto? :S
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
+	// Esto no anda ni a palos... Pero es la idea :D
 	pMsg->Body = xml;
 
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
 
 	// Si pude insertar el mensaje correctamente cierro todo al carajo.
+	delete [] xml;
+	DeleteObject(pMsg);
 	_endthreadex(0);
     return 0;
 }
@@ -82,7 +86,7 @@ int main(){
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
 
-	/* Prueba de insersion de 1 msj 
+	/* Prueba de insercion de 1 msj 
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 	pMsg->Label = "Label de la prueba de Fer";                     //Agrego el Label y Body y envío el mensaje
 	pMsg->Body = "Body de la prueba de Fer";
