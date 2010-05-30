@@ -12,7 +12,17 @@ class xmlProcess
 {
 	//Lo privado
 public:
-}*/
+}
+*/
+
+struct IRC_IPC{
+   char idDescriptor[16];
+   char payloadDescriptor[2];
+   long payloadLength[3];
+   char* payloadXML;
+};
+
+
 typedef struct stThreadParameters {
 	int ficheroCliente;    /*el file descriptor de la conexion con el nuevo cliente.	*/
 	MsmqProcess colaMsmq; /*Cola MSMQ*/
@@ -53,14 +63,18 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
 	int bytesRecibidos;
-	int lenXML;
-	char* xml;
-	xml = new char[1024];
+	int largoEstructuraIPCRPC;
+	char* estructuraEnBytesIPCRPC;
+	estructuraEnBytesIPCRPC = new char[1024];
 	//TODO - FGUERRA: ¡¡ DESHARDCODEAR ESTO !!
-	lenXML = 1024;
+	largoEstructuraIPCRPC = 1024;
 
-	bytesRecibidos = recv(stParametros.ficheroCliente, xml, lenXML, 0);
-	cout << "Recibi el xml: " << xml << endl;
+	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, largoEstructuraIPCRPC, 0);
+	
+	//TODO - PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
+
+
+	//cout << "Recibi el xml: " << xml << endl;
 	
 	// Paso el xml a un msj para meter en la cola.
 	// TODO - FGUERRA: Por ahora meto todo el xml en el body. ¿Es correcto esto? :S
