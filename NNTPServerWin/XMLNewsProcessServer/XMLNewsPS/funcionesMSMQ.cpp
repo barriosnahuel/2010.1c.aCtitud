@@ -7,6 +7,9 @@ HRESULT MsmqProcess::crearCola()
 	OleInitialize(NULL);    // Hay que inicializar OLE para usar el COM de MSMQ//
 	IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
 	qInfo->PathName = ".\\Private$\\colaDeNoticias";
+	// TODO - FGUERRA: Esto lo agregue simplemente para que cree la cola cada vez que corremos el programa. 
+	// ¡¡¡¡ NO ES LO CORRECTO !!!!
+	qInfo->Delete();
 	try
 	{
 	  cout<<"Se intentara crear la cola de mensajes"<<endl;
@@ -29,6 +32,7 @@ void MsmqProcess::leerMensajes()
   IMSMQQueuePtr pQueue;
   IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
   qInfo->PathName = ".\\Private$\\colaDeNoticias";
+
   
   _variant_t    timeOut((long)1000);                   // 1 segundo de time-out
   _variant_t    wantBody((bool)true);                  // Configuramos para recibir el body
@@ -39,8 +43,9 @@ void MsmqProcess::leerMensajes()
   pMsg = pQueue->Receive(&vtMissing, &vtMissing, &wantBody, &timeOut);  //Recibimos el mensaje
   if(pMsg == NULL) 
 	  cout<<"No hay mensajes en la cola";
-  else
-	  cout<<"Label: "<<pMsg->Label;//cout<< pMsg->Body;
+  else {
+	  cout << "Label: " << pMsg->Label << endl;
+  }
   pQueue->Close();
   CoUninitialize();
   return;
@@ -51,12 +56,9 @@ void MsmqProcess::insertarMensaje(IMSMQMessagePtr pMsg)
   OleInitialize(NULL);                                   // Hay que inicializar OLE//
   IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
   IMSMQQueuePtr qSend;
-  //IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
   qInfo->PathName = ".\\Private$\\colaDeNoticias";
   //Abro la Cola de Mensajería con derechos de escritura
-  qSend = qInfo->Open(MQ_SEND_ACCESS, MQ_DENY_NONE);         
-  //pMsg->Label = "Probando el Label";                     //Agrego el Label y Body y envío el mensaje
-  //pMsg->Body = "Este TP lo aprobamos";
+  qSend = qInfo->Open(MQ_SEND_ACCESS, MQ_DENY_NONE);
   pMsg->Send(qSend);   //enviamos el mensaje
   qSend->Close();    //Cerramos la cola de mensajería
   CoUninitialize();
