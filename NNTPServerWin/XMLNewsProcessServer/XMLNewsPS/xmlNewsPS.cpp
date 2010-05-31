@@ -86,7 +86,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	stParametros.colaMsmq.insertarMensaje(pMsg);
 
 	// Si pude insertar el mensaje correctamente cierro todo al carajo.
-	delete [] xml;
+	delete [] estructuraEnBytesIPCRPC;
 	DeleteObject(pMsg);
 	_endthreadex(0);
     return 0;
