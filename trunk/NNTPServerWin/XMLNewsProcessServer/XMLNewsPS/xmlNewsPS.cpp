@@ -15,16 +15,17 @@ public:
 }
 */
 
-struct IRC_IPC{
+typedef struct stIRC_IPC{
    char idDescriptor[16];
    char payloadDescriptor[2];
-   long payloadLength[3];
-   char* payloadXML;
-};
+   char payloadLength[3];
+   char payloadXML[1024]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
+}stIRC_IPC;
 
 
 typedef struct stThreadParameters {
 	int ficheroCliente;    /*el file descriptor de la conexion con el nuevo cliente.	*/
+	stIRC_IPC datosRecibidos;
 	MsmqProcess colaMsmq; /*Cola MSMQ*/
 } stThreadParameters;
 
@@ -62,7 +63,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
-	int bytesRecibidos;
+int bytesRecibidos;
 	int largoEstructuraIPCRPC;
 	char* estructuraEnBytesIPCRPC;
 	estructuraEnBytesIPCRPC = new char[1024];
@@ -71,7 +72,16 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, largoEstructuraIPCRPC, 0);
 	
-	//TODO - PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
+	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
+	memcpy(stParametros.datosRecibidos.idDescriptor,
+		   (char*)&bytesRecibidos,strlen(stParametros.datosRecibidos.idDescriptor)/*16*/);
+	memcpy(stParametros.datosRecibidos.payloadDescriptor,
+		   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor),strlen(stParametros.datosRecibidos.payloadDescriptor));
+	memcpy(stParametros.datosRecibidos.payloadLength,
+		   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor),strlen(stParametros.datosRecibidos.payloadLength));
+	memcpy(stParametros.datosRecibidos.payloadXML,
+		   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor)
+           + strlen(stParametros.datosRecibidos.payloadLength),strlen(stParametros.datosRecibidos.payloadXML));
 
 
 	//cout << "Recibi el xml: " << xml << endl;
