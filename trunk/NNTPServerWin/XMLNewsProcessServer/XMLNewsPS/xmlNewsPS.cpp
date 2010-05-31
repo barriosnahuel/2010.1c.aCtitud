@@ -79,14 +79,20 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// Paso el xml a un msj para meter en la cola.
 	// TODO - FGUERRA: Por ahora meto todo el xml en el body. ¿Es correcto esto? :S
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
+
+	// Aca hay que tratar la estructura para obtener solamente el XML. Seria una onda asi:
+	// char* xml;
+	// xml = obtenerXMLDeEstructura(estructuraEnBytesIPCRPC);
+
 	// Esto no anda ni a palos... Pero es la idea :D
-	pMsg->Body = xml;
+	//pMsg->Body = xml;
 
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
 
 	// Si pude insertar el mensaje correctamente cierro todo al carajo.
 	delete [] estructuraEnBytesIPCRPC;
+	//delete [] xml;
 	DeleteObject(pMsg);
 	_endthreadex(0);
     return 0;
