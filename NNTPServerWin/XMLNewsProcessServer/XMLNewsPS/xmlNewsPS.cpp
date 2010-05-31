@@ -63,12 +63,13 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
-int bytesRecibidos;
+    int bytesRecibidos;
 	int largoEstructuraIPCRPC;
 	char* estructuraEnBytesIPCRPC;
-	estructuraEnBytesIPCRPC = new char[1024];
+	largoEstructuraIPCRPC = sizeof(stIRC_IPC);
+	estructuraEnBytesIPCRPC = new char[largoEstructuraIPCRPC];
 	//TODO - FGUERRA: ¡¡ DESHARDCODEAR ESTO !!
-	largoEstructuraIPCRPC = 1024;
+	
 
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, largoEstructuraIPCRPC, 0);
 	
