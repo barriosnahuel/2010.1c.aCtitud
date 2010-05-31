@@ -63,32 +63,29 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
-    int bytesRecibidos;
-	int largoEstructuraIPCRPC;
+int bytesRecibidos;
 	char* estructuraEnBytesIPCRPC;
-	largoEstructuraIPCRPC = sizeof(stIRC_IPC);
-	estructuraEnBytesIPCRPC = new char[largoEstructuraIPCRPC];
-	//TODO - FGUERRA: ¡¡ DESHARDCODEAR ESTO !!
-	
+	estructuraEnBytesIPCRPC = new char[100];
 
-	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, largoEstructuraIPCRPC, 0);
+	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, (int)strlen(estructuraEnBytesIPCRPC), 0);
 	
 	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
-	memcpy(stParametros.datosRecibidos.idDescriptor,
-		   (char*)&bytesRecibidos,strlen(stParametros.datosRecibidos.idDescriptor)/*16*/);
-	memcpy(stParametros.datosRecibidos.payloadDescriptor,
-		   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor),strlen(stParametros.datosRecibidos.payloadDescriptor));
-	memcpy(stParametros.datosRecibidos.payloadLength,
-		   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor),strlen(stParametros.datosRecibidos.payloadLength));
-	memcpy(stParametros.datosRecibidos.payloadXML,
-		   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor)
-           + strlen(stParametros.datosRecibidos.payloadLength),strlen(stParametros.datosRecibidos.payloadXML));
+	//memcpy(stParametros.datosRecibidos.idDescriptor,
+	//	   (char*)&bytesRecibidos,strlen(stParametros.datosRecibidos.idDescriptor)/*16*/);
+	//memcpy(stParametros.datosRecibidos.payloadDescriptor,
+	//	   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor),strlen(stParametros.datosRecibidos.payloadDescriptor));
+	//memcpy(stParametros.datosRecibidos.payloadLength,
+	//	   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor),strlen(stParametros.datosRecibidos.payloadLength));
+	//memcpy(stParametros.datosRecibidos.payloadXML,
+	//	   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor)
+      //     + strlen(stParametros.datosRecibidos.payloadLength),strlen(stParametros.datosRecibidos.payloadXML));
 
 
-	//cout << "Recibi el xml: " << xml << endl;
+	// TODO - FGUERRA: Esto posteriormente se cambiara por el xml solo.
+	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
 	
 	// Paso el xml a un msj para meter en la cola.
-	// TODO - FGUERRA: Por ahora meto todo el xml en el body. ¿Es correcto esto? :S
+	// TODO - FGUERRA: Por ahora meto todo el xml en el label. ¿Es correcto esto? :S
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 
 	// Aca hay que tratar la estructura para obtener solamente el XML. Seria una onda asi:
@@ -96,7 +93,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// xml = obtenerXMLDeEstructura(estructuraEnBytesIPCRPC);
 
 	// Esto no anda ni a palos... Pero es la idea :D
-	//pMsg->Body = xml;
+	pMsg->Label = "Este mensaje indica que me llego un mensaje del publisher y en este lugar deberia ir dicho mensaje. El problema es que Fernando no tiene idea de como setearle el string del publisher que le llega a este label que te estoy mostrando :)";
 
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
@@ -171,6 +168,7 @@ int main(){
 			cout<<"Problemas al aceptar conexion cliente."<<endl;
 		}
 	//}*/
+	colaMsmq.leerMensajes();
 	system("PAUSE");
 	return 0;
 }
