@@ -15,6 +15,7 @@ class xmlProcess
 public:
 }
 */
+#define BUFFERSIZE 1024
 
 typedef struct stIRC_IPC{
    char idDescriptor[16];
@@ -59,9 +60,13 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
 unsigned __stdcall clientFunction(void* threadParameters)
 {
 	cout<<"Entro al threadCliente"<<endl;
-
-
-	HANDLE handle = HeapCreate( 0, 0, 4000 );
+	
+	/* HeapCreate( 
+					Opciones del heap, 
+					tamaño inicial del heap (en bytes). Si es cero provee el tamaño de una pagina,
+					tamaño maximo del heap (en bytes). Si es cero puede crecer y su unica restriccion es la memoria disponible )
+	---- En este caso se setea 0 0 0 porque no me interesa el tamaño del heap.---- */
+	HANDLE handle = HeapCreate( 0, 0, 0 );
 	if( handle == NULL ) {
 		cout << "HeapCreate error." << endl;
 	}
@@ -73,15 +78,14 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	int bytesRecibidos;
 	char* estructuraEnBytesIPCRPC;
-	estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, HEAP_ZERO_MEMORY, 100 );//new char[100];
-
-
+	// Reservamos 1024 bytes (BUFFERSIZE) que es lo q corresponde segun restriccion de TP.
+	estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	
 	if( estructuraEnBytesIPCRPC == NULL ) {
 		cout << "HeapAlloc error." << endl;
 	}
 
-
-	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, (int)strlen(estructuraEnBytesIPCRPC), 0);
+	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
 	
 	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
 	//memcpy(stParametros.datosRecibidos.idDescriptor,
@@ -106,24 +110,22 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// char* xml;
 	// xml = obtenerXMLDeEstructura(estructuraEnBytesIPCRPC);
 
-	// Esto no anda ni a palos... Pero es la idea :D
-	pMsg->Label = "Este mensaje indica que me llego un mensaje del publisher y en este lugar deberia ir dicho mensaje. El problema es que Fernando no tiene idea de como setearle el string del publisher que le llega a este label que te estoy mostrando :)";
+	pMsg->Label = estructuraEnBytesIPCRPC;
 
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
 
 	// Si pude insertar el mensaje correctamente cierro todo al carajo.
 
-	// Free the memory allocated.
+	// Libero la memoria reservada.
 	if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
 		cout << "HeapFree error." << endl;
 	}
-	// Destroy the heap.
+	// Destruyo el heap.
 	if( ! HeapDestroy( handle ) ) {
 		cout << "HeapDestroy error." << endl;
 	}
 
-	//delete [] estructuraEnBytesIPCRPC;
 	//delete [] xml;
 	DeleteObject(pMsg);
 	_endthreadex(0);
@@ -137,18 +139,6 @@ int main(){
 	//Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
-
-	/* Prueba de insercion de 1 msj 
-	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
-	pMsg->Label = "Label de la prueba de Fer";                     //Agrego el Label y Body y envío el mensaje
-	pMsg->Body = "Body de la prueba de Fer";
-	cout << "pMsg creado correctamente" << endl;
-	//colaMsmq.insertarMensaje(pMsg);
-	cout << "Inserte el mensaje en la cola" << endl;
-
-	cout << "Voy a leer los msjs" << endl;
-	colaMsmq.leerMensajes();
-	*/
 
 	//Se inicializa la biblioteca winsock.
 	WSADATA WsaData;
