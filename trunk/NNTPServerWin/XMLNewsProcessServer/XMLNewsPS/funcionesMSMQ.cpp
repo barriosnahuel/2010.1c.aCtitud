@@ -42,6 +42,7 @@ void MsmqProcess::leerMensajes()
 	  cout<<"No hay mensajes en la cola";
   else {
 	  cout << "Label: " << pMsg->Label << endl;
+	  cout << "Body: " << (char *)(_bstr_t) pMsg->Body << endl;
   }
   pQueue->Close();
   CoUninitialize();
