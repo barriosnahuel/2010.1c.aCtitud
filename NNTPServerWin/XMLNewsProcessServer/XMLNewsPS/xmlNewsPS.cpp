@@ -1,5 +1,6 @@
 #include <winsock2.h>
 #include<windows.h>
+#include <winbase.h>
 #include<iostream>
 #include<cstdlib>
 #include<process.h>
@@ -58,14 +59,27 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
 unsigned __stdcall clientFunction(void* threadParameters)
 {
 	cout<<"Entro al threadCliente"<<endl;
+
+
+	HANDLE handle = HeapCreate( 0, 0, 4000 );
+	if( handle == NULL ) {
+		cout << "HeapCreate error." << endl;
+	}
+
 	
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters); //Esto es raro xD, lo saque del HHTPServer
 	
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
-int bytesRecibidos;
+	int bytesRecibidos;
 	char* estructuraEnBytesIPCRPC;
-	estructuraEnBytesIPCRPC = new char[100];
+	estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, HEAP_ZERO_MEMORY, 100 );//new char[100];
+
+
+	if( estructuraEnBytesIPCRPC == NULL ) {
+		cout << "HeapAlloc error." << endl;
+	}
+
 
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, (int)strlen(estructuraEnBytesIPCRPC), 0);
 	
@@ -99,7 +113,17 @@ int bytesRecibidos;
 	stParametros.colaMsmq.insertarMensaje(pMsg);
 
 	// Si pude insertar el mensaje correctamente cierro todo al carajo.
-	delete [] estructuraEnBytesIPCRPC;
+
+	// Free the memory allocated.
+	if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
+		cout << "HeapFree error." << endl;
+	}
+	// Destroy the heap.
+	if( ! HeapDestroy( handle ) ) {
+		cout << "HeapDestroy error." << endl;
+	}
+
+	//delete [] estructuraEnBytesIPCRPC;
 	//delete [] xml;
 	DeleteObject(pMsg);
 	_endthreadex(0);
