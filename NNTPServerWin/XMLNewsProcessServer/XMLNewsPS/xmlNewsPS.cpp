@@ -103,14 +103,14 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
 	
 	// Paso el xml a un msj para meter en la cola.
-	// TODO - FGUERRA: Por ahora meto todo el xml en el label. ¿Es correcto esto? :S
+	// TODO - FGUERRA: Por ahora meto todo el xml en el body.
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 
 	// Aca hay que tratar la estructura para obtener solamente el XML. Seria una onda asi:
 	// char* xml;
 	// xml = obtenerXMLDeEstructura(estructuraEnBytesIPCRPC);
 
-	pMsg->Label = estructuraEnBytesIPCRPC;
+	pMsg->Body = estructuraEnBytesIPCRPC;
 
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
