@@ -113,6 +113,8 @@ int Comando::validacion() {
 
 int Comando::parsearParametro(string parametro) {
 	logger.LoguearDebugging("--> Comando::parsearParametro()", APP_NAME_FOR_LOGGER);
+	if(parametro.length() < 3 || parametro.length() > 250) return 0;
+	
 	int i = 0;
 
 
