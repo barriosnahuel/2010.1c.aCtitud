@@ -114,7 +114,7 @@ cout<<"Parametro sin corchetes angulares:"<<parametro<<endl;
 
 string Comando::sacarCorchetesAngulares(string parametro){
 		int i ;
-		string sinCorchetesAngulares;
+		string sinCorchetesAngulares="";
 		for(i=0;i<=parametro.length();i++){
 			if(parametro.c_str()[i]!= '<' || parametro.c_str()[i]!= '>' )
 				sinCorchetesAngulares = sinCorchetesAngulares + parametro[i];
