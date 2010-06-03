@@ -18,6 +18,7 @@ class Comando {
 
     void   inicializarComandos(void);
     string sacaEspaciosIzquierda(string cadena);
+	string Comando::sacarCorchetesAngulares(string parametro);
     void   extraerNombreYParametro(string comandoEntero);
     int    consumeEspaciosDesde(int posicion, string cadena);
 	void   reset(void);

@@ -103,7 +103,8 @@ int Comando::validacion() {
 	else
 		logger.LoguearInformacion("El nombre del comando NO esta OK.", APP_NAME_FOR_LOGGER);
 
-
+	parametro = sacarCorchetesAngulares(parametro);
+cout<<"Parametro sin corchetes angulares:"<<parametro<<endl;
 	logger.LoguearDebugging("<-- Comando::validacion()", APP_NAME_FOR_LOGGER);
 	if(comandoOk + parametroOk == 2)
 		return 1;
@@ -111,6 +112,15 @@ int Comando::validacion() {
 		return 0;
 }
 
+string Comando::sacarCorchetesAngulares(string parametro){
+		int i ;
+		string sinCorchetesAngulares;
+		for(i=0;i<=parametro.length();i++){
+			if(parametro[i]!= '<' || parametro[i]!= '>' )
+				sinCorchetesAngulares = sinCorchetesAngulares + parametro[i];
+		}
+return sinCorchetesAngulares;
+}
 int Comando::parsearParametro(string parametro) {
 	logger.LoguearDebugging("--> Comando::parsearParametro()", APP_NAME_FOR_LOGGER);
 	if(parametro.length() < 3 || parametro.length() > 250) return 0;
