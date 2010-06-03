@@ -117,11 +117,11 @@ int Comando::parsearParametro(string parametro) {
 	
 	int i = 0;
 
-
-	if(parametro[i] == '@') {
+	
+	if(parametro[i] == '@' || parametro[i]!='<') {
 		return 0;
 	}
-	if(parametro[parametro.length()-1] == '@') {
+	if(parametro[parametro.length()-1] == '@' || parametro[parametro.length()-1]!='>') {
 		return 0;
 	}
 
