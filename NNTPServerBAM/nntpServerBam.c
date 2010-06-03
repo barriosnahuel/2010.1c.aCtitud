@@ -29,8 +29,8 @@ int main(int argn, char *argv[]){
 	char czMsg[BUFFERSIZE];
 	fd_set master;
 	fd_set read_fds;
-	SSL_CTX *ctx;  //contexto ctx
-	SSL *ssl;  // ssl state
+	SSL_CTX *ctx;	/*	contexto ctx	*/
+	SSL *ssl;  		/*	ssl state	*/
 
 	stConfiguracion stConf;
 
@@ -204,19 +204,19 @@ int main(int argn, char *argv[]){
                 }
             }
 
-	        /* si tengo algo en el teclado: puede ser una salida */
+	        /* Si tengo algo en el teclado: puede ser una salida */
 	        if (FD_ISSET(STDIN,&read_fds)) {
 		        scanf("%c", &letra);
 		        if(letra != '\n')
-			        for(;getchar() != '\n';); // vaciar buffer
+			        for(;getchar() != '\n';); /*	vaciar buffer	*/
 		        if (toupper(letra) == 'S')
 			        sigue = 0;
 	        }
-	    } //if del select
+	    } /*	if del select	*/
     }
 	
 	
-    // cerrar todo y liberar la memoria
+    /*	Cerrar todo y liberar la memoria	*/
     close(stConf.iSockServer);
     if (stConf.iSockClient != -1)
         close(stConf.iSockClient);
