@@ -36,7 +36,6 @@ void iniciarClusterCache(memcached_st **memCluster,char* memcachedServer1,int me
 
 void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias,char* grupoSinEspacios,memcached_st **memc)
 {
-printf("####################### QUIERE GUARDAR EN LA CACHE ####################### \n");
   memcached_return rc;
   uint32_t flags;
   t_news *articuloCache = malloc(sizeof(t_news));
@@ -73,7 +72,6 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
 
   if (rc == MEMCACHED_SUCCESS){
 	LoguearInformacion("Se inserto correctamente el articulo en la cache.");
-	printf("Se inserto correctamente el articulo en la cache\n");
   }else{
 	LoguearError("No se pudo insertar el articulo en la cache.");
   }
@@ -87,8 +85,6 @@ printf("####################### QUIERE GUARDAR EN LA CACHE #####################
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,char* grupoSinEspacios,memcached_st **memc)
 {
-printf("##################### BUSQUEDA EN LA CACHE ######################\n");
-  
   uint32_t flags;
   memcached_return rc;
   t_news *resultNoticia = malloc(sizeof(t_news));
@@ -104,10 +100,8 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS){
 	LoguearInformacion("Se encontro el articulo en la cache.");
-	printf("Se encontro el articulo en la cache\n");
   }else{
   	LoguearError("No se encontro el articulo en la cache.");
-	printf("No se encontro el articulo en la cache\n");
 	free(claveCache);
 	free(resultNoticia);
 	return 0;
@@ -116,13 +110,9 @@ printf("##################### BUSQUEDA EN LA CACHE ######################\n");
   memcpy(&resultNoticia->datos,resultadoCache,sizeof(t_news_largos));
   resultNoticia->head = malloc(resultNoticia->datos.largoHead);
   memcpy(resultNoticia->head,resultadoCache+sizeof(t_news_largos),resultNoticia->datos.largoHead);
-/*printf("Resultado HEAD: %s \n",resultNoticia->head);
-  printf("Tamanio cabecera : %d \n",resultNoticia->datos.largoHead);
-*/
   resultNoticia->body=malloc(resultNoticia->datos.largoBody);
   memcpy(resultNoticia->body,resultadoCache+sizeof(t_news_largos)+resultNoticia->datos.largoHead,resultNoticia->datos.largoBody);
-/*  printf("Resultado BODY : %s \n",resultNoticia->body);*/
-     
+
   pstArticulo->sNewsgroup = sGrupoDeNoticias;
   pstArticulo->sHead	  = resultNoticia->head;
   pstArticulo->sBody	  = resultNoticia->body;
