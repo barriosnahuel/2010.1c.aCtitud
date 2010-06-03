@@ -116,7 +116,7 @@ string Comando::sacarCorchetesAngulares(string parametro){
 		int i ;
 		string sinCorchetesAngulares="";
 		for(i=0;i<=parametro.length();i++){
-			if(parametro.c_str()[i]!= '<' || parametro.c_str()[i]!= '>' )
+			if(parametro[i]!= '<' && parametro[i]!= '>' )
 				sinCorchetesAngulares = sinCorchetesAngulares + parametro[i];
 		}
 		cout<<"sinCorchetesAngulares en la funcion:"<<sinCorchetesAngulares<<endl;
