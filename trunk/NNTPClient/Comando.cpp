@@ -104,7 +104,6 @@ int Comando::validacion() {
 		logger.LoguearInformacion("El nombre del comando NO esta OK.", APP_NAME_FOR_LOGGER);
 
 	parametro = sacarCorchetesAngulares(parametro);
-cout<<"Parametro sin corchetes angulares:"<<parametro<<endl;
 	logger.LoguearDebugging("<-- Comando::validacion()", APP_NAME_FOR_LOGGER);
 	if(comandoOk + parametroOk == 2)
 		return 1;
@@ -119,7 +118,6 @@ string Comando::sacarCorchetesAngulares(string parametro){
 			if(parametro[i]!= '<' && parametro[i]!= '>' )
 				sinCorchetesAngulares = sinCorchetesAngulares + parametro[i];
 		}
-		cout<<"sinCorchetesAngulares en la funcion:"<<sinCorchetesAngulares<<endl;
 return sinCorchetesAngulares;
 }
 int Comando::parsearParametro(string parametro) {
