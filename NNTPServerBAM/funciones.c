@@ -288,11 +288,11 @@ char* processArticleCommand(  char** sResponse
 			body"
 			Donde:
 			-	200 es el codigo del response.
-			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	0	es el article number. (TODO: Hardcodeado en 0 porque no trabajamos con articleNumber)??
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
-		 */
-		asprintf(sResponse, "200 0 %s@%d\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
+		 *//*	TODO: Este formato no esta ok, falta terminarlo.	*/
+		asprintf(sResponse, "200 0 <%s@%d>\n%s\n\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead, stArticulo.sBody);
 
 	LoguearDebugging("<-- processArticleCommand()");
 }
@@ -314,15 +314,16 @@ char* processHeadCommand(  char** sResponse
 		asprintf(sResponse, getMessageForResponseCode(430));
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
-			"221	0	clarin@2
-			head
+			"221	0	<clarin@2>
+			[S] head
+			[S] .
 			Donde:
 			-	221 es el codigo del response.
-			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	0	es el article number. (TODO: Hardcodeado en 0 porque no trabajamos con articleNumber)??
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "221 0 %s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead);
+		asprintf(sResponse, "221 0 <%s@%d>\n[S] %s\n[S] .", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sHead);
 
 	LoguearDebugging("<-- processHeadCommand()");
 }
@@ -343,15 +344,17 @@ char* processBodyCommand(  char** sResponse
 		asprintf(sResponse, getMessageForResponseCode(430));
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
-			"222	0	clarin@2
-			body
+			"222	0	<clarin@2>
+			[S] body
+			[S] .
+
 			Donde:
 			-	222 es el codigo del response.
-			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	0	es el article number. (TODO: Hardcodeado en 0 porque no trabajamos con articleNumber)??
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "222 0 %s@%d\n%s", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
+		asprintf(sResponse, "222 0 <%s@%d>\n[S] %s\n[S] .", stArticulo.sNewsgroup, stArticulo.uiArticleID, stArticulo.sBody);
 	LoguearDebugging("<-- processBodyCommand()");
 }
 
@@ -371,14 +374,14 @@ char* processStatCommand(  char** sResponse
 		asprintf(sResponse, getMessageForResponseCode(430));
 	else
 		/*	Este formato del response esta especificado por el RFC 3977
-			"223	0	clarin@2
+			"223	0	<clarin@2>
 			Donde:
 			-	223 es el codigo del response.
-			-	0	es el article number. (Hardcodeado en 0 porque no trabajamos con articleNumber)??
+			-	0	es el article number. (TODO: Hardcodeado en 0 porque no trabajamos con articleNumber)??
 			-	clarin@2	es el message-id (PK compuesta por newsgroupName y articleID).
 			-	y luego el articulo con una linea para el head. Una linea en blanco. Y finalmente el body.
 		 */
-		asprintf(sResponse, "223 0 %s@%d", stArticulo.sNewsgroup, stArticulo.uiArticleID);
+		asprintf(sResponse, "223 0 <%s@%d>", stArticulo.sNewsgroup, stArticulo.uiArticleID);
 	LoguearDebugging("<-- processStatCommand()");
 }
 
@@ -407,10 +410,10 @@ char* processListNewsgroupsCommand(	  char**			psResponse
 		/**
 		 * "
 		 * 215 Information follows
-		 * newsgroupName	newsgroupShortDescript
-		 * ...
-		 * newsgroupName	newsgroupShortDescript
-		 * .
+		 * [S] newsgroupName	newsgroupShortDescript
+		 * [S] ...
+		 * [S] newsgroupName	newsgroupShortDescript
+		 * [S] .
 		 * "
 		 * - 215					El codigo del response.
 		 * - newsgroupName			El nombre del grupo de noticias.
