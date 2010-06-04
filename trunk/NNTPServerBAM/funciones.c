@@ -402,7 +402,7 @@ char* processListNewsgroupsCommand(	  char**			psResponse
 		asprintf(&sListadoParaResponse, "");
 		int index;
 		for(index= 0; index<uiCantidadGruposNoticias; index++)
-			asprintf(&sListadoParaResponse, "%s\n%s", sListadoParaResponse, listadoGruposNoticias[index]);
+			asprintf(&sListadoParaResponse, "%s\n[S] %s", sListadoParaResponse, listadoGruposNoticias[index]);
 
 		/**
 		 * "
@@ -416,7 +416,7 @@ char* processListNewsgroupsCommand(	  char**			psResponse
 		 * - newsgroupName			El nombre del grupo de noticias.
 		 * - newsgroupShortDescript	Una descripcion corta del grupo de noticias (En nuestra BD no existe).
 		 */
-		asprintf(psResponse, "%s%s\n.", *psResponse, sListadoParaResponse);
+		asprintf(psResponse, "%s%s\n[S] .", *psResponse, sListadoParaResponse);
 	}
 
 	LoguearDebugging("<-- processListNewsgroupsCommand()");
@@ -440,12 +440,21 @@ char* processListGroupCommand(	  char**			psResponse
 	/*	Tiro el query a la BD por medio del LDAPWrapperHandler.	*/
 
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
-	unsigned int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, stPLDAPSession, stPLDAPSessionOperations, sGrupoDeNoticias);
+	unsigned int uiCantidadDeNoticias= 0;
+	unsigned int uiTieneParametro= 1;
 
-	asprintf(&sLogMessage, "La cantidad de noticias encontradas para el grupo \"%s\" es de: %d", sGrupoDeNoticias, uiCantidadDeNoticias);
-	LoguearInformacion(sLogMessage);
+	if(strlen(sGrupoDeNoticias)==0)
+		uiTieneParametro= 0;
+	else{
+		uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, stPLDAPSession, stPLDAPSessionOperations, sGrupoDeNoticias);
 
-	if(uiCantidadDeNoticias==0)
+		asprintf(&sLogMessage, "La cantidad de noticias encontradas para el grupo \"%s\" es de: %d", sGrupoDeNoticias, uiCantidadDeNoticias);
+		LoguearInformacion(sLogMessage);
+	}
+
+	if(!uiTieneParametro)
+		asprintf(psResponse, getMessageForResponseCode(412));
+	else if(uiCantidadDeNoticias==0)
 		asprintf(psResponse, getMessageForResponseCode(411));
 	else{
 		unsigned int uiArticleIDMasChico= 99999999;		/*	El maximo decidimos que son 10 digitos.	*/
@@ -463,7 +472,7 @@ char* processListGroupCommand(	  char**			psResponse
 			if(uiArticleID>uiArticleIDMasGrande)
 				uiArticleIDMasGrande= uiArticleID;
 
-			asprintf(&sListadoParaResponse, "%s\n%d", sListadoParaResponse, uiArticleID);
+			asprintf(&sListadoParaResponse, "%s\n[S] %d", sListadoParaResponse, uiArticleID);
 		}
 
 		/**
@@ -481,7 +490,7 @@ char* processListGroupCommand(	  char**			psResponse
 		 * - group	El nombre del grupo
 		 * Nota: Por las dudas, se usan espacios en lugares de tabs.
 		 */
-		asprintf(psResponse, "211 %d %d %d %s%s\n.", uiCantidadDeNoticias, uiArticleIDMasChico, uiArticleIDMasGrande, sGrupoDeNoticias, sListadoParaResponse);
+		asprintf(psResponse, "211 %d %d %d %s%s\n[S] .", uiCantidadDeNoticias, uiArticleIDMasChico, uiArticleIDMasGrande, sGrupoDeNoticias, sListadoParaResponse);
 	}
 
 	LoguearDebugging("<-- processListGroupCommand()");
@@ -499,7 +508,7 @@ char* getMessageForResponseCode(unsigned int uiResponseCode){
 			return "215 Information follows";
 		case 411:
 			return "411 No such newsgroup.";
-		case 412:	/*	TODO: Chequear si este hay que mandarlo o no.	*/
+		case 412:
 			return "412 No newsgroup selected.";
 		case 430:
 			return "430 No article with that message-id.";
