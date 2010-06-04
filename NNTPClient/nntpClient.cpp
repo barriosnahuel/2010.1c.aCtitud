@@ -36,13 +36,16 @@ void* threadInterfazDeUsuario(void* parametro){
     Comando* comando = ((Comando*)parametro);
 
     do {
-        cout << "[C]: ";
+        cout << "[C] ";
         getline(cin, strCadenaIngresada);
         (*comando).init(strCadenaIngresada);
         pthread_mutex_unlock(&semConexion);
         pthread_mutex_lock(&semUI);
-        cout << "[S]: " << (*comando).respuestaObtenida() << endl << endl;
+        cout << "[S] " << (*comando).respuestaObtenida() << endl << endl;
     } while ((*comando).indicaSalida() != 0);
+
+    cout << "[Server closes connection.]" << endl;
+
     pthread_exit(comando);
 }
 

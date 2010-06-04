@@ -75,10 +75,14 @@ void NNTPClientDAO::enviarMensaje(string comandoEscritoPorUsuario) {
     int bytesEscritos;
     
     bytesEscritos = SSL_write(ssl, comandoEscritoPorUsuario.c_str(), comandoEscritoPorUsuario.length());
+    if (bytesEscritos <= 0)
+        cout << "Hubo un error intentando escribir mediante un canal SSL. (Falta logguear esto)" << endl;
+/*
     if (bytesEscritos > 0) {
         cout << "estos son los bytes escritos " << bytesEscritos << endl;}
     else
         cout << "-------- MAL!!!" << endl;
+*/
 }
 
 string NNTPClientDAO::recibirRespuesta() {
