@@ -18,7 +18,7 @@ configuration.o: configuration.c configuration.h ../Logger/logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) configuration.o configuration.c
 
 funciones.o: funciones.c funciones.h
-	gcc $(OPTFLAGS) funciones.o funciones.c
+	gcc $(CFLAGS) $(OPTFLAGS) funciones.o funciones.c
 
 logger-Debian-C.o: ../Logger/logger-Debian.c ../Logger/logger.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../Logger/logger-Debian-C.o ../Logger/logger-Debian.c
@@ -30,7 +30,7 @@ LdapWrapperHandler.o: ../LDAP/LdapWrapperHandler.c ../LDAP/LdapWrapperHandler.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../LDAP/LdapWrapperHandler.o ../LDAP/LdapWrapperHandler.c
 
 nntpServerBam.o: nntpServerBam.c
-	gcc $(OPTFLAGS) nntpServerBam.o nntpServerBam.c
+	gcc $(CFLAGS) $(OPTFLAGS) nntpServerBam.o nntpServerBam.c
 
 util.o: ../util.c ../util.h
 	gcc $(CFLAGS) $(OPTFLAGS) ../util.o ../util.c
