@@ -53,7 +53,7 @@ void Comando::inicializarComandos() {
 
 	vectorDeParametros[0]= 0; 
 	vectorDeParametros[1]= 0;
-	vectorDeParametros[2]= 1; //group
+	vectorDeParametros[2]= 0; //group
 	vectorDeParametros[3]= 1; //message-id
 	vectorDeParametros[4]= 1; //message-id
 	vectorDeParametros[5]= 1; //message-id
@@ -81,11 +81,13 @@ int Comando::validacion() {
 
 	if(comandoOk) {
 		if(vectorDeParametros[i]==1 && parametro.empty()!=1) {
+/*	Se comenta esto, porque en el vectorDeParametros le puse 0 porque la validacion del parametro la hace el server NNTP
 			if(i == 2) {
 				parametroOk = 1;
 			}
-			else if(nombreComando == vectorDeComandos[3] || nombreComando == vectorDeComandos[4] || nombreComando == vectorDeComandos[5] || nombreComando == vectorDeComandos[6]) {
-				parametroOk = parsearParametro(parametro);
+			else*/
+			if(nombreComando == vectorDeComandos[3] || nombreComando == vectorDeComandos[4] || nombreComando == vectorDeComandos[5] || nombreComando == vectorDeComandos[6]) {
+				parametroOk= parsearParametro(parametro);
 			}
 
 			if(parametroOk)
@@ -93,7 +95,7 @@ int Comando::validacion() {
 			else
 				logger.LoguearInformacion("El parametro NO esta OK.", APP_NAME_FOR_LOGGER);
 		}
-		else if(vectorDeParametros[i]==0 && parametro.empty()==1){
+		else if(vectorDeParametros[i]==0 && (parametro.empty()==1 || nombreComando=="LISTGROUP")){
 			parametroOk = 1;
 			logger.LoguearInformacion("El parametro esta OK.", APP_NAME_FOR_LOGGER);
 		}
@@ -123,9 +125,8 @@ return sinCorchetesAngulares;
 int Comando::parsearParametro(string parametro) {
 	logger.LoguearDebugging("--> Comando::parsearParametro()", APP_NAME_FOR_LOGGER);
 	if(parametro.length() < 3 || parametro.length() > 250) return 0;
-	
-	int i = 0;
 
+	int i = 0;
 	
 	if(parametro[i] == '@' || parametro[i]!='<') {
 		return 0;
