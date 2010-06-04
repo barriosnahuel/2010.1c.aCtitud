@@ -182,6 +182,8 @@ int main(int argn, char *argv[]){
                 	    	processQuitCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations);
                 	    	break;
                    	    case 2:  /* LISTGROUP */
+                   	    	if(strlen(czMsg)==10)/*	Esto es para validar el codigo de response 412	*/
+                   	    		asprintf(&sParametroDelComando, "");
                    	    	processListGroupCommand(&sResponse, stPLDAPSession, stPLDAPSessionOperations, sParametroDelComando);
                    	    	break;
                    	    case 3:  /* ARTICLE */
