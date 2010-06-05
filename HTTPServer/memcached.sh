@@ -1,16 +1,14 @@
-# Especifico una constante, que es el path absoluto del directorio donde esta el OopenDS
-
-# Hago un case con el parametro 1, para ver que quiero hacer con el server.
 case "${1}" in
 	start)
 		echo "Iniciando Memcached..."
-		"/usr/lib/memcached -l 192.168.1.116 -p 11211 -d -u root"
+		echo "Este shell script no anda, ejecutar a mano: /usr/lib/memcached -l laIP -p elPuerto -d -u root"
+		"/usr/lib/memcached -l ${2} -p ${3} -d -u root"
 		exit ${?}
 		;;
 		
 	install)
 		echo "Instalando Memcached..."
-		echo "Nota: El install no fue probado."
+		echo "Nota: El install no fue probado, asi que lo mas probable es que no ande."
 		"wget http://www.monkey.org/%7Eprovos/libevent-1.4.13-stable.tar.gz"
 		"gtar -xvzf libevent-1.4.13-stable.tar.gz"
 	
