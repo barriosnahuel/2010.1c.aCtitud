@@ -15,9 +15,6 @@ case "${1}" in
 		wget http://memcached.googlecode.com/files/memcached-1.4.5.tar.gz 
 		gtar -xvzf memcached-1.4.5.tar.gz
 	
-		su
-		osol0906
-
 		cd libevent-1.4.13-stable
 		./configure 
 		make
