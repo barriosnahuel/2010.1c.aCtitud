@@ -8,12 +8,12 @@ case "${1}" in
 		
 	install)
 		echo "Instalando Memcached..."
-		echo "Nota: El install no fue probado, asi que lo mas probable es que no ande."
-		"wget http://www.monkey.org/%7Eprovos/libevent-1.4.13-stable.tar.gz"
-		"gtar -xvzf libevent-1.4.13-stable.tar.gz"
+		
+		wget http://www.monkey.org/%7Eprovos/libevent-1.4.13-stable.tar.gz
+		gtar -xvzf libevent-1.4.13-stable.tar.gz
 	
-		"wget http://memcached.googlecode.com/files/memcached-1.4.5.tar.gz" 
-		"gtar -xvzf memcached-1.4.5.tar.gz"
+		wget http://memcached.googlecode.com/files/memcached-1.4.5.tar.gz 
+		gtar -xvzf memcached-1.4.5.tar.gz
 	
 		"su"
 		"osol0906"
