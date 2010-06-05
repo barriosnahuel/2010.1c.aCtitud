@@ -4,7 +4,7 @@
 case "${1}" in
 	start)
 		echo "Iniciando Memcached..."
-		"/usr/lib/memcached -l ${2} -p ${3} -d -u root"
+		"/usr/lib/memcached -l 192.168.1.116 -p 11211 -d -u root"
 		exit ${?}
 		;;
 		
