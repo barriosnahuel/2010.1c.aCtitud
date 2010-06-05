@@ -101,7 +101,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   if(rc==MEMCACHED_SUCCESS){
 	LoguearInformacion("Se encontro el articulo en la cache.");
   }else{
-  	LoguearError("No se encontro el articulo en la cache.");
+  	LoguearInformacion("No se encontro el articulo en la cache.");
 	free(claveCache);
 	free(resultNoticia);
 	return 0;
