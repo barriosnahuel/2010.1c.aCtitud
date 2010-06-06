@@ -44,11 +44,13 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
 		return EXIT_FAILURE;
 	}
 	
-	cout<<"EN FUNCION CREARSOCKETCONEXION Puerto:"<<htons((u_short)configuracion->appPort)<<" IP:"<<configuracion->serverIP<<endl;
+	unsigned int puerto = atoi(configuracion->appPort); 
+	cout<<"EL PUERTO QUE LE LLEGA: "<<configuracion->appPort<<endl;
 	server->sin_family		 = AF_INET;
 	server->sin_addr.s_addr  = INADDR_ANY ;//Coloca nuestra direccion IP
-    server->sin_port		 = htons(16000/*(u_short)configuracion->appPort*/); //AL FINAL NO FUNCO ¬¬
+    server->sin_port		 = htons((u_short)puerto);
 	
+	cout<<"LO QUE TIENE server->sin_port"<<server->sin_port<<endl;
 	if (bind(*ficheroServer, (SOCKADDR*) &(*server), sizeof(*server))==-1){
 	  cout<<"Error al asociar el puerto al socket."<<endl;
 	  return EXIT_FAILURE;
@@ -146,7 +148,6 @@ int main(){
 	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
 	GetPrivateProfileString("configuracion","IP", configuracion.szDefault,configuracion.serverIP,16,archivoConfiguracion);
 	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
-
     cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
 
 
