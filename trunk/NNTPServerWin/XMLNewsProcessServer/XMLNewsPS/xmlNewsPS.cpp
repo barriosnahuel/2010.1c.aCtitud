@@ -24,14 +24,19 @@ typedef struct stIRC_IPC{
    char payloadXML[1024]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
 
+typedef struct stConfiguracion{
+	char	appPort[6];
+    char	serverIP[15+1]; 
+}stConfiguracion;
+
 
 typedef struct stThreadParameters {
-	int ficheroCliente;    /*el file descriptor de la conexion con el nuevo cliente.	*/
+	SOCKET ficheroCliente;    /*el file descriptor de la conexion con el nuevo cliente.	*/
 	stIRC_IPC datosRecibidos;
 	MsmqProcess colaMsmq; /*Cola MSMQ*/
 } stThreadParameters;
 
-int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
+int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct stConfiguracion* configuracion)
 {
 	if((*ficheroServer = socket (AF_INET, SOCK_STREAM, 0))== INVALID_SOCKET){
 		cout<<"No se pudo crear el socket"<<endl;
@@ -40,7 +45,7 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server)
 	
 	server->sin_family		 = AF_INET;
 	server->sin_addr.s_addr  = INADDR_ANY ;//Coloca nuestra direccion IP
-    server->sin_port		 = htons(16000); //El puerto
+    server->sin_port		 = htons((u_short)configuracion->appPort);//htons(16000);//*(u_short*)configuracion->appPort); //El puerto
 	
 	if (bind(*ficheroServer, (SOCKADDR*) &(*server), sizeof(*server))==-1){
 	  cout<<"Error al asociar el puerto al socket."<<endl;
@@ -134,7 +139,16 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 
 int main(){
+	//Carga configuracion --> Ip y puerto del serividor
+	struct stConfiguracion configuracion;
+
 	
+	LPCSTR archivoConfiguracion = "../configuracion.ini";
+	GetPrivateProfileString("configuracion2","IP", 0,configuracion.serverIP,16,archivoConfiguracion);
+	GetPrivateProfileString("configuracion2","PUERTO", 0,configuracion.appPort,6,archivoConfiguracion);
+
+//    cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
+
 
 	//Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
@@ -148,7 +162,7 @@ int main(){
 	struct sockaddr_in server;
 	
 	/* Se crea el socket que quedara a la escucha de conexiones */
-	if(crearConexionSocket(&ficheroServer,&server)==1){
+	if(crearConexionSocket(&ficheroServer,&server,&configuracion)==1){
 		cout<<"No se pudo crear la conexion"<<endl;
 		return EXIT_FAILURE;
 	}
