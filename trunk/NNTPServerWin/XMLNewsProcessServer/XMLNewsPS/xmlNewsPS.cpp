@@ -75,6 +75,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 					tamaño inicial del heap (en bytes). Si es cero provee el tamaño de una pagina,
 					tamaño maximo del heap (en bytes). Si es cero puede crecer y su unica restriccion es la memoria disponible )
 	---- En este caso se setea 0 0 0 porque no me interesa el tamaño del heap.---- */
+
 	HANDLE handle = HeapCreate( 0, 0, 0 );
 	if( handle == NULL ) {
 		cout << "HeapCreate error." << endl;
@@ -86,9 +87,8 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
 	int bytesRecibidos;
-	char* estructuraEnBytesIPCRPC;
 	// Reservamos 1024 bytes (BUFFERSIZE) que es lo q corresponde segun restriccion de TP.
-	estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	
 	if( estructuraEnBytesIPCRPC == NULL ) {
 		cout << "HeapAlloc error." << endl;
@@ -102,14 +102,23 @@ unsigned __stdcall clientFunction(void* threadParameters)
 			1 deberia ser payloadDescriptor, 
 			030 deberia ser payloadLength,
 			Esta es una prueba del payload deberia ser payloadXML*/
-	memcpy(stParametros.datosRecibidos.idDescriptor, estructuraEnBytesIPCRPC,strlen(stParametros.datosRecibidos.idDescriptor));
-	memcpy(stParametros.datosRecibidos.payloadDescriptor, estructuraEnBytesIPCRPC+strlen(stParametros.datosRecibidos.idDescriptor), strlen(stParametros.datosRecibidos.payloadDescriptor));
-	memcpy(stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor),strlen(stParametros.datosRecibidos.payloadLength));
-	memcpy(stParametros.datosRecibidos.payloadXML, estructuraEnBytesIPCRPC+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor)+ strlen(stParametros.datosRecibidos.payloadLength),strlen(stParametros.datosRecibidos.payloadXML));
+	
+	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
+	cout<<"Largos: "<<endl;
+	cout<<"idDescriptor: "<<sizeof(stParametros.datosRecibidos.idDescriptor)<<endl;
+	cout<<"payloadDescriptor: "<<sizeof(stParametros.datosRecibidos.payloadDescriptor)<<endl;
+	cout<<"payloadLength: "<<sizeof(stParametros.datosRecibidos.payloadLength)<<endl;
+	cout<<"payloadXML: "<<sizeof(stParametros.datosRecibidos.payloadXML)<<endl;
+	
+	
+	memcpy(&stParametros.datosRecibidos.idDescriptor,estructuraEnBytesIPCRPC,sizeof(stParametros.datosRecibidos.idDescriptor));
+	memcpy(&stParametros.datosRecibidos.payloadDescriptor,estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor),sizeof(stParametros.datosRecibidos.payloadDescriptor));
+	memcpy(&stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor),sizeof(stParametros.datosRecibidos.payloadLength));
+	memcpy(&stParametros.datosRecibidos.payloadXML, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength),sizeof(stParametros.datosRecibidos.payloadXML));
 
 
 	// TODO - FGUERRA: Esto posteriormente se cambiara por el xml solo.
-	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
+
 
 	cout << "Id descriptor: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor: " << stParametros.datosRecibidos.payloadDescriptor << endl;
@@ -173,7 +182,7 @@ int main(){
 		return EXIT_FAILURE;
 	}
 	
-	//while(1){
+	while(1){
 		int  addrlen = sizeof(struct sockaddr_in);
 		struct sockaddr_in cliente;
 		SOCKET ficheroCliente = accept(ficheroServer,(sockaddr*)&cliente,&addrlen);
@@ -201,7 +210,7 @@ int main(){
 		else{
 			cout<<"Problemas al aceptar conexion cliente."<<endl;
 		}
-	//}*/
+	}
 	colaMsmq.leerMensajes();
 	system("PAUSE");
 	return 0;
