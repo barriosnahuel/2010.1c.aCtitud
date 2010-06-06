@@ -26,7 +26,8 @@ typedef struct stIRC_IPC{
 
 typedef struct stConfiguracion{
 	char	appPort[6];
-    char	serverIP[15+1]; 
+    char	serverIP[16]; 
+	char	szDefault[255];
 }stConfiguracion;
 
 
@@ -43,9 +44,10 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
 		return EXIT_FAILURE;
 	}
 	
+	cout<<"EN FUNCION CREARSOCKETCONEXION Puerto:"<<htons((u_short)configuracion->appPort)<<" IP:"<<configuracion->serverIP<<endl;
 	server->sin_family		 = AF_INET;
 	server->sin_addr.s_addr  = INADDR_ANY ;//Coloca nuestra direccion IP
-    server->sin_port		 = htons((u_short)configuracion->appPort);//htons(16000);//*(u_short*)configuracion->appPort); //El puerto
+    server->sin_port		 = htons(16000/*(u_short)configuracion->appPort*/); //AL FINAL NO FUNCO ¬¬
 	
 	if (bind(*ficheroServer, (SOCKADDR*) &(*server), sizeof(*server))==-1){
 	  cout<<"Error al asociar el puerto al socket."<<endl;
@@ -141,13 +143,11 @@ unsigned __stdcall clientFunction(void* threadParameters)
 int main(){
 	//Carga configuracion --> Ip y puerto del serividor
 	struct stConfiguracion configuracion;
+	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
+	GetPrivateProfileString("configuracion","IP", configuracion.szDefault,configuracion.serverIP,16,archivoConfiguracion);
+	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
 
-	
-	LPCSTR archivoConfiguracion = "../configuracion.ini";
-	GetPrivateProfileString("configuracion2","IP", 0,configuracion.serverIP,16,archivoConfiguracion);
-	GetPrivateProfileString("configuracion2","PUERTO", 0,configuracion.appPort,6,archivoConfiguracion);
-
-//    cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
+    cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
 
 
 	//Creo la cola MSMQ o me fijo que ya exista.
