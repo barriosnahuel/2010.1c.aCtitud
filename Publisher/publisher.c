@@ -6,6 +6,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #define DEFAULT_BUFLEN 512
@@ -18,9 +19,17 @@ int __cdecl main(int argc, char **argv)
     struct addrinfo *result = NULL,
                     *ptr = NULL,
                     hints;
-    char *sendbuf = "Este mensaje llego desde el publisher y es lo que permitio que el XML Process server entrara al hilo";
+	//Estos son los campos con los que voy a formar sendbuf segun el protocolo IPC/IRC.
+	char* descriptorID = "1234567812345678"; //Identificador de 16 bytes único descriptor en la red.
+	char* payloadDescriptor = "1"; //1 byte. Identificador de nro de protocolo.
+	char* payload = "Esta es una prueba del payload"; //La carga de datos que se necesite pasar. Queda libre al usuario del protocolo.
+	char* payloadLenght = (char*)strlen(payload);//La longitud del descriptor inmediatamente seguido del header.
+
+	// Aca armo el mensaje a enviar.
+	// TODO - FGUERRA: como carajo concateno los char* de arriba para armar el sendbuff? :P
+	char *sendbuf = "1234567812345678130Esta es una prueba del payload";
    // char recvbuf[DEFAULT_BUFLEN];
-    int iResult;
+   int iResult;
    // int recvbuflen = DEFAULT_BUFLEN;
     
 
