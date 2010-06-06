@@ -19,7 +19,7 @@ public:
 
 typedef struct stIRC_IPC{
    char idDescriptor[16];
-   char payloadDescriptor[2];
+   char payloadDescriptor[1];
    char payloadLength[3];
    char payloadXML[1024]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
@@ -97,19 +97,24 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
 	
 	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
-	//memcpy(stParametros.datosRecibidos.idDescriptor,
-	//	   (char*)&bytesRecibidos,strlen(stParametros.datosRecibidos.idDescriptor)/*16*/);
-	//memcpy(stParametros.datosRecibidos.payloadDescriptor,
-	//	   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor),strlen(stParametros.datosRecibidos.payloadDescriptor));
-	//memcpy(stParametros.datosRecibidos.payloadLength,
-	//	   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor),strlen(stParametros.datosRecibidos.payloadLength));
-	//memcpy(stParametros.datosRecibidos.payloadXML,
-	//	   (char*)&bytesRecibidos+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor)
-      //     + strlen(stParametros.datosRecibidos.payloadLength),strlen(stParametros.datosRecibidos.payloadXML));
+	/* FGUERRA: Por el momento, desde el publisher recibe "12345678123456781030Esta es una prueba del payload" donde:
+			1234567812345678 deberia ser el idDescriptor,
+			1 deberia ser payloadDescriptor, 
+			030 deberia ser payloadLength,
+			Esta es una prueba del payload deberia ser payloadXML*/
+	memcpy(stParametros.datosRecibidos.idDescriptor, estructuraEnBytesIPCRPC,strlen(stParametros.datosRecibidos.idDescriptor));
+	memcpy(stParametros.datosRecibidos.payloadDescriptor, estructuraEnBytesIPCRPC+strlen(stParametros.datosRecibidos.idDescriptor), strlen(stParametros.datosRecibidos.payloadDescriptor));
+	memcpy(stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor),strlen(stParametros.datosRecibidos.payloadLength));
+	memcpy(stParametros.datosRecibidos.payloadXML, estructuraEnBytesIPCRPC+strlen(stParametros.datosRecibidos.idDescriptor)+strlen(stParametros.datosRecibidos.payloadDescriptor)+ strlen(stParametros.datosRecibidos.payloadLength),strlen(stParametros.datosRecibidos.payloadXML));
 
 
 	// TODO - FGUERRA: Esto posteriormente se cambiara por el xml solo.
 	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
+
+	cout << "Id descriptor: " << stParametros.datosRecibidos.idDescriptor << endl;
+	cout << "payloadDescriptor: " << stParametros.datosRecibidos.payloadDescriptor << endl;
+	cout << "payloadLength: " << stParametros.datosRecibidos.payloadLength << endl;
+	cout << "Payload: " << stParametros.datosRecibidos.payloadXML << endl;
 	
 	// Paso el xml a un msj para meter en la cola.
 	// TODO - FGUERRA: Por ahora meto todo el xml en el body.
