@@ -24,10 +24,12 @@ int __cdecl main(int argc, char **argv)
 	char* payloadDescriptor = "1"; //1 byte. Identificador de nro de protocolo.
 	char* payload = "Esta es una prueba del payload"; //La carga de datos que se necesite pasar. Queda libre al usuario del protocolo.
 	char* payloadLenght = (char*)strlen(payload);//La longitud del descriptor inmediatamente seguido del header.
-
+	
 	// Aca armo el mensaje a enviar.
 	// TODO - FGUERRA: como carajo concateno los char* de arriba para armar el sendbuff? :P
-	char *sendbuf = "1234567812345678130Esta es una prueba del payload";
+	char *sendbuf = "12345678123456781030Esta es una prueba del payload";
+	//sprintf(sendbuf, "%s%s%s%s", descriptorID, payloadDescriptor, payloadLenght, payload);
+	
    // char recvbuf[DEFAULT_BUFLEN];
    int iResult;
    // int recvbuflen = DEFAULT_BUFLEN;
