@@ -22,17 +22,17 @@ int __cdecl main(int argc, char **argv)
 	//Estos son los campos con los que voy a formar sendbuf segun el protocolo IPC/IRC.
 	char* descriptorID = "1234567812345678"; //Identificador de 16 bytes único descriptor en la red.
 	char* payloadDescriptor = "1"; //1 byte. Identificador de nro de protocolo.
-	char* payload = "Esta es una prueba del payload"; //La carga de datos que se necesite pasar. Queda libre al usuario del protocolo.
+	char* payload = "Esta es una prueba del payload\0"; //La carga de datos que se necesite pasar. Queda libre al usuario del protocolo.
 	char* payloadLenght = (char*)strlen(payload);//La longitud del descriptor inmediatamente seguido del header.
 	
 	// Aca armo el mensaje a enviar.
 	// TODO - FGUERRA: como carajo concateno los char* de arriba para armar el sendbuff? :P
-	char *sendbuf = "12345678123456781030Esta es una prueba del payload";
+	char *sendbuf = "123456781234567810030Esta es una prueba del payload";
 	//sprintf(sendbuf, "%s%s%s%s", descriptorID, payloadDescriptor, payloadLenght, payload);
 	
-   // char recvbuf[DEFAULT_BUFLEN];
+   char recvbuf[DEFAULT_BUFLEN];
    int iResult;
-   // int recvbuflen = DEFAULT_BUFLEN;
+   int recvbuflen = DEFAULT_BUFLEN;
     
 
     // Initialize Winsock
@@ -107,7 +107,7 @@ int __cdecl main(int argc, char **argv)
     }
 
     // Receive until the peer closes the connection
-   /* do {
+    //do {
 
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if ( iResult > 0 )
@@ -117,7 +117,8 @@ int __cdecl main(int argc, char **argv)
         else
             printf("recv failed: %d\n", WSAGetLastError());
 
-    } while( iResult > 0 );*/
+    //} while( iResult > 0 );
+		printf("Recibi del XML Process server como response lo siguiente -> %s", recvbuf);
 
     // cleanup
     closesocket(ConnectSocket);

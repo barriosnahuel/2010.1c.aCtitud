@@ -20,7 +20,7 @@ public:
 typedef struct stIRC_IPC{
    char idDescriptor[16+1];
    char payloadDescriptor[1+1];
-   char payloadLength[3+1];
+   char payloadLength[4+1];
    char payloadXML[1023+1]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
 
@@ -87,8 +87,15 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	//HANDSHAKE PROTOCOLO IPC/RPC
 	
 	int bytesRecibidos;
+	int bytesEnviados;
 	// Reservamos 1024 bytes (BUFFERSIZE) que es lo q corresponde segun restriccion de TP.
 	char *estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+
+	// Variables para el response
+	char *idDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadLength = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadXMLResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	
 	if( estructuraEnBytesIPCRPC == NULL ) {
 		cout << "HeapAlloc error." << endl;
@@ -119,15 +126,20 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "payloadLength: " << stParametros.datosRecibidos.payloadLength << endl;
 	cout << "Payload: " << stParametros.datosRecibidos.payloadXML << endl;
 	
+	idDescriptor = "8765432187654321";
+	payloadDescriptor = "2";
+	payloadXMLResponse = "Esta es la respuesta al request";
+	payloadLength = (char*)strlen(payloadXMLResponse);
+
+
+	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
+		cout << "Error al enviar response" << endl;
+	
 	// Paso el xml a un msj para meter en la cola.
 	// TODO - FGUERRA: Por ahora meto todo el xml en el body.
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 
-	// Aca hay que tratar la estructura para obtener solamente el XML. Seria una onda asi:
-	// char* xml;
-	// xml = obtenerXMLDeEstructura(estructuraEnBytesIPCRPC);
-
-	pMsg->Body = estructuraEnBytesIPCRPC;
+	pMsg->Body = stParametros.datosRecibidos.payloadXML;
 
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
@@ -143,7 +155,6 @@ unsigned __stdcall clientFunction(void* threadParameters)
 		cout << "HeapDestroy error." << endl;
 	}
 
-	//delete [] xml;
 	DeleteObject(pMsg);
 	_endthreadex(0);
     return 0;
@@ -205,7 +216,7 @@ int main(){
 			cout<<"Problemas al aceptar conexion cliente."<<endl;
 		}
 	}
-	colaMsmq.leerMensajes();
+	
 	system("PAUSE");
 	return 0;
 }
