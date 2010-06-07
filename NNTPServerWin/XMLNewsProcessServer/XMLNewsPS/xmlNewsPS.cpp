@@ -110,7 +110,6 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout<<"payloadLength: "<<sizeof(stParametros.datosRecibidos.payloadLength)<<endl;
 	cout<<"payloadXML: "<<sizeof(stParametros.datosRecibidos.payloadXML)<<endl;
 	
-	
 	memcpy(&stParametros.datosRecibidos.idDescriptor,estructuraEnBytesIPCRPC,sizeof(stParametros.datosRecibidos.idDescriptor));
 	memcpy(&stParametros.datosRecibidos.payloadDescriptor,estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor),sizeof(stParametros.datosRecibidos.payloadDescriptor));
 	memcpy(&stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor),sizeof(stParametros.datosRecibidos.payloadLength));
