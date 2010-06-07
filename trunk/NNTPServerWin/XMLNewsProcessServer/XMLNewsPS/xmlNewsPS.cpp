@@ -18,10 +18,10 @@ public:
 #define BUFFERSIZE 1024
 
 typedef struct stIRC_IPC{
-   char idDescriptor[16];
-   char payloadDescriptor[1];
-   char payloadLength[3];
-   char payloadXML[1024]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
+   char idDescriptor[16+1];
+   char payloadDescriptor[1+1];
+   char payloadLength[3+1];
+   char payloadXML[1023+1]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
 
 typedef struct stConfiguracion{
@@ -104,20 +104,15 @@ unsigned __stdcall clientFunction(void* threadParameters)
 			Esta es una prueba del payload deberia ser payloadXML*/
 	
 	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
-	cout<<"Largos: "<<endl;
-	cout<<"idDescriptor: "<<sizeof(stParametros.datosRecibidos.idDescriptor)<<endl;
-	cout<<"payloadDescriptor: "<<sizeof(stParametros.datosRecibidos.payloadDescriptor)<<endl;
-	cout<<"payloadLength: "<<sizeof(stParametros.datosRecibidos.payloadLength)<<endl;
-	cout<<"payloadXML: "<<sizeof(stParametros.datosRecibidos.payloadXML)<<endl;
-	
-	memcpy(&stParametros.datosRecibidos.idDescriptor,estructuraEnBytesIPCRPC,sizeof(stParametros.datosRecibidos.idDescriptor));
-	memcpy(&stParametros.datosRecibidos.payloadDescriptor,estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor),sizeof(stParametros.datosRecibidos.payloadDescriptor));
-	memcpy(&stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor),sizeof(stParametros.datosRecibidos.payloadLength));
-	memcpy(&stParametros.datosRecibidos.payloadXML, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength),sizeof(stParametros.datosRecibidos.payloadXML));
 
-
-	// TODO - FGUERRA: Esto posteriormente se cambiara por el xml solo.
-
+	memcpy( &stParametros.datosRecibidos.idDescriptor , estructuraEnBytesIPCRPC , sizeof(stParametros.datosRecibidos.idDescriptor)-1);
+	stParametros.datosRecibidos.idDescriptor[sizeof(stParametros.datosRecibidos.idDescriptor)-1] = '\0';
+	memcpy( &stParametros.datosRecibidos.payloadDescriptor , estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)-1 , sizeof(stParametros.datosRecibidos.payloadDescriptor)-1);
+    stParametros.datosRecibidos.payloadDescriptor[sizeof(stParametros.datosRecibidos.payloadDescriptor)-1] = '\0';
+	memcpy( &stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)-2 , sizeof(stParametros.datosRecibidos.payloadLength)-1);
+    stParametros.datosRecibidos.payloadLength[sizeof(stParametros.datosRecibidos.payloadLength)-1] = '\0';
+	memcpy( &stParametros.datosRecibidos.payloadXML , estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength)-3 , sizeof(stParametros.datosRecibidos.payloadXML)-1);
+    stParametros.datosRecibidos.payloadXML[sizeof(stParametros.datosRecibidos.payloadXML)-1] = '\0';
 
 	cout << "Id descriptor: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor: " << stParametros.datosRecibidos.payloadDescriptor << endl;
