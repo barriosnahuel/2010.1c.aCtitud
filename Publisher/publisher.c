@@ -20,17 +20,18 @@ int __cdecl main(int argc, char **argv)
                     *ptr = NULL,
                     hints;
 	//Estos son los campos con los que voy a formar sendbuf segun el protocolo IPC/IRC.
-	char* descriptorID = "1234567812345678"; //Identificador de 16 bytes único descriptor en la red.
+/*	char* descriptorID = "1234567812345678"; //Identificador de 16 bytes único descriptor en la red.
 	char* payloadDescriptor = "1"; //1 byte. Identificador de nro de protocolo.
 	char* payload = "Esta es una prueba del payload\0"; //La carga de datos que se necesite pasar. Queda libre al usuario del protocolo.
-	char* payloadLenght = (char*)strlen(payload);//La longitud del descriptor inmediatamente seguido del header.
+	char* payloadLenght = (char*)strlen(payload);//La longitud del descriptor inmediatamente seguido del header.*/
 	
 	// Aca armo el mensaje a enviar.
 	// TODO - FGUERRA: como carajo concateno los char* de arriba para armar el sendbuff? :P
-	char *sendbuf = "123456781234567810030Esta es una prueba del payload";
-	//sprintf(sendbuf, "%s%s%s%s", descriptorID, payloadDescriptor, payloadLenght, payload);
+	char *sendbufHandshake = "876543218765432110000";
+	char *sendbufXML = "123456781234567810030Esta es una prueba del payload";
 	
    char recvbuf[DEFAULT_BUFLEN];
+   char recvbufXML[DEFAULT_BUFLEN];
    int iResult;
    int recvbuflen = DEFAULT_BUFLEN;
     
@@ -86,8 +87,9 @@ int __cdecl main(int argc, char **argv)
         return 1;
     }
 
+	// ##################### HANDSHAKE ###############################################
     // Send an initial buffer
-    iResult = send( ConnectSocket, sendbuf, (int)strlen(sendbuf), 0 );
+    iResult = send( ConnectSocket, sendbufHandshake, (int)strlen(sendbufHandshake), 0 );
     if (iResult == SOCKET_ERROR) {
         printf("Fallo el send: %d\n", WSAGetLastError());
         closesocket(ConnectSocket);
@@ -98,13 +100,13 @@ int __cdecl main(int argc, char **argv)
     printf("Bytes enviados: %ld\n", iResult);
 
     // shutdown the connection since no more data will be sent
-    iResult = shutdown(ConnectSocket, SD_SEND);
+  /*  iResult = shutdown(ConnectSocket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
         printf("shutdown failed: %d\n", WSAGetLastError());
         closesocket(ConnectSocket);
         WSACleanup();
         return 1;
-    }
+    }*/
 
     // Receive until the peer closes the connection
     //do {
@@ -118,7 +120,49 @@ int __cdecl main(int argc, char **argv)
             printf("recv failed: %d\n", WSAGetLastError());
 
     //} while( iResult > 0 );
-		printf("Recibi del XML Process server como response lo siguiente -> %s", recvbuf);
+		//recvbuf[recvbuflen] = '\0';
+		printf("Recibi del XML Process server como response del handshake lo siguiente -> %s", recvbuf);
+		// ##################### FIN HANDSHAKE ###############################################
+
+		// ##################### XML ###############################################
+    // Send an initial buffer
+    iResult = send( ConnectSocket, sendbufXML, (int)strlen(sendbufXML), 0 );
+    if (iResult == SOCKET_ERROR) {
+        printf("Fallo el send: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
+    }
+
+    printf("Bytes enviados: %ld\n", iResult);
+
+    // shutdown the connection since no more data will be sent
+  /*  iResult = shutdown(ConnectSocket, SD_SEND);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed: %d\n", WSAGetLastError());
+        closesocket(ConnectSocket);
+        WSACleanup();
+        return 1;
+    }*/
+
+    // Receive until the peer closes the connection
+    //do {
+
+        iResult = recv(ConnectSocket, recvbufXML, recvbuflen, 0);
+        if ( iResult > 0 )
+            printf("Bytes received: %d\n", iResult);
+        else if ( iResult == 0 )
+            printf("Connection closed\n");
+        else
+            printf("recv failed: %d\n", WSAGetLastError());
+
+    //} while( iResult > 0 );
+		//recvbufXML[recvbuflen] = '\0';
+		printf("Recibi del XML Process server como response del xml lo siguiente -> %s", recvbufXML);
+		// ##################### FIN XML ###############################################
+		
+
+
 
     // cleanup
     closesocket(ConnectSocket);
