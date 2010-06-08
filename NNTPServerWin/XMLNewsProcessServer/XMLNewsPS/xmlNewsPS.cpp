@@ -167,6 +167,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	payloadLength = (char*)strlen(payloadXMLResponse);
 
 
+	// TODO - FGuerra: por el momento le mando el idDescriptor. Realmente le debo mandar los 4 strings de arriba concatenados segun protocolo.
 	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
 		cout << "Error al enviar response" << endl;
 
