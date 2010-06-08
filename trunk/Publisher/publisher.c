@@ -137,16 +137,14 @@ int __cdecl main(int argc, char **argv)
     printf("Bytes enviados: %ld\n", iResult);
 
     // shutdown the connection since no more data will be sent
-  /*  iResult = shutdown(ConnectSocket, SD_SEND);
+    iResult = shutdown(ConnectSocket, SD_SEND);
     if (iResult == SOCKET_ERROR) {
         printf("shutdown failed: %d\n", WSAGetLastError());
         closesocket(ConnectSocket);
         WSACleanup();
         return 1;
-    }*/
+    }
 
-    // Receive until the peer closes the connection
-    //do {
 
         iResult = recv(ConnectSocket, recvbufXML, recvbuflen, 0);
         if ( iResult > 0 )
@@ -156,8 +154,6 @@ int __cdecl main(int argc, char **argv)
         else
             printf("recv failed: %d\n", WSAGetLastError());
 
-    //} while( iResult > 0 );
-		//recvbufXML[recvbuflen] = '\0';
 		printf("Recibi del XML Process server como response del xml lo siguiente -> %s", recvbufXML);
 		// ##################### FIN XML ###############################################
 		

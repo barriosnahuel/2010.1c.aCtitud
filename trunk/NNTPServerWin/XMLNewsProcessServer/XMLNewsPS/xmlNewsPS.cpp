@@ -106,9 +106,10 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// ################## FIN Variables para el response ####################################
 	
 	// ################## INICIO MENSAJE HANDSHAKE ###################################
+	cout << "---------------- Arranco a procesar el Handshake ----------------" << endl;
 	bytesRecibidos = recv(stParametros.ficheroCliente, handshake, BUFFERSIZE, 0);
 	
-	cout << "Recibi el xml del handshake: " << handshake << endl;
+	cout << "Recibi el handshake: " << handshake << endl;
 
 	memcpy( &stParametros.datosRecibidos.idDescriptor , handshake , sizeof(stParametros.datosRecibidos.idDescriptor)-1);
 	stParametros.datosRecibidos.idDescriptor[sizeof(stParametros.datosRecibidos.idDescriptor)-1] = '\0';
@@ -121,6 +122,8 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "payloadDescriptor handshake: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength handshake: " << stParametros.datosRecibidos.payloadLength << endl;
 	
+	// TODO - FGuerra : Falta validar que el handshake sea valido. Caso contrario, cerrar la conexion.
+
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
 	payloadDescriptor = "2";
 
@@ -128,9 +131,11 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
 		cout << "Error al enviar response handshake" << endl;
 	
+	cout << "---------------- Termino de procesar el Handshake ----------------" << endl;
 	// ################## FIN MENSAJE HANDSHAKE ###################################
 
 	// ################## INICIO MENSAJE CON XML ###################################
+	cout << "---------------- Arranco a procesar el mensaje con XML ----------------" << endl;
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
 	
 	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
@@ -164,14 +169,12 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
 		cout << "Error al enviar response" << endl;
-	
+
+	cout << "---------------- Termino de procesar el mensaje con XML ----------------" << endl;
 
 	// ################## FIN MENSAJE CON XML ###################################
 
-
-
 	// Paso el xml a un msj para meter en la cola.
-	// TODO - FGUERRA: Por ahora meto todo el xml en el body.
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
 
 	pMsg->Body = stParametros.datosRecibidos.payloadXML;
@@ -183,8 +186,12 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	// Libero la memoria reservada.
 	if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
-		cout << "HeapFree error." << endl;
+		cout << "HeapFree error en estructuraEnBytesIPCRPC." << endl;
 	}
+	if( ! HeapFree( handle, 0, handshake ) ) {
+		cout << "HeapFree error en handshake." << endl;
+	}
+
 	// Destruyo el heap.
 	if( ! HeapDestroy( handle ) ) {
 		cout << "HeapDestroy error." << endl;
