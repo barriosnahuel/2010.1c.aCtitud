@@ -89,18 +89,48 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	int bytesRecibidos;
 	int bytesEnviados;
 	// Reservamos 1024 bytes (BUFFERSIZE) que es lo q corresponde segun restriccion de TP.
+	char *handshake = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	if( handshake == NULL ) {
+		cout << "HeapAlloc error." << endl;
+	}
 	char *estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-
-	// Variables para el response
-	char *idDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-	char *payloadDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-	char *payloadLength = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-	char *payloadXMLResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-	
 	if( estructuraEnBytesIPCRPC == NULL ) {
 		cout << "HeapAlloc error." << endl;
 	}
 
+	// ################## Variables para el response ####################################
+	char *idDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadLength = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadXMLResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	// ################## FIN Variables para el response ####################################
+	
+	// ################## INICIO MENSAJE HANDSHAKE ###################################
+	bytesRecibidos = recv(stParametros.ficheroCliente, handshake, BUFFERSIZE, 0);
+	
+	cout << "Recibi el xml del handshake: " << handshake << endl;
+
+	memcpy( &stParametros.datosRecibidos.idDescriptor , handshake , sizeof(stParametros.datosRecibidos.idDescriptor)-1);
+	stParametros.datosRecibidos.idDescriptor[sizeof(stParametros.datosRecibidos.idDescriptor)-1] = '\0';
+	memcpy( &stParametros.datosRecibidos.payloadDescriptor , handshake+sizeof(stParametros.datosRecibidos.idDescriptor)-1 , sizeof(stParametros.datosRecibidos.payloadDescriptor)-1);
+    stParametros.datosRecibidos.payloadDescriptor[sizeof(stParametros.datosRecibidos.payloadDescriptor)-1] = '\0';
+	memcpy( &stParametros.datosRecibidos.payloadLength, handshake+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)-2 , sizeof(stParametros.datosRecibidos.payloadLength)-1);
+    stParametros.datosRecibidos.payloadLength[sizeof(stParametros.datosRecibidos.payloadLength)-1] = '\0';
+
+	cout << "Id descriptor handshake: " << stParametros.datosRecibidos.idDescriptor << endl;
+	cout << "payloadDescriptor handshake: " << stParametros.datosRecibidos.payloadDescriptor << endl;
+	cout << "payloadLength handshake: " << stParametros.datosRecibidos.payloadLength << endl;
+	
+	idDescriptor = stParametros.datosRecibidos.idDescriptor;
+	payloadDescriptor = "2";
+
+	// TODO - FGuerra: se deben concatenar los valores de arriba para mandarlos por este send.
+	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
+		cout << "Error al enviar response handshake" << endl;
+	
+	// ################## FIN MENSAJE HANDSHAKE ###################################
+
+	// ################## INICIO MENSAJE CON XML ###################################
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
 	
 	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
@@ -126,7 +156,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "payloadLength: " << stParametros.datosRecibidos.payloadLength << endl;
 	cout << "Payload: " << stParametros.datosRecibidos.payloadXML << endl;
 	
-	idDescriptor = "8765432187654321";
+	idDescriptor = stParametros.datosRecibidos.idDescriptor;
 	payloadDescriptor = "2";
 	payloadXMLResponse = "Esta es la respuesta al request";
 	payloadLength = (char*)strlen(payloadXMLResponse);
@@ -135,6 +165,11 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
 		cout << "Error al enviar response" << endl;
 	
+
+	// ################## FIN MENSAJE CON XML ###################################
+
+
+
 	// Paso el xml a un msj para meter en la cola.
 	// TODO - FGUERRA: Por ahora meto todo el xml en el body.
 	IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
