@@ -28,12 +28,12 @@ int __cdecl main(int argc, char **argv)
 	// Aca armo el mensaje a enviar.
 	// TODO - FGUERRA: como carajo concateno los char* de arriba para armar el sendbuff? :P
 	char *sendbufHandshake = "876543218765432110000";
-	char *sendbufXML = "123456781234567810030Esta es una prueba del payload";
+	char *sendbufXML = "123456781234567810237<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?><news><newsgroup>Minuto.com</newsgroup><idNoticia>12345</idNoticia><HEAD>El tp de operativos no deja dormir a los alumnos!!!</HEAD><BODY>UFFF tengo 32 tecnologías en la cabeza</BODY></news>";
 	
-   char recvbuf[DEFAULT_BUFLEN];
-   char recvbufXML[DEFAULT_BUFLEN];
-   int iResult;
-   int recvbuflen = DEFAULT_BUFLEN;
+	char recvbuf[DEFAULT_BUFLEN];
+	char recvbufXML[DEFAULT_BUFLEN];
+	int iResult;
+	int recvbuflen = DEFAULT_BUFLEN;
     
 
     // Initialize Winsock
@@ -109,7 +109,6 @@ int __cdecl main(int argc, char **argv)
     }*/
 
     // Receive until the peer closes the connection
-    //do {
 
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if ( iResult > 0 )
@@ -119,9 +118,7 @@ int __cdecl main(int argc, char **argv)
         else
             printf("recv failed: %d\n", WSAGetLastError());
 
-    //} while( iResult > 0 );
-		//recvbuf[recvbuflen] = '\0';
-		printf("Recibi del XML Process server como response del handshake lo siguiente -> %s", recvbuf);
+		printf("Recibi del XML Process server como response del handshake lo siguiente -> %s\n", recvbuf);
 		// ##################### FIN HANDSHAKE ###############################################
 
 		// ##################### XML ###############################################
@@ -154,7 +151,7 @@ int __cdecl main(int argc, char **argv)
         else
             printf("recv failed: %d\n", WSAGetLastError());
 
-		printf("Recibi del XML Process server como response del xml lo siguiente -> %s", recvbufXML);
+		printf("Recibi del XML Process server como response del xml lo siguiente -> %s\n", recvbufXML);
 		// ##################### FIN XML ###############################################
 		
 
