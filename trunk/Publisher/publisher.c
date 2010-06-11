@@ -27,7 +27,7 @@ int __cdecl main(int argc, char **argv)
 	
 	// Aca armo el mensaje a enviar.
 	// TODO - FGUERRA: como carajo concateno los char* de arriba para armar el sendbuff? :P
-	char *sendbufHandshake = "876543218765432110000";
+	char *sendbufHandshake = "123456781234567810000";
 	char *sendbufXML = "123456781234567810237<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?><news><newsgroup>Minuto.com</newsgroup><idNoticia>12345</idNoticia><HEAD>El tp de operativos no deja dormir a los alumnos!!!</HEAD><BODY>UFFF tengo 32 tecnologías en la cabeza</BODY></news>";
 	
 	char recvbuf[DEFAULT_BUFLEN];
