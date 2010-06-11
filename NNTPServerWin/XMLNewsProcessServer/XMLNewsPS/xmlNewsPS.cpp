@@ -66,6 +66,17 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
 };
 
 
+/*
+int validarHandshake(stThreadParameters *stParametros) {
+	if((strcmp(stParametros->datosRecibidos.payloadLength, "0000") != 0) || (strlen(stParametros->datosRecibidos.idDescriptor) != 16)
+		|| (strlen(stParametros->datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros->datosRecibidos.payloadLength) != 4)
+		|| (strcmp(stParametros->datosRecibidos.payloadXML, "") != 0)) {
+		return 0;
+	}
+	return 1;
+
+}*/
+
 unsigned __stdcall clientFunction(void* threadParameters)
 {
 	cout<<"Entro al threadCliente"<<endl;
@@ -83,8 +94,6 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters); //Esto es raro xD, lo saque del HHTPServer
-	
-	//HANDSHAKE PROTOCOLO IPC/RPC
 	
 	int bytesRecibidos;
 	int bytesEnviados;
@@ -117,12 +126,38 @@ unsigned __stdcall clientFunction(void* threadParameters)
     stParametros.datosRecibidos.payloadDescriptor[sizeof(stParametros.datosRecibidos.payloadDescriptor)-1] = '\0';
 	memcpy( &stParametros.datosRecibidos.payloadLength, handshake+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)-2 , sizeof(stParametros.datosRecibidos.payloadLength)-1);
     stParametros.datosRecibidos.payloadLength[sizeof(stParametros.datosRecibidos.payloadLength)-1] = '\0';
+	memcpy( &stParametros.datosRecibidos.payloadXML , handshake+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength)-3 , sizeof(stParametros.datosRecibidos.payloadXML)-1);
+    stParametros.datosRecibidos.payloadXML[sizeof(stParametros.datosRecibidos.payloadXML)-1] = '\0';
 
 	cout << "Id descriptor handshake: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor handshake: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength handshake: " << stParametros.datosRecibidos.payloadLength << endl;
+	cout << "payload handshake: " << stParametros.datosRecibidos.payloadXML << endl;
 	
-	// TODO - FGuerra : Falta validar que el handshake sea valido. Caso contrario, cerrar la conexion.
+	// ################## INICIO VALIDACION HANDSHAKE ##################
+
+	if((strcmp(stParametros.datosRecibidos.payloadLength, "0000") != 0) || (strlen(stParametros.datosRecibidos.idDescriptor) != 16)
+		|| (strlen(stParametros.datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros.datosRecibidos.payloadLength) != 4)
+		|| (strcmp(stParametros.datosRecibidos.payloadXML, "") != 0)) {
+	/*if(validarHandshake(&stParametros)) {*/
+		if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
+			cout << "HeapFree error en estructuraEnBytesIPCRPC." << endl;
+		}
+		if( ! HeapFree( handle, 0, handshake ) ) {
+			cout << "HeapFree error en handshake." << endl;
+		}
+
+		// Destruyo el heap.
+		if( ! HeapDestroy( handle ) ) {
+			cout << "HeapDestroy error." << endl;
+		}
+
+		cout << "Se cerrara el thread ya que el handshake es invalido." << endl;
+
+		_endthreadex(0);
+		return 1;
+	}
+	// ################## FIN VALIDACION HANDSHAKE ##################
 
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
 	payloadDescriptor = "2";
