@@ -57,17 +57,17 @@ typedef short 				SHORT;
 #ifndef LONG
 	#define LONG               long
 #endif
-//typedef long 				LONG;
+/*	typedef long 				LONG;	*/
 
 #ifndef LONGLONG
 	#define LONGLONG               double
 #endif
-//typedef double 				LONGLONG;
+/*	typedef double 				LONGLONG;	*/
 
 #ifndef ULONGLONG
 	#define ULONGLONG               double
 #endif
-//typedef double 				ULONGLONG;
+/*	typedef double 				ULONGLONG;	*/
 
 typedef BYTE				BOOLEAN;
 typedef char				**PPCHAR;
