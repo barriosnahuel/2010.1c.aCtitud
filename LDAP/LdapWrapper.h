@@ -40,15 +40,35 @@ typedef unsigned char       BYTE;
 typedef unsigned short      WORD;
 typedef float               FLOAT;
 typedef FLOAT 				*PFLOAT;
-typedef void				VOID, *PVOID;
+
+#ifndef VOID
+	#define VOID               void
+#endif
+//typedef void				VOID;
+typedef void				*PVOID;
+//typedef void				VOID, *PVOID;
+
 typedef char				CHAR, *PCHAR;
 typedef int                 INT;
 typedef unsigned int        UINT;
 typedef unsigned int        *PUINT;
 typedef short 				SHORT;
-typedef long 				LONG;
-typedef double 				LONGLONG;
-typedef double 				ULONGLONG;
+
+#ifndef LONG
+	#define LONG               long
+#endif
+//typedef long 				LONG;
+
+#ifndef LONGLONG
+	#define LONGLONG               double
+#endif
+//typedef double 				LONGLONG;
+
+#ifndef ULONGLONG
+	#define ULONGLONG               double
+#endif
+//typedef double 				ULONGLONG;
+
 typedef BYTE				BOOLEAN;
 typedef char				**PPCHAR;
 typedef LDAP				*PLDAP;
