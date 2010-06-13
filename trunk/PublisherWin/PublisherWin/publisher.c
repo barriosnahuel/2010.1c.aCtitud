@@ -2,7 +2,23 @@
 #include<db.h>
 #include<windows.h>
 int main(){
+/** Para probar lo de BERKELEY
 	
+	HANDLE* memoryHandler = HeapCreate( 0, 1024, 0); //esto debería ir en cada hilo
+	DB* dbHandler;
+	printf("<------------------- Berkeley aCtitud -------------------> \n");
+	
+	
+	createDb(&dbHandler, &memoryHandler);
+	putArticle(&dbHandler);	
+	getArticle(&dbHandler);
+	closeDb(&dbHandler);
+	getchar();
+	return 0;
+
+
+**/
+
 /**	
 
 	Leo archivo de configuracion para saber el newsgroup
