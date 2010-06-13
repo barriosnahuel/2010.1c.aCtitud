@@ -44,9 +44,9 @@ typedef FLOAT 				*PFLOAT;
 #ifndef VOID
 	#define VOID               void
 #endif
-//typedef void				VOID;
+/*	typedef void				VOID;	*/
 typedef void				*PVOID;
-//typedef void				VOID, *PVOID;
+/*	typedef void				VOID, *PVOID;	*/
 
 typedef char				CHAR, *PCHAR;
 typedef int                 INT;
