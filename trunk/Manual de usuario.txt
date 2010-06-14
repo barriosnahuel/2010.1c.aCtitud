@@ -1,0 +1,119 @@
+ M A N U A L - D E - U S U A R I O
+-----------------------------------
+
+Contenidos:
+-----------
+
+- 1. Tecnologías que deben instalarse previamente [TCN]
+- 2. Archivos de configuración [CNFG]
+- 3. Puesta en marcha [PMCH]
+
+
+
+1. [TCN] Tecnologías que deben instalarse previamente:
+------------------------------------------------------
+
+ ---------------------------------------------------------------------------
+|  SISTEMA OPERATIVO  |      TECNOLOGIA      |     MÉTODO DE INSTALACIÓN    |
+|---------------------------------------------------------------------------|
+| Linux               | SSL                  | apt-get install libssl-dev   |
+|                     |                      |                              |
+|---------------------|----------------------|------------------------------|
+| Solaris             | Memcached            | En el directorio HTTPServer: |
+|                     |                      |    sh memcached.sh install   |
+|---------------------|----------------------|------------------------------|
+| Solaris             | OpenDS               | En el directorio HTTPServer: |
+|                     |                      |  - Correr OpenDS	            |
+|                     |                      |      sh openDS.sh start      |
+|                     |                      |  - Detener OpenDS            |
+|                     |                      |      sh openDS.sh stop       |
+|                     |                      |  - Reiniciar OpenDS          |
+|                     |                      |      sh openDS.sh restart    |
+|                     |                      |                              |
+|---------------------|----------------------|------------------------------|
+
+
+
+2. [CNFG] Archivos de configuración:
+------------------------------------
+
+En cada directorio hay un archivo de configuración,
+
+NNTPServer Bam - server.conf
+HTTPServer     - config.conf
+NNTPClient     - cliente.conf
+
+server.conf:
+ LOCAL_IP debe corresponder a la PC/VM en donde se haya levantado el NNTPServer Bam.
+
+cliente.conf:
+ SERVER, es la ip del NNTPServer Bam.
+
+La ip y puerto de OpenDs, deben corresponder a la de la PC/VM donde se haya levantado 
+dicha tecnología, por tal motivo, debe coincidir en los diferetens archivos de configuración.
+
+
+
+3. [PMCH] Puesta en marcha:
+---------------------------
+
+================
+ NNTPServer Bam
+================
+- Sistema operativo: Linux
+
+En el directorio NNTPServerBAM,
+
+Compilar con makefile:
+  make
+
+Ejecutar:
+  ./NNTPServerBAM
+
+
+================
+ NNTP Client
+================
+- Sistema operativo: Linux
+
+En el directorio NNTPClient,
+
+Compilar con makefile:
+  make
+
+Ejecutar:
+  ./NNTPClient
+
+- Comandos que soporta:
+	List newsgroups
+	Quit
+	Listgroup()
+	Article()
+	Stat()
+	Head()
+	Body()
+
+Ejemplos:
+  List newsgroups
+  Body <NombreDelGrupo@IDarticulo>
+  Quit
+
+(Los comandos no son case sensitive)
+
+
+================
+ HTTP Server
+================
+- Sistema operativo: Solaris
+
+En el directorio HTTPServer,
+
+Compilar con makefile:
+  make
+
+Ejecutar:
+  ./HTTPServer
+
+
+
+
