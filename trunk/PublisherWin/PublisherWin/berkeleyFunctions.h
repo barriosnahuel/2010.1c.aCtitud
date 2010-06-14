@@ -5,7 +5,6 @@
 #include<windows.h>
 #include<stdio.h>
 #include<string.h>
-#include<db.h>
 #pragma comment(lib,"libdb48.lib")
 
 	void putArticle(DB** dbp);
