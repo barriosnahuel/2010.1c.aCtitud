@@ -4,23 +4,21 @@
 void createDb(DB** dbp, HANDLE** memoryHandle)
 {
 	char* ruta = "C:\\";
-	char* dbName = "aCtitud.db";	//Aca debe levantar el nombre del newsgroup
+	char* dbName = "aCtitud2.db";	//Aca debe levantar el nombre del newsgroup
 	char* rutaDb = NULL;
 	int ret;
 	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
 
-	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb ); //si no pongo en los dos parametros lo mismo, imprime simbolos
+	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb ); 
 	printf("Paso por ahi trankilo");
-	getchar();
-	
+
 	printf("strlen(%s): %d \n",ruta,strlen(ruta));
 	printf("strlen(%s): %d \n",dbName,strlen(dbName));
 	strcat(rutaDb,ruta);	
 	strcat(rutaDb,dbName);
 	printf("rutaDB: %s \n", rutaDb);
 	printf("strlen(%s): %d \n",rutaDb,strlen(rutaDb));
-	getchar();
-
+	
 	if (!(ret = db_create(&*dbp, NULL, 0))) {
 		fprintf(stderr, "db_create: %s\n", db_strerror(ret));
 		getchar();
@@ -32,9 +30,8 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 		getchar();
 	}
 
-	getchar();
-	
-	//HeapFree(memoryHandle, 0, rutaDb );
+		
+	HeapFree(memoryHandle,HEAP_ZERO_MEMORY, rutaDb );
 	return;
 }
 
@@ -62,8 +59,6 @@ void putArticle(DB** dbp)
 	default:
 		(*dbp)->err(dbp, ret, "DB->put");
 	}
-
-	getchar();
 	return;
 }
 
@@ -84,7 +79,6 @@ void getArticle(DB** dbp)
 		printf("db: %s: key encontrada: datos: %s.\n",(char *)key.data, (char *)data.data);
 	else 
 		(*dbp)->err(*dbp, ret, "DB->get");
-	getchar();
 
 	return;
 }
