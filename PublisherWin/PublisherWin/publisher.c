@@ -1,6 +1,5 @@
 #include "berkeleyFunctions.h"
 #include<windows.h>
-
 typedef struct stIRC_IPC{
    char idDescriptor[16+1];
    char payloadDescriptor[1+1];
@@ -9,27 +8,30 @@ typedef struct stIRC_IPC{
 }stIRC_IPC;
 
 typedef struct stThreadParameters {
-	SOCKET ficheroCliente;    
-	stIRC_IPC datosRecibidos;
+	DB* dbHandler;
+	HANDLE* memoryHandler;
 } stThreadParameters;
 
-unsigned __stdcall clientFunction(void* threadParameters)
+unsigned __stdcall publisherFunction(void* threadParameters)
 {
 	
-	HANDLE* memoryHandler = HeapCreate( 0, 1024, 0); //esto debería ir en cada hilo
-	DB* dbHandler;
-	
-	if( memoryHandler == NULL ) 
+	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
+	stParametros.memoryHandler =  HeapCreate( 0,1024, 0); //esto debería ir en cada hilo
+	stParametros.dbHandler = NULL;
+
+	if( stParametros.memoryHandler == NULL ) 
 		printf("HeapCreate error.\n");
 	
 	printf("<------------------- Berkeley aCtitud -------------------> \n");
-	createDb(&dbHandler, &memoryHandler);
-	putArticle(&dbHandler);	
-	getArticle(&dbHandler);
-	closeDb(&dbHandler);
-	printf("Hace todo lo que tiene que hacer\n");
-	getchar();
+	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
+	putArticle(&stParametros.dbHandler);	
+	getArticle(&stParametros.dbHandler);
+	closeDb(&stParametros.dbHandler);
 	
+	
+	printf("TERMINA DE PROCESAR EL THREAD CLIENTE\n");
+	getchar();
+	_endthreadex(0);
 	return 0;
 }
 
@@ -59,13 +61,15 @@ int main(){
 	//THREAD SENDER
 	unsigned threadProcesarSender;
 	HANDLE threadSender;
-	
-	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&clientFunction,(void*)&stParameters, 
+
+	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stParameters, 
 		0, &threadProcesarRequest))!=0){
 		CloseHandle(threadCliente);
 	}else{
 		printf("No se pudo crear el thread para procesar el request\n");
 	}
+
+	printf("Sale del thread cliente \n");
 /*
 	segundosEsperaSender = 3000;
 	//while(1){

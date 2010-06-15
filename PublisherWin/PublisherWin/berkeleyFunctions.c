@@ -1,6 +1,5 @@
 #include"berkeleyFunctions.h"
 
-
 void createDb(DB** dbp, HANDLE** memoryHandle)
 {
 	char* ruta = "C:\\";
@@ -8,10 +7,8 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 	char* rutaDb = NULL;
 	int ret;
 	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
-
+	
 	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb ); 
-	printf("Paso por ahi trankilo");
-
 	printf("strlen(%s): %d \n",ruta,strlen(ruta));
 	printf("strlen(%s): %d \n",dbName,strlen(dbName));
 	strcat(rutaDb,ruta);	
@@ -21,17 +18,16 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 	
 	if (!(ret = db_create(&*dbp, NULL, 0))) {
 		fprintf(stderr, "db_create: %s\n", db_strerror(ret));
-		getchar();
 	}
 		
 	if (!(ret = (*dbp)->open(*dbp,NULL, rutaDb , NULL, DB_BTREE, DB_CREATE, 0))){
 		printf("ENTRA A  DBP->OPEN \n");
 		(*dbp)->err(*dbp, ret, "%s", rutaDb);
-		getchar();
 	}
 
+	printf("QUIERE RESERVAR MEMORIA EN CREATEDB \N");	
 		
-	HeapFree(memoryHandle,HEAP_ZERO_MEMORY, rutaDb );
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY, rutaDb );
 	return;
 }
 
