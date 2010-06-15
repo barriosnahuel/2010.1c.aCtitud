@@ -10,19 +10,59 @@ typedef struct stIRC_IPC{
 typedef struct stThreadParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
+	char* newsgroup;
 } stThreadParameters;
+
+void LeerTeclado(char* szCadena,HANDLE** memoryHandler){
+   
+   char c;
+   char* szAuxiliar;
+   int LONGITUD_INICIAL =   15;
+   int INCREMENTO       =   5;
+   int iAllocSize=LONGITUD_INICIAL;
+   int iAllocUsed=0;
+   
+   szCadena = malloc(LONGITUD_INICIAL*sizeof(char));
+   if (szCadena==NULL) {
+        return;
+    }
+
+    while ((c=getchar())!='\n') {
+        if (iAllocUsed < iAllocSize-1) {
+			szAuxiliar = HeapReAlloc( memoryHandler,HEAP_ZERO_MEMORY,0,(iAllocSize+INCREMENTO)*sizeof(char));
+			szAuxiliar = realloc(szCadena,(iAllocSize+INCREMENTO)*sizeof(char));
+            if (szAuxiliar==NULL) {
+                free(szCadena);
+                return;
+            }
+            iAllocSize+=INCREMENTO;
+            szCadena = szAuxiliar;
+        }
+        szCadena[iAllocUsed++]=c;
+    }
+
+    szCadena[iAllocUsed]='\0';
+/*    printf("szCadena: %s\n",szCadena);*/
+    return;
+}
 
 unsigned __stdcall publisherFunction(void* threadParameters)
 {
 	
+	char* head;
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 	stParametros.memoryHandler =  HeapCreate( 0,1024, 0); //esto debería ir en cada hilo
 	stParametros.dbHandler = NULL;
-
+	
 	if( stParametros.memoryHandler == NULL ) 
 		printf("HeapCreate error.\n");
 	
 	printf("<------------------- Berkeley aCtitud -------------------> \n");
+	printf("Ingrese el HEAD de la noticia:\n");
+/*	LeerTeclado(&head,&stParametros.memoryHandler);
+	printf("CADENA LEIDA: %s",head);
+	getchar();
+*/
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
 	putArticle(&stParametros.dbHandler);	
 	getArticle(&stParametros.dbHandler);
@@ -42,6 +82,8 @@ unsigned __stdcall senderFunction()
 	getchar();
 	return 0;
 }
+
+
 
 
 int main(){
