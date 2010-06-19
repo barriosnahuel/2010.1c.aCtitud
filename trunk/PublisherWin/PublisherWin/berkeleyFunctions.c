@@ -3,12 +3,12 @@
 void createDb(DB** dbp, HANDLE** memoryHandle)
 {
 	char* ruta = "C:\\";
-	char* dbName = "aCtitud2.db";	//Aca debe levantar el nombre del newsgroup
+	char* dbName = "aCtitud3.db";	//Aca debe levantar el nombre del newsgroup
 	char* rutaDb = NULL;
 	int ret;
 	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
 	
-	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb ); 
+	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb); 
 	printf("strlen(%s): %d \n",ruta,strlen(ruta));
 	printf("strlen(%s): %d \n",dbName,strlen(dbName));
 	strcat(rutaDb,ruta);	
@@ -31,9 +31,10 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 	return;
 }
 
-int lastID(DB** dpb)
+int lastID(DB** dbp)
 {
 	int ret;
+	int nextKey;
 	DBC* dbCursor;
 	DBT key,data;
 	memset (&data, 0, sizeof(data));
@@ -41,28 +42,78 @@ int lastID(DB** dpb)
 	
 	printf("\n ####### LASTID ####### \n");
 	
-	if ((ret = (*dpb)->cursor(*dpb,NULL,&dbCursor,0)) != 0) {
-		(*dpb)->err(*dpb, ret, "DB->cursor");
-		return (1);
+	if ((ret = (*dbp)->cursor(*dbp,NULL,&dbCursor,0)) != 0) {
+		(*dbp)->err(*dbp, ret, "DB->cursor");
 	}
 	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0)
 		printf("KEY ALMACENADA : %s  \n",key.data);
-		//printf("%lu : %.*s\n",*(u_long *)key.data, (int)data.size, (char *)data.data);
 
-/*
-	while (dbCursor->get(&key, &data, DB_NEXT) != DB_NOTFOUND)
-		printf("Key encontrada : %d ",key);
-*/
-	return 0 ;
+	if(key.data==NULL)
+		return 0; //Para generar la ID la primera vez
+
+	if ((ret = dbCursor->c_close(dbCursor)) != 0){
+		(*dbp)->err(*dbp, ret, "DBcursor->close");
+	}
+	nextKey = atoi(key.data);
+	return nextKey;
 }
 
-void putArticle(DB** dbp)
-{
-	int ret;          
-	DBT key, data;
 
-	printf("############## Insertar en base de datos ##############\n");
+
+void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
+{
+	int idAuxLen,ret;          
+	DBT key, data;
+	unsigned int noticiaEnBytesLargo;
+	char* noticiaEnBytes;
+	char  idAux[1000];
 	
+	printf("########### putArticle ###########\n");
+	
+	memset(&key, 0, sizeof(key));
+	memset(&data, 0, sizeof(data));
+	
+	
+	//NOTICIA
+	noticiaEnBytesLargo = sizeof(noticia->largos) + noticia->largos.newsgrouplen + 
+		                  noticia->largos.headlen + noticia->largos.bodylen + noticia->largos.transmittedlen;
+
+	data.data = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,noticiaEnBytesLargo);
+    data.size = noticiaEnBytesLargo;
+	
+	//ID NOTICIA -- Hago esto porque la id me llega como entero, y dps el memcpy se me simplifica
+	itoa(noticia->id,idAux,10);
+	idAuxLen = strlen(idAux) + 1;
+	key.data  = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,idAuxLen);		
+	memcpy((char*)key.data,idAux,idAuxLen);
+	key.size = idAuxLen;
+
+	printf("Noticia en bytes largo: %d",noticiaEnBytesLargo);
+	getchar();
+	memcpy((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
+	memcpy((char*)data.data + sizeof(noticia->largos),noticia->newsgroup,noticia->largos.newsgrouplen);
+	memcpy((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
+	memcpy((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen,
+		   noticia->body,noticia->largos.bodylen);
+	memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
+		   noticia->transmitted,noticia->largos.transmittedlen);
+
+	
+	switch (ret = (*dbp)->put(*dbp, NULL, &key, &data, DB_NOOVERWRITE)) {
+	case 0:
+		printf("db: %s: Articulo guardado.\n", (char *)key.data);
+		break;
+	case DB_KEYEXIST:
+		printf("db: %s: El articulo ya se encontraba en la base.\n",(char*)key.data);
+		break;
+	default:
+		(*dbp)->err(dbp, ret, "DB->put");
+	}
+
+	HeapFree(*memoryHandler,HEAP_ZERO_MEMORY, data.data);
+	HeapFree(*memoryHandler,HEAP_ZERO_MEMORY, key.data );
+
+	/*
 	memset(&key, 0, sizeof(key));
 	memset(&data, 0, sizeof(data));
 	key.data = "34037030";
@@ -80,6 +131,7 @@ void putArticle(DB** dbp)
 	default:
 		(*dbp)->err(dbp, ret, "DB->put");
 	}
+	*/
 	return;
 }
 
