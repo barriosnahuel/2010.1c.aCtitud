@@ -10,60 +10,86 @@ typedef struct stIRC_IPC{
 typedef struct stThreadParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
-	char* newsgroup;
+	char newsgroup[1024];
 } stThreadParameters;
 
-void LeerTeclado(char* szCadena,HANDLE** memoryHandler){
-   
-   char c;
-   char* szAuxiliar;
-   int LONGITUD_INICIAL =   15;
-   int INCREMENTO       =   5;
-   int iAllocSize=LONGITUD_INICIAL;
-   int iAllocUsed=0;
-   
-   szCadena = malloc(LONGITUD_INICIAL*sizeof(char));
-   if (szCadena==NULL) {
-        return;
-    }
+#define BUFFERSIZE 1024
 
-    while ((c=getchar())!='\n') {
-        if (iAllocUsed < iAllocSize-1) {
-			szAuxiliar = HeapReAlloc( memoryHandler,HEAP_ZERO_MEMORY,0,(iAllocSize+INCREMENTO)*sizeof(char));
-			szAuxiliar = realloc(szCadena,(iAllocSize+INCREMENTO)*sizeof(char));
-            if (szAuxiliar==NULL) {
-                free(szCadena);
-                return;
-            }
-            iAllocSize+=INCREMENTO;
-            szCadena = szAuxiliar;
-        }
-        szCadena[iAllocUsed++]=c;
-    }
+void LecturaDinamica(char** cadena,HANDLE** memoryHandler)
+{
+	int i;
+	char c;
+	int tamanioInicial= sizeof(char);
 
-    szCadena[iAllocUsed]='\0';
-/*    printf("szCadena: %s\n",szCadena);*/
-    return;
+	*cadena = (char*)HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,tamanioInicial);
+	
+	for(i=0;(c=getchar())!='\n';i++)
+	{
+		
+		*cadena		 = (char*)HeapReAlloc(*memoryHandler,HEAP_ZERO_MEMORY,*cadena,(2*tamanioInicial));
+		tamanioInicial += 1;
+		(*cadena)[i] = c;
+		/*if( *cadena == NULL )
+			printf( "HeapReAlloc error.");
+		else*/
+		
+	}
+
+	*cadena     = (char*)HeapReAlloc(*memoryHandler,HEAP_ZERO_MEMORY,*cadena,2*(tamanioInicial+1));
+	(*cadena)[i]= '\0';
+	//printf("Cadena dentro de la funcion: %s \n",*cadena);
+	return;
 }
+
+
 
 unsigned __stdcall publisherFunction(void* threadParameters)
 {
-	
-	char* head;
+	struct news noticia;
+	char head[BUFFERSIZE] = "NACE UN NUEVO BILL GATES";
+	char body[BUFFERSIZE] = "LINUX NO EXISTIS";
+
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
-	stParametros.memoryHandler =  HeapCreate( 0,1024, 0); //esto debería ir en cada hilo
+	stParametros.memoryHandler =  HeapCreate(0,1024,0); //esto debería ir en cada hilo
 	stParametros.dbHandler = NULL;
 	
 	if( stParametros.memoryHandler == NULL ) 
 		printf("HeapCreate error.\n");
 	
-	printf("<------------------- Berkeley aCtitud -------------------> \n");
-	printf("Ingrese el HEAD de la noticia:\n");
-/*	LeerTeclado(&head,&stParametros.memoryHandler);
-	printf("CADENA LEIDA: %s",head);
+	printf("<------------------- Ingreso de Noticia aCtitud -------------------> \n");
+	//VOY A USAR CAMPOS ESTATICOS PERO LA FUNCION LECTURADINAMICA ESTA AHIII DE SALIR JAJA
+/*	printf("Ingrese el HEAD de la noticia:");
+	gets(head);
+	printf("Ingrese el BODY de la noticia:");
+	gets(body);
+*/	
+	printf("HEAD LEIDO: %s \n",head);
+	printf("BODY LEIDA: %s \n", body);
+	
+	noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
+	noticia.largos.headlen = strlen(head)+1;
+	noticia.largos.bodylen = strlen(body)+1;
+
+	noticia.newsgroup = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.newsgrouplen);
+	noticia.head	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
+	noticia.body	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.bodylen);
+	noticia.newsgroup = stParametros.newsgroup;
+	noticia.head      = head;
+	noticia.body	  = body;
+	noticia.transmitted = 0 ; 
+	printf("noticia.newsgroup : %s \n",noticia.newsgroup);
+	printf("noticia.head : %s \n",noticia.head);
+	printf("noticia.body : %s \n",noticia.body);
+	
+	
 	getchar();
-*/
+	
+	printf("<------------------- BERKELEY aCtitud -------------------> \n");
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
+	
+	lastID(&stParametros.dbHandler);
+
+
 	putArticle(&stParametros.dbHandler);	
 	getArticle(&stParametros.dbHandler);
 	closeDb(&stParametros.dbHandler);
@@ -99,11 +125,12 @@ int main(){
 	//THREAD CLIENTE
 	stThreadParameters stParameters;
 	unsigned threadProcesarRequest;
-	HANDLE threadCliente;
+	HANDLE threadCliente; 
 	//THREAD SENDER
 	unsigned threadProcesarSender;
 	HANDLE threadSender;
-
+	
+	strcpy(stParameters.newsgroup,"LA NACION");
 	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stParameters, 
 		0, &threadProcesarRequest))!=0){
 		CloseHandle(threadCliente);
@@ -159,7 +186,6 @@ int main(){
         - Si no hubo problemas marco la noticia en Berkeley como transmitted (1)
         - Finaliza el thread
 **/
-	
-	getchar();
+	Sleep(10000000);
 	return 0;
 }

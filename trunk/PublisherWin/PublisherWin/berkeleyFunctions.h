@@ -6,6 +6,21 @@
 #include<stdio.h>
 #include<string.h>
 #pragma comment(lib,"libdb48.lib")
+#define BUFFERSIZE 1024
+
+typedef struct newslen{
+    int newsgrouplen;
+    int bodylen;
+    int headlen;
+}newslen;
+
+typedef struct news{
+   newslen largos;
+   char*   head;
+   char*   body;
+   char*   newsgroup;
+   unsigned int transmitted; // 0 NO FUE TRANSMITIDA , 1 SI .
+}news;
 
 	void putArticle(DB** dbp);
 	void getArticle(DB** dbp);
