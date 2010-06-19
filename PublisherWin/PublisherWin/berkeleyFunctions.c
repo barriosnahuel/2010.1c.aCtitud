@@ -31,6 +31,31 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 	return;
 }
 
+int lastID(DB** dpb)
+{
+	int ret;
+	DBC* dbCursor;
+	DBT key,data;
+	memset (&data, 0, sizeof(data));
+	memset (&key, 0, sizeof(key));
+	
+	printf("\n ####### LASTID ####### \n");
+	
+	if ((ret = (*dpb)->cursor(*dpb,NULL,&dbCursor,0)) != 0) {
+		(*dpb)->err(*dpb, ret, "DB->cursor");
+		return (1);
+	}
+	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0)
+		printf("KEY ALMACENADA : %s  \n",key.data);
+		//printf("%lu : %.*s\n",*(u_long *)key.data, (int)data.size, (char *)data.data);
+
+/*
+	while (dbCursor->get(&key, &data, DB_NEXT) != DB_NOTFOUND)
+		printf("Key encontrada : %d ",key);
+*/
+	return 0 ;
+}
+
 void putArticle(DB** dbp)
 {
 	int ret;          
@@ -40,7 +65,7 @@ void putArticle(DB** dbp)
 	
 	memset(&key, 0, sizeof(key));
 	memset(&data, 0, sizeof(data));
-	key.data = "34037022";
+	key.data = "34037030";
 	key.size = strlen(key.data) + 1 ;
 	data.data = "Alan";
 	data.size = strlen(data.data) + 1;
