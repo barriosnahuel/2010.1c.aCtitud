@@ -5,6 +5,7 @@
 #include<windows.h>
 #include<stdio.h>
 #include<string.h>
+#include"xmlFunctions.h"
 #pragma comment(lib,"libdb48.lib")
 #define BUFFERSIZE 1024
 
