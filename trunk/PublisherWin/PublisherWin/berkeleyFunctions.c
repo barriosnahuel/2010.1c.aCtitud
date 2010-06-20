@@ -3,7 +3,7 @@
 void createDb(DB** dbp, HANDLE** memoryHandle)
 {
 	char* ruta = "C:\\";
-	char* dbName = "aCtitud3.db";	//Aca debe levantar el nombre del newsgroup
+	char* dbName = "aCtitud7.db";	//Aca debe levantar el nombre del newsgroup
 	char* rutaDb = NULL;
 	int ret;
 	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
@@ -24,10 +24,62 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 		printf("ENTRA A  DBP->OPEN \n");
 		(*dbp)->err(*dbp, ret, "%s", rutaDb);
 	}
-
-	printf("QUIERE RESERVAR MEMORIA EN CREATEDB \N");	
-		
+	
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY, rutaDb );
+	return;
+}
+
+void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
+{
+	int ret;
+	struct news* noticia;
+	DBC* dbCursor;
+	DBT key,data;
+	
+	memset (&data, 0, sizeof(data));
+	memset (&key, 0, sizeof(key));
+	
+	noticia = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct news)); 
+	
+	printf("\n ####### Noticias No enviadas ####### \n");
+	
+	if ((ret = (*dbp)->cursor(*dbp,NULL,&dbCursor,0)) != 0) {
+		(*dbp)->err(*dbp, ret, "DB->cursor");
+	}
+
+	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0)
+	{
+		//Obtengo el tamañano de cada campo
+		memcpy(&noticia->largos,(char*)data.data,sizeof(newslen));
+		
+		//Solo trabajo con aquellas que no estan trasmitidas.
+		noticia->transmitted = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.transmittedlen);
+		memcpy(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+
+			   noticia->largos.bodylen,noticia->largos.transmittedlen);
+		
+		if(strcmp(noticia->transmitted,"0")==0)
+		{	//No fue trasmitida
+			noticia->newsgroup = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.newsgrouplen);
+			memcpy(noticia->newsgroup,(char*)data.data + sizeof(newslen), noticia->largos.newsgrouplen);
+			printf("KEY ALMACENADA : %s  \n",key.data);
+			printf("NewsGroupNoticia : %s \n",noticia->newsgroup);
+			
+			//PASAR A FORMATO XML
+
+			//ENVIAR A NNTP
+
+
+			//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
+			noticia->transmitted="1";
+			memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
+		    noticia->transmitted,noticia->largos.transmittedlen);
+			dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
+		}
+	}
+	if ((ret = dbCursor->c_close(dbCursor)) != 0){
+		(*dbp)->err(*dbp, ret, "DBcursor->close");
+	}
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia);
 	return;
 }
 
@@ -58,8 +110,6 @@ int lastID(DB** dbp)
 	return nextKey;
 }
 
-
-
 void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 {
 	int idAuxLen,ret;          
@@ -88,8 +138,6 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	memcpy((char*)key.data,idAux,idAuxLen);
 	key.size = idAuxLen;
 
-	printf("Noticia en bytes largo: %d",noticiaEnBytesLargo);
-	getchar();
 	memcpy((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
 	memcpy((char*)data.data + sizeof(noticia->largos),noticia->newsgroup,noticia->largos.newsgrouplen);
 	memcpy((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
@@ -97,7 +145,7 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 		   noticia->body,noticia->largos.bodylen);
 	memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
 		   noticia->transmitted,noticia->largos.transmittedlen);
-
+	
 	
 	switch (ret = (*dbp)->put(*dbp, NULL, &key, &data, DB_NOOVERWRITE)) {
 	case 0:
@@ -143,11 +191,11 @@ void getArticle(DB** dbp)
 	printf("############## Lee en BerkeleyDB ##############\n");
 	memset(&key, 0, sizeof(key));
 	memset(&data, 0, sizeof(data));
-	key.data = "34037022";
+	key.data = "1";
 	key.size = strlen(key.data) + 1 ;
-	data.data = "Alan";
+/*	data.data = "Alan";
 	data.size = strlen(data.data) + 1;
-	
+*/	
 	if (!(ret = (*dbp)->get(*dbp, NULL, &key, &data, 0)))
 		printf("db: %s: key encontrada: datos: %s.\n",(char *)key.data, (char *)data.data);
 	else 
