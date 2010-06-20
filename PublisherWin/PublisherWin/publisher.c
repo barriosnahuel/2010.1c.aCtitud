@@ -158,7 +158,7 @@ int main(){
 		printf("No se pudo crear el thread para procesar el request\n");
 	}
 
-	printf("Sale del thread cliente \n");
+	printf("Sale del thread cliente\n");
 
 	segundosEsperaSender = 5000;
 	while(1){
