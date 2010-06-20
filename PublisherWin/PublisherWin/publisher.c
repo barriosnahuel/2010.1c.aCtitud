@@ -13,6 +13,11 @@ typedef struct stThreadParameters {
 	char newsgroup[1024];
 } stThreadParameters;
 
+typedef struct stSenderParameters {
+	DB* dbHandler;
+	HANDLE* memoryHandler;
+} stSenderParameters;
+
 #define BUFFERSIZE 1024
 
 void LecturaDinamica(char** cadena,HANDLE** memoryHandler)
@@ -92,9 +97,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
 	noticia.id = lastID(&stParametros.dbHandler) + 1 ;
 	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
-	getArticle(&stParametros.dbHandler,&stParametros.memoryHandler);
-	
-	//getArticle(&stParametros.dbHandler);
+	//getArticle(&stParametros.dbHandler,&stParametros.memoryHandler);
 	closeDb(&stParametros.dbHandler);
 
 
@@ -105,17 +108,24 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 }
 
 
-unsigned __stdcall senderFunction()
+unsigned __stdcall senderFunction(void* threadParameters)
 {
 	/**
 	 * Busco en Berkeley noticias con 0 , ya que no estan transmitidas.
 	 * Las paso a formato XML
 	 * Las envio al NNTP 
 	**/
+	stSenderParameters stParametros = *((stSenderParameters*) threadParameters);
 	printf("<------------------- SENDER - aCtitud -------------------> \n");
+	stParametros.memoryHandler =  HeapCreate(0,1024,0); 
+	stParametros.dbHandler = NULL;
+	if( stParametros.memoryHandler == NULL ) 
+		printf("Sender HeapCreate error.\n");
 	
-
-	getchar();
+	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
+	noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler);	
+	closeDb(&stParametros.dbHandler);
+	
 	return 0;
 }
 
@@ -137,6 +147,7 @@ int main(){
 	unsigned threadProcesarRequest;
 	HANDLE threadCliente; 
 	//THREAD SENDER
+	stSenderParameters stSender;
 	unsigned threadProcesarSender;
 	HANDLE threadSender;
 	
@@ -150,10 +161,10 @@ int main(){
 
 	printf("Sale del thread cliente \n");
 
-	segundosEsperaSender = 30000;
+	segundosEsperaSender = 5000;
 	while(1){
 		Sleep(segundosEsperaSender);
-		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,NULL, 
+		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 
 			0, &threadProcesarSender))!=0){
 			CloseHandle(threadSender);
 		}else{
