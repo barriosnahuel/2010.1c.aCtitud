@@ -112,6 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\include;&quot;C:\Program Files\Oracle\Berkeley DB 4.8.26\include&quot;"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -128,6 +129,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\bin\$(ProjectName).exe"
+				AdditionalLibraryDirectories="&quot;..\lib&quot;;&quot;C:\Program Files\Oracle\Berkeley DB 4.8.26\lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -175,6 +178,10 @@
 				RelativePath=".\publisher.c"
 				>
 			</File>
+			<File
+				RelativePath=".\xmlFunctions.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -183,6 +190,10 @@
 			>
 			<File
 				RelativePath=".\berkeleyFunctions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xmlFunctions.h"
 				>
 			</File>
 		</Filter>
