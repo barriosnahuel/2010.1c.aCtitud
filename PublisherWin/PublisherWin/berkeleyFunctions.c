@@ -3,7 +3,7 @@
 void createDb(DB** dbp, HANDLE** memoryHandle)
 {
 	char* ruta = "C:\\";
-	char* dbName = "aCtitud7.db";	//Aca debe levantar el nombre del newsgroup
+	char* dbName = "aCtitud8.db";	//Aca debe levantar el nombre del newsgroup
 	char* rutaDb = NULL;
 	int ret;
 	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
@@ -59,10 +59,22 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
 		
 		if(strcmp(noticia->transmitted,"0")==0)
 		{	//No fue trasmitida
+			
 			noticia->newsgroup = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.newsgrouplen);
 			memcpy(noticia->newsgroup,(char*)data.data + sizeof(newslen), noticia->largos.newsgrouplen);
-			printf("KEY ALMACENADA : %s  \n",key.data);
+			
+			noticia->head      = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.headlen);
+			memcpy(noticia->head,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen,noticia->largos.headlen);
+
+			noticia->body      = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.bodylen);
+			memcpy(noticia->body,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen,
+								  noticia->largos.bodylen);
+
+			
+			printf("Key almacenada   : %s  \n",key.data);
 			printf("NewsGroupNoticia : %s \n",noticia->newsgroup);
+			printf("Head : %s \n",noticia->head);
+			printf("Body : %s \n",noticia->body);
 			
 			//PASAR A FORMATO XML
 
@@ -79,7 +91,12 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
 	if ((ret = dbCursor->c_close(dbCursor)) != 0){
 		(*dbp)->err(*dbp, ret, "DBcursor->close");
 	}
+	
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia->newsgroup);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia->head);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia->body);
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia);
+	
 	return;
 }
 
