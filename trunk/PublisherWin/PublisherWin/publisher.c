@@ -90,8 +90,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	printf("noticia.body : %s \n",noticia.body);
 	printf("noticia.transmitted : %s \n",noticia.transmitted);	
 	
-	getchar();
-	
+		
 	printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
 	
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
