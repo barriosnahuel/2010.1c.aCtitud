@@ -122,7 +122,10 @@ unsigned __stdcall senderFunction(void* threadParameters)
 		printf("Sender HeapCreate error.\n");
 	
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
+	
+	//Se fija las noticias que no estan enviadas, las pasa a XML y las envia a nntp
 	noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler);	
+	
 	closeDb(&stParametros.dbHandler);
 	
 	return 0;
@@ -160,7 +163,7 @@ int main(){
 
 	printf("Sale del thread cliente\n");
 
-	segundosEsperaSender = 5000;
+	segundosEsperaSender = 10000;
 	while(1){
 		Sleep(segundosEsperaSender);
 		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 

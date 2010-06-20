@@ -3,7 +3,7 @@
 void createDb(DB** dbp, HANDLE** memoryHandle)
 {
 	char* ruta = "C:\\";
-	char* dbName = "aCtitud8.db";	//Aca debe levantar el nombre del newsgroup
+	char* dbName = "aCtitud10.db";	//Aca debe levantar el nombre del newsgroup
 	char* rutaDb = NULL;
 	int ret;
 	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
@@ -33,9 +33,14 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
 {
 	int ret;
 	struct news* noticia;
+	//berkeley
 	DBC* dbCursor;
 	DBT key,data;
-	
+	//XML
+	xmlDocPtr doc;
+	xmlChar* memoriaXML; //contiene el XML ARMADO
+	int tamanioXML;
+			
 	memset (&data, 0, sizeof(data));
 	memset (&key, 0, sizeof(key));
 	
@@ -43,6 +48,7 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
 	
 	printf("\n ####### Noticias No enviadas ####### \n");
 	
+	//Creo el cursor de Berkeley
 	if ((ret = (*dbp)->cursor(*dbp,NULL,&dbCursor,0)) != 0) {
 		(*dbp)->err(*dbp, ret, "DB->cursor");
 	}
@@ -77,7 +83,9 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
 			printf("Body : %s \n",noticia->body);
 			
 			//PASAR A FORMATO XML
-
+			doc = crearXML(noticia,key.data);
+			xmlDocDumpFormatMemory(doc,&memoriaXML,&tamanioXML,1);
+			
 			//ENVIAR A NNTP
 
 
@@ -106,6 +114,7 @@ int lastID(DB** dbp)
 	int nextKey;
 	DBC* dbCursor;
 	DBT key,data;
+	int maxID = -1;
 	memset (&data, 0, sizeof(data));
 	memset (&key, 0, sizeof(key));
 	
@@ -114,17 +123,20 @@ int lastID(DB** dbp)
 	if ((ret = (*dbp)->cursor(*dbp,NULL,&dbCursor,0)) != 0) {
 		(*dbp)->err(*dbp, ret, "DB->cursor");
 	}
-	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0)
+	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0){
 		printf("KEY ALMACENADA : %s  \n",key.data);
-
+		if(maxID<atoi(key.data))
+			maxID = atoi(key.data);
+		
+	}
 	if(key.data==NULL)
 		return 0; //Para generar la ID la primera vez
 
 	if ((ret = dbCursor->c_close(dbCursor)) != 0){
 		(*dbp)->err(*dbp, ret, "DBcursor->close");
 	}
-	nextKey = atoi(key.data);
-	return nextKey;
+	//nextKey = atoi(key.data);
+	return maxID;
 }
 
 void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
