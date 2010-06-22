@@ -1,10 +1,10 @@
 #include <winsock2.h>
-#include<windows.h>
+#include <windows.h>
 #include <winbase.h>
-#include<iostream>
-#include<cstdlib>
-#include<process.h>
-#include "../../funcionesMSMQ.hpp"
+#include <iostream>
+#include <cstdlib>
+#include <process.h>
+#include "funcionesMSMQ.hpp"
 using namespace std;
 /*
 #include<libxml/tree.h>
