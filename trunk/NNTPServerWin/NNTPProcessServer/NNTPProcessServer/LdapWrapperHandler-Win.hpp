@@ -9,7 +9,7 @@
 #define LDAPWRAPPERHANDLER_H_
 
 
-//#pragma comment(lib,"openldap.lib")
+#pragma comment(lib,"openldap.lib")
 extern "C"{
     #include "LdapWrapper.h"
 }
