@@ -5,7 +5,6 @@
 	Name="NNTPProcessServer"
 	ProjectGUID="{D99A5E40-AD53-4BF6-AEC8-F585F107A7A9}"
 	RootNamespace="NNTPProcessServer"
-	AssemblyReferenceSearchPaths="&quot;..\lib&quot;;&quot;..\bin&quot;"
 	>
 	<Platforms>
 		<Platform
@@ -114,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin\NNTPProcessServer\include&quot;;&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin&quot;;&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin\NNTPProcessServer\include&quot;"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -132,6 +131,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
+				OutputFile="..\bin\$(ProjectName).exe"
 				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin\NNTPProcessServer\lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -186,14 +186,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\funcionesMSMQ.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LdapWrapperHandler-Win.hpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
