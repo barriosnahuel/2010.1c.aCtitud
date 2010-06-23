@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin&quot;;&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin\NNTPProcessServer\include&quot;"
+				AdditionalIncludeDirectories=".\include;C:\projects\trunk\NNTPServerWin;C:\projects\trunk\NNTPServerWin\NNTPProcessServer\include"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -131,8 +131,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="..\bin\$(ProjectName).exe"
-				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin\NNTPProcessServer\lib&quot;"
+				OutputFile=".\bin\$(ProjectName).exe"
+				AdditionalLibraryDirectories="&quot;.\lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
