@@ -88,7 +88,6 @@ typedef struct __LDAP_CONTEXT {
 
 } LDAP_CONTEXT, *PLDAP_CONTEXT;
 
-
 /**
  * Objeto que representa una sesion LDAP
  *
