@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\projects\trunk\NNTPServerWin;C:\projects\trunk\NNTPServerWin\NNTPProcessServer\include;C:\projects\trunk\NNTPServerWin\NNTPProcessServer\lib"
+				AdditionalIncludeDirectories="..\include"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -132,7 +132,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
 				OutputFile=".\bin\$(ProjectName).exe"
-				AdditionalLibraryDirectories="C:\projects\trunk\NNTPServerWin\NNTPProcessServer\lib"
+				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -191,11 +191,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\include\Article.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\funcionesMSMQ.hpp"
 				>
 			</File>
 			<File
+				RelativePath="..\include\LdapWrapper.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LdapWrapperHandler-Win.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\include\LdapWrapperHandler.h"
 				>
 			</File>
 		</Filter>
