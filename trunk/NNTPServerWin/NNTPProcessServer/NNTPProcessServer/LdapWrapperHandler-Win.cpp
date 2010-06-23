@@ -152,11 +152,12 @@ VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
 		/* Itero sobre los campos de cada uno de los record */
 		while(recordOp->hasNextField(record)) {
 			PLDAP_FIELD field = recordOp->nextField(record);
-			INT     index = 0;
+			/*INT     index = 0; --- TODO cambio acá para probar */
+			DWORD index = 0;
 
 			printf("\tAttribute: %s - values: %d\n", field->name, (int)field->valuesSize);
 
-			for(; index < field->valuesSize; index++)
+			for(; index < (field->valuesSize); index++)
 				printf("\t\tValue[%d]: %s\n", index, field->values[index]);
 
 			/* se libera la memoria utilizada por el field si este ya no es necesario. */
