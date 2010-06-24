@@ -9,7 +9,7 @@
 #define LDAPWRAPPERHANDLER_H_
 
 #include "LdapWrapper.h"
-#include "../Article.h"
+#include "Article.h"
 
 /*	Estos dos atributos los defino aca, porque necesito tener acceso
  *  desde el httpServer.c para poder buscar lo que necesito.

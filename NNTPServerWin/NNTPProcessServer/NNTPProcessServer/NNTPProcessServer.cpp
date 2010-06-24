@@ -17,9 +17,9 @@
 //	Nuestros includes:
 #include "../../funcionesMSMQ.hpp"
 
-extern "C"{
+/*extern "C"{
     #include "LdapWrapper.h"
-}
+}*/
 
 #include "LdapWrapperHandler-Win.hpp"
 
