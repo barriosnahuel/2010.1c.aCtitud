@@ -12,15 +12,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <ldap.h>
 
 //	Nuestros includes:
 #include "../../funcionesMSMQ.hpp"
-
-/*extern "C"{
-    #include "LdapWrapper.h"
-}*/
-
 #include "LdapWrapperHandler-Win.hpp"
 
 //	Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib

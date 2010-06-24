@@ -131,7 +131,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile=".\bin\$(ProjectName).exe"
+				OutputFile="..\bin\$(ProjectName).exe"
 				AdditionalLibraryDirectories="..\lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
