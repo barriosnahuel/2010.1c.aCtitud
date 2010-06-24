@@ -9,7 +9,7 @@
 #define LDAPWRAPPERHANDLER_H_
 
 
-#pragma comment(lib,"openldap.lib")
+#pragma comment(lib, "openldap.lib")
 extern "C"{
     #include "LdapWrapper.h"
 }
@@ -46,9 +46,7 @@ char* getDNFor(int dArticleID);
  * se setea en -1 el articleID para una posterior verificacion (para decidir que
  * tipo de response se tiene que enviar al cliente).
  */
-stArticlle getArticle(PLDAP_SESSION stPLDAPSession,
-		PLDAP_SESSION_OP stPLDAPSessionOperations, char* sGrupoDeNoticias,
-		char* sArticleID);
+stArticle getArticle(PLDAP_SESSION stPLDAPSession, PLDAP_SESSION_OP stPLDAPSessionOperations, char* sGrupoDeNoticias, char* sArticleID);
 
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.

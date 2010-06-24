@@ -9,9 +9,12 @@
 #include <stdio.h>
 #include <string.h>
 
-extern "C"{
+#include "LdapWrapperHandler-Win.hpp"
+
+/*extern "C"{
   #include "LdapWrapperHandler.h"
-}
+}*/
+
 /*	ToDo: Ver en todos los lugares donde haya asprintf(...) de reemplazarlo por otra forma porque esa funcion usa malloc. 
 Se tendria que usar lo del heap seguramente.	*/
 

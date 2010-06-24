@@ -173,6 +173,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\..\Article.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\funcionesMSMQ.cpp"
 				>
 			</File>
@@ -204,10 +208,6 @@
 			</File>
 			<File
 				RelativePath=".\LdapWrapperHandler-Win.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\include\LdapWrapperHandler.h"
 				>
 			</File>
 		</Filter>
