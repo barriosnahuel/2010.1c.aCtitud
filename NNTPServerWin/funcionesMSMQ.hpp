@@ -10,5 +10,6 @@ public:
 	HRESULT crearCola(void);
 	void leerMensajes(void);
 	void insertarMensaje(IMSMQMessagePtr pMsg);
+	IMSMQMessagePtr desencolarMensaje(void);
 };
 #endif

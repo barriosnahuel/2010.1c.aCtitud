@@ -22,6 +22,31 @@ HRESULT MsmqProcess::crearCola()
 	return 0;
 }
 
+IMSMQMessagePtr MsmqProcess::desencolarMensaje()
+{
+  OleInitialize(NULL);                                 // Hay que inicializar OLE//
+  IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
+  IMSMQQueuePtr pQueue;
+  IMSMQMessagePtr pMsg("MSMQ.MSMQMessage");
+  qInfo->PathName = ".\\Private$\\colaDeNoticias";
+
+  
+  _variant_t    timeOut((long)1000);                   // 1 segundo de time-out
+  _variant_t    wantBody((bool)true);                  // Configuramos para recibir el body
+  
+  //Abrimos la cola con derecho de Lectura
+  
+  pQueue = qInfo->Open(MQ_RECEIVE_ACCESS, MQ_DENY_NONE); 
+  pMsg = pQueue->Receive(&vtMissing, &vtMissing, &wantBody, &timeOut);  //Recibimos el mensaje
+  if(pMsg == NULL) {
+	  cout<<"No hay mensajes en la cola" << endl;
+	  return NULL;
+  }
+  pQueue->Close();
+  CoUninitialize();
+  return pMsg;
+}
+
 void MsmqProcess::leerMensajes()
 {
   OleInitialize(NULL);                                 // Hay que inicializar OLE//

@@ -218,9 +218,6 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// Sea lo que sea lo encolo (despues me ocupare de verificar que lo que me mandaron es correcto, aca es al pedo).
 	stParametros.colaMsmq.insertarMensaje(pMsg);
 
-	cout << "---------------- Mensajes encolados ----------------" << endl;
-	stParametros.colaMsmq.leerMensajes();
-
 	// Si pude insertar el mensaje correctamente cierro todo al carajo.
 
 	// Libero la memoria reservada.
