@@ -16,6 +16,7 @@
 //	Nuestros includes:
 #include "../../funcionesMSMQ.hpp"
 #include "LdapWrapperHandler-Win.hpp"
+#include "xmlFunctions.hpp"
 
 //	Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #define DEFAULT_BUFLEN 512/*	ESTO CREO QUE NO HACE FALTA.*/
@@ -179,14 +180,22 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 									, PLDAP_SESSION_OP stPLDAPSessionOperations){
 	cout << "--> consumirMensajesYAlmacenarEnBD()" << endl;
 	
+	//XML
+	xmlDocPtr doc;
+	xmlChar* xmlArmado;
 	IMSMQMessagePtr pMsg = colaMsmq.tomarMensaje();
 
 	if(pMsg == NULL) {
-		cout << "No hay mensajes en la cola!" << endl;
+		// No hay mensajes en la cola.
 		return 0;
 	}
 
 	cout << "El body del mensaje es: " << (char *)(_bstr_t) pMsg->Body << endl;
+
+	//xmlArmado = pMsg->Body;
+
+	//cout << "El xml es: " << xmlArmado << endl;
+
 
 	//stArticle articulo;
 	//articulo.sBody = "un body de ejemplo desde el proceso";
