@@ -78,15 +78,15 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	colaMsmq.crearCola();
 
 	// Initialize Winsock
-    WSADATA wsaData;
+ /*   WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed: %d\n", iResult);
         return 1;
-    }
+    }*/
 
 	/*	heap????? Que es esto?	*/
-	struct addrinfo hints;
+/*	struct addrinfo hints;
     ZeroMemory(&hints, sizeof(hints));
     hints.ai_family= AF_UNSPEC;
     hints.ai_socktype= SOCK_STREAM;
@@ -132,7 +132,7 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
         printf("Unable to connect to server!\n");
         WSACleanup();
         return 1;
-    }
+    }*/
 
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
@@ -154,19 +154,16 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	//	Comienzo a iterar infinitamente, con un intervalo de X tiempo el cual logro llamando a
 	//	la funcion sleep(intervaloDeTiempo); donde intervaloDeTiempo es una variable que cargamos
 	//	del archivo de configuracion.
-	while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
+	//while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
 
-		if(/*ToDo: Hay nuevos mensajes en la cola MSMQ*/true){
-			if(!consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations))
-				cout << "Ocurrio un error y la aplicacion no pudo continuar normalmente." << endl;
-			else
-				cout << "Se consumieron los mensajes y se persistieron correctamente." << endl;
-		}
-		else
-			cout << "Como no hay mensajes nuevos, no hago nada." << endl;
-	
-		Sleep(atoi(configuracion.acInterval));
+	while(consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) {
+		cout << "Se consumirá un mensaje de la cola y se guardara en OpenDS" << endl;
 	}
+
+	cout << "No hay mensajes nuevos!" << endl;
+	
+	//	Sleep(atoi(configuracion.acInterval));
+//	}
 
 	/*	ToDo: Cerrar la conexion (socket).	*/
 
@@ -182,22 +179,22 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 									, PLDAP_SESSION_OP stPLDAPSessionOperations){
 	cout << "--> consumirMensajesYAlmacenarEnBD()" << endl;
 	
-	while(/*Haya mas mensajes*/true){
-		if(!/*	ToDo: Obtengo el primer msj de la cola.	*/true){
-			cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
-			return 0;
-		}
+	IMSMQMessagePtr pMsg = colaMsmq.tomarMensaje();
 
-		if(!/*	ToDo: Parseo el msj usando seguramente libxml2 y voy armando el objeto article.	*/true){
-			cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
-			return 0;
-		}
-
-		if(!/*	ToDo: Persisto el msj usando las funciones del LDAPWrapperHandler. (El parametro es un objeto stArticle)	*/true){
-			cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
-			return 0;
-		}
+	if(pMsg == NULL) {
+		cout << "No hay mensajes en la cola!" << endl;
+		return 0;
 	}
+
+	cout << "El body del mensaje es: " << (char *)(_bstr_t) pMsg->Body << endl;
+
+	//stArticle articulo;
+	//articulo.sBody = "un body de ejemplo desde el proceso";
+	//articulo.sHead = "un head de ejemplo desde el proceso";
+	//articulo.sNewsgroup = "newsgroup1";
+	//articulo.uiArticleID = 9876;
+
+	//insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
 
 	cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
 	return 1;
