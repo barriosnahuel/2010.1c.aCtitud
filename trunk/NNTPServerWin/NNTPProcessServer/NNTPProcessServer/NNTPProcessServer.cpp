@@ -181,9 +181,9 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	cout << "--> consumirMensajesYAlmacenarEnBD()" << endl;
 	
 	//XML
-	xmlDocPtr doc;
-	xmlChar* xmlArmado;
-	IMSMQMessagePtr pMsg = colaMsmq.tomarMensaje();
+	//xmlDocPtr doc;
+	//xmlChar* xmlArmado;
+	IMSMQMessagePtr pMsg = colaMsmq.desencolarMensaje();
 
 	if(pMsg == NULL) {
 		// No hay mensajes en la cola.

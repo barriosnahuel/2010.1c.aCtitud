@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Administrator\Desktop\2010.1c.aCtitud\NNTPServerWin&quot;"
+				AdditionalIncludeDirectories="..\..\"
 				RuntimeLibrary="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
