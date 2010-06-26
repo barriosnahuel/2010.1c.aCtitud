@@ -32,7 +32,7 @@ class xmlProcess
 public:
 }
 */
-
+#define BUFFERSIZE 1024
 typedef struct stConfiguracion{
 	char	acOpenDSPort[6];
     char	acOpenDSServer[16];
@@ -142,12 +142,12 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	PLDAP_CONTEXT_OP stPLDAPContextOperations= newLDAPContextOperations(); /*	Me permite operar sobre un contexto	*/
 	PLDAP_SESSION stPLDAPSession;
 	PLDAP_SESSION_OP stPLDAPSessionOperations= newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
-	if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
+/*	if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		cout << "No se pudo conectar a OpenDS." << endl;
 		//LoguearError("No se pudo conectar a OpenDS.");
 		return -1;
-	}
+	}*/
 	//asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czOpenDSServer, stConf.uiOpenDSPort);
 	//LoguearInformacion(sLogMessage);
 	cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
@@ -158,7 +158,7 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	//while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
 
 	while(consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) {
-		cout << "Se consumirá un mensaje de la cola y se guardara en OpenDS" << endl;
+		cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
 	}
 
 	cout << "No hay mensajes nuevos!" << endl;
@@ -180,9 +180,12 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 									, PLDAP_SESSION_OP stPLDAPSessionOperations){
 	cout << "--> consumirMensajesYAlmacenarEnBD()" << endl;
 	
-	//XML
-	//xmlDocPtr doc;
-	//xmlChar* xmlArmado;
+	HANDLE handle = HeapCreate( 0, 0, 0 );
+	if( handle == NULL ) {
+		cout << "HeapCreate error." << endl;
+	}
+
+	char *xmlCompleto = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	IMSMQMessagePtr pMsg = colaMsmq.desencolarMensaje();
 
 	if(pMsg == NULL) {
@@ -190,12 +193,8 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		return 0;
 	}
 
-	cout << "El body del mensaje es: " << (char *)(_bstr_t) pMsg->Body << endl;
-
-	//xmlArmado = pMsg->Body;
-
-	//cout << "El xml es: " << xmlArmado << endl;
-
+	strcpy(xmlCompleto, (char *)(_bstr_t) pMsg->Body);
+	cout << "El body del mensaje es: " << xmlCompleto << endl;
 
 	//stArticle articulo;
 	//articulo.sBody = "un body de ejemplo desde el proceso";
