@@ -41,6 +41,13 @@ typedef struct stConfiguracion{
 	char	szDefault[255];
 }stConfiguracion;
 
+typedef struct news{
+   char*   head;
+   char*   body;
+   char*   newsgroup;
+   unsigned int id;
+}news;
+
 /***********************************************************************************************
 							Declaraciones de funciones
  ***********************************************************************************************/ 
@@ -77,63 +84,6 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	//	Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
-
-	// Initialize Winsock
- /*   WSADATA wsaData;
-    int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed: %d\n", iResult);
-        return 1;
-    }*/
-
-	/*	heap????? Que es esto?	*/
-/*	struct addrinfo hints;
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family= AF_UNSPEC;
-    hints.ai_socktype= SOCK_STREAM;
-    hints.ai_protocol= IPPROTO_TCP;
-
-    // Resolve the server address and port
-	struct addrinfo *result= NULL;
-	iResult = getaddrinfo(argv[1], configuracion.acOpenDSPort, &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return 1;
-    }
-
-    // Itero intentando conectarme, hasta que consiga una conexion.
-	SOCKET ConnectSocket= INVALID_SOCKET;
-	struct addrinfo *ptr= NULL;
-    for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
-
-        // Creo un socket para conectarme.
-        ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, 
-            ptr->ai_protocol);
-        if (ConnectSocket == INVALID_SOCKET) {
-            printf("Error at socket(): %ld\n", WSAGetLastError());
-            freeaddrinfo(result);
-            WSACleanup();
-            return 1;
-        }
-
-        // Me conecto.
-        iResult = connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-        if (iResult == SOCKET_ERROR) {
-            closesocket(ConnectSocket);
-            ConnectSocket = INVALID_SOCKET;
-            continue;
-        }
-        break;
-    }
-
-    freeaddrinfo(result);
-
-    if (ConnectSocket == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
-        WSACleanup();
-        return 1;
-    }*/
 
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
@@ -185,6 +135,10 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		cout << "HeapCreate error." << endl;
 	}
 
+	xmlDocPtr doc;
+	xmlNodePtr root; 
+	xmlNodePtr child;
+	stArticle articulo;
 	char *xmlCompleto = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	IMSMQMessagePtr pMsg = colaMsmq.desencolarMensaje();
 
@@ -196,14 +150,37 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	strcpy(xmlCompleto, (char *)(_bstr_t) pMsg->Body);
 	cout << "El body del mensaje es: " << xmlCompleto << endl;
 
-	//stArticle articulo;
-	//articulo.sBody = "un body de ejemplo desde el proceso";
-	//articulo.sHead = "un head de ejemplo desde el proceso";
-	//articulo.sNewsgroup = "newsgroup1";
-	//articulo.uiArticleID = 9876;
+	doc = xmlParseMemory(xmlCompleto, BUFFERSIZE);
+	if(doc!=NULL){ //si la variable doc devuelve un valor diferente a NULL, se dice que el documento se ha parseado correctamente.
+		cout << "se parseo correctamente" << endl;
+	}
+
+	root = xmlDocGetRootElement(doc);
+	child = root->xmlChildrenNode;
+
+	articulo.sNewsgroup = (char*)xmlNodeGetContent(child);
+	child = child->next;
+	articulo.uiArticleID = (unsigned int)xmlNodeGetContent(child);
+	child = child->next;
+	articulo.sHead = (char*)xmlNodeGetContent(child);
+	child = child->next;
+	articulo.sBody = (char*)xmlNodeGetContent(child);
+
+	cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
+	cout << "Id del articulo: " << articulo.uiArticleID << endl;
+	cout << "Head del articulo: " << articulo.sHead << endl;
+	cout << "Body del articulo: " << articulo.sBody << endl;
 
 	//insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
 
+	if( ! HeapFree( handle, 0, xmlCompleto ) ) {
+			cout << "HeapFree error en handshake." << endl;
+	}
+
+	// Destruyo el heap.
+	if( ! HeapDestroy( handle ) ) {
+		cout << "HeapDestroy error." << endl;
+	}
 	cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
 	return 1;
 }
