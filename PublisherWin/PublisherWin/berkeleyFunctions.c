@@ -35,6 +35,7 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 {
 	int ret;
 	struct news* noticia;
+	int transmitioANNTPServer;
 	//berkeley
 	DBC* dbCursor;
 	DBT key,data;
@@ -90,14 +91,15 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 			printf("TAMANIO XML: %d", tamanioXML);
 			
 			//ENVIAR A NNTP
-			enviarXML(memoriaXML,tamanioXML,ipNNTP,puertoNNTP,&*memoryHandle);
-
-			//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
-			strcpy(noticia->transmitted,"1");
-			memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
-		    noticia->transmitted,noticia->largos.transmittedlen);
-			dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
+			transmitioANNTPServer = enviarXML(memoriaXML,tamanioXML,ipNNTP,puertoNNTP,&*memoryHandle);
 			
+			if(transmitioANNTPServer == 0){ 
+				//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
+				strcpy(noticia->transmitted,"1");
+				memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
+				noticia->transmitted,noticia->largos.transmittedlen);
+				dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
+	      }
 		}
 	
 	
