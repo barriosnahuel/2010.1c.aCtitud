@@ -8,8 +8,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <cstdlib>
+#include <iostream>
+#include <windows.h>
+#include <winbase.h>
 
 #include "LdapWrapperHandler-Win.hpp"
+#define BUFFERSIZE 1024
+
+using namespace std;
 
 /*	ToDo: Ver en todos los lugares donde haya asprintf(...) de reemplazarlo por otra forma porque esa funcion usa malloc. 
 Se tendria que usar lo del heap seguramente.	*/
@@ -29,28 +36,46 @@ int crearConexionLDAP(	char* sIp
 						, PLDAP_CONTEXT_OP* pstPLDAPContextOperations
 						, PLDAP_SESSION* pstPLDAPSession
 						, PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
-	
+
+	HANDLE handle= HeapCreate(0, 0, 0); 
+	if(handle==NULL)
+		cout << "HeapCreate error." << endl; 
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
-	char *sOpenDSLocation= (char*)malloc(sizeof(char)*(9+15+5));/*	ToDo: Cambiar el malloc por lo que corresponde en Windows!!	*/
+	char* sOpenDSLocation= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
+	if(sOpenDSLocation==NULL) 
+		cout << "HeapAlloc error." << endl; 
+
 	strcpy(sOpenDSLocation, "ldap://");
 	strcat(sOpenDSLocation, sIp);
 	strcat(sOpenDSLocation, ":");
-	char* sPort= (char*)malloc(sizeof(char)*6);/*	ToDo: Cambiar el malloc por lo que corresponde en Windows!!	*/
-	itoa(uiPort, sPort, 2);
+	char* sPort= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
+	if(sPort==NULL) 
+		cout << "HeapAlloc error." << endl; 
+	itoa(uiPort, sPort, 10);
+	
 	strcat(sOpenDSLocation, sPort);
-	/*asprintf(&sOpenDSLocation, "ldap://%s:%d", sIp, uiPort);*/
+	if( !HeapFree(handle, 0, sPort) )
+		cout << "HeapFree error en handshake." << endl; 
+
+	cout << "La URL de LDAP es: " << sOpenDSLocation << endl;
 
 	/* Inicializamos el contexto. */
 	(*pstPLDAPContextOperations)->initialize(*pstPLDAPContext, sOpenDSLocation);
 	(*pstPLDAPSession) = (*pstPLDAPContextOperations)->newSession(
 			*pstPLDAPContext, "cn=Directory Manager", "password");
 
+	if( !HeapFree(handle, 0, sOpenDSLocation) )
+		cout << "HeapFree error en handshake." << endl; 
+
+	// Destruyo el heap. 
+	if( !HeapDestroy(handle) )
+	  cout << "HeapDestroy error." << endl; 
+
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
-	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/
-	
+	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/	
 	return 1;
 }
 
@@ -59,8 +84,28 @@ int crearConexionLDAP(	char* sIp
  * Retorna un char* de la forma: "utnArticleID=12345,ou=so,dn=utn,dn=edu"
  */
 char* getDNFor(int dArticleID){
-	char *sDn;
-	/*asprintf(&sDn, "%s=%d,%s", OPENDS_ATTRIBUTE_ARTICLE_ID, dArticleID, OPENDS_SCHEMA);*/
+	HANDLE handle= HeapCreate(0, 0, 0); 
+	if(handle==NULL)
+		cout << "HeapCreate error." << endl; 
+
+	char* sDn= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
+	if(sDn==NULL) 
+		cout << "HeapAlloc error." << endl; 
+
+	strcpy(sDn, OPENDS_ATTRIBUTE_ARTICLE_ID);
+	strcat(sDn, "=");
+	
+	char* sArticleID= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
+	if(sArticleID==NULL) 
+		cout << "HeapAlloc error." << endl; 
+	itoa(dArticleID, sArticleID, 10);
+	strcat(sDn, sArticleID);
+	if( !HeapFree(handle, 0, sArticleID) )
+		cout << "HeapFree error en handshake." << endl; 
+
+	strcat(sDn, ",");
+	strcat(sDn, OPENDS_SCHEMA);
+	cout << "sdn vale: " << sDn << endl;
 
 	return sDn;
 }
