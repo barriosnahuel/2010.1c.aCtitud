@@ -213,7 +213,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
 	payloadXMLResponse = "RequestOK";
-	payloadLengthXml = "9";
+	payloadLengthXml = "0009";
 
 	strcpy(xmlResponse, idDescriptor);
 	xmlResponse = strcat(xmlResponse, payloadDescriptor);
