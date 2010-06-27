@@ -17,11 +17,17 @@ public:
 */
 #define BUFFERSIZE 1024
 
+typedef struct largos_IRCIPC{
+	int lenIdDescriptor;
+	int lenPayloadDescriptor;
+	int lenPayloadLength;
+}largos_IRCIPC;
 typedef struct stIRC_IPC{
+   largos_IRCIPC largos;
    char idDescriptor[16+1];
    char payloadDescriptor[1+1];
    char payloadLength[4+1];
-   char payloadXML[1023+1]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
+   char* payloadXML; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
 
 typedef struct stConfiguracion{
@@ -123,6 +129,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	cout << "Recibi el handshake: " << handshake << endl;
 
+/*
 	memcpy( &stParametros.datosRecibidos.idDescriptor , handshake , sizeof(stParametros.datosRecibidos.idDescriptor)-1);
 	stParametros.datosRecibidos.idDescriptor[sizeof(stParametros.datosRecibidos.idDescriptor)-1] = '\0';
 	memcpy( &stParametros.datosRecibidos.payloadDescriptor , handshake+sizeof(stParametros.datosRecibidos.idDescriptor)-1 , sizeof(stParametros.datosRecibidos.payloadDescriptor)-1);
@@ -131,11 +138,17 @@ unsigned __stdcall clientFunction(void* threadParameters)
     stParametros.datosRecibidos.payloadLength[sizeof(stParametros.datosRecibidos.payloadLength)-1] = '\0';
 	memcpy( &stParametros.datosRecibidos.payloadXML , handshake+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength)-3 , sizeof(stParametros.datosRecibidos.payloadXML)-1);
     stParametros.datosRecibidos.payloadXML[sizeof(stParametros.datosRecibidos.payloadXML)-1] = '\0';
-
+*/
+	CopyMemory(&stParametros.datosRecibidos.largos,handshake,sizeof(largos_IRCIPC));
+	CopyMemory(&stParametros.datosRecibidos.idDescriptor,handshake + sizeof(largos_IRCIPC),stParametros.datosRecibidos.largos.lenIdDescriptor);
+	CopyMemory(&stParametros.datosRecibidos.payloadDescriptor, handshake+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor , stParametros.datosRecibidos.largos.lenPayloadDescriptor);
+	CopyMemory(&stParametros.datosRecibidos.payloadLength,handshake+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor, stParametros.datosRecibidos.largos.lenPayloadLength);
+	
 	cout << "Id descriptor handshake: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor handshake: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength handshake: " << stParametros.datosRecibidos.payloadLength << endl;
-	cout << "payload handshake: " << stParametros.datosRecibidos.payloadXML << endl;
+	
+	//cout << "payload handshake: " << stParametros.datosRecibidos.payloadXML << endl;
 
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
 	payloadLengthHandshake = "0000";
@@ -143,13 +156,11 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// ################## INICIO VALIDACION HANDSHAKE ##################
 
 	if((strcmp(stParametros.datosRecibidos.payloadLength, "0000") != 0) || (strlen(stParametros.datosRecibidos.idDescriptor) != 16)
-		|| (strlen(stParametros.datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros.datosRecibidos.payloadLength) != 4)
-		|| (strcmp(stParametros.datosRecibidos.payloadXML, "") != 0)) {
+		|| (strlen(stParametros.datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros.datosRecibidos.payloadLength) != 4)) {
 	/*if(validarHandshake(&stParametros)) {*/
 
 		// Si el handshake es invalido mando 1, caso contrario 2.
 		payloadDescriptor = "1";
-
 		// Concateno los valores para responderle al publisher handshake OK.
 		handshakeResponse = strcat(idDescriptor, payloadDescriptor);
 		handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
@@ -194,17 +205,17 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "---------------- Arranco a procesar el mensaje con XML ----------------" << endl;
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
 	
-	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
+	CopyMemory(&stParametros.datosRecibidos.largos,estructuraEnBytesIPCRPC,sizeof(largos_IRCIPC));
+	CopyMemory(&stParametros.datosRecibidos.idDescriptor,estructuraEnBytesIPCRPC + sizeof(largos_IRCIPC),stParametros.datosRecibidos.largos.lenIdDescriptor);
+	CopyMemory(&stParametros.datosRecibidos.payloadDescriptor, estructuraEnBytesIPCRPC+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor , stParametros.datosRecibidos.largos.lenPayloadDescriptor);
+	CopyMemory(&stParametros.datosRecibidos.payloadLength,estructuraEnBytesIPCRPC + sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor, stParametros.datosRecibidos.largos.lenPayloadLength);
+	printf("largo payloadLength: %s",stParametros.datosRecibidos.payloadLength);
 
-	memcpy( &stParametros.datosRecibidos.idDescriptor , estructuraEnBytesIPCRPC , sizeof(stParametros.datosRecibidos.idDescriptor)-1);
-	stParametros.datosRecibidos.idDescriptor[sizeof(stParametros.datosRecibidos.idDescriptor)-1] = '\0';
-	memcpy( &stParametros.datosRecibidos.payloadDescriptor , estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)-1 , sizeof(stParametros.datosRecibidos.payloadDescriptor)-1);
-    stParametros.datosRecibidos.payloadDescriptor[sizeof(stParametros.datosRecibidos.payloadDescriptor)-1] = '\0';
-	memcpy( &stParametros.datosRecibidos.payloadLength, estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)-2 , sizeof(stParametros.datosRecibidos.payloadLength)-1);
-    stParametros.datosRecibidos.payloadLength[sizeof(stParametros.datosRecibidos.payloadLength)-1] = '\0';
-	memcpy( &stParametros.datosRecibidos.payloadXML , estructuraEnBytesIPCRPC+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength)-3 , sizeof(stParametros.datosRecibidos.payloadXML)-1);
-    stParametros.datosRecibidos.payloadXML[sizeof(stParametros.datosRecibidos.payloadXML)-1] = '\0';
-
+	stParametros.datosRecibidos.payloadXML = (char*)HeapAlloc(handle,0,atoi(stParametros.datosRecibidos.payloadLength));
+		
+	CopyMemory(stParametros.datosRecibidos.payloadXML,estructuraEnBytesIPCRPC+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor + stParametros.datosRecibidos.largos.lenPayloadLength,
+			   atoi(stParametros.datosRecibidos.payloadLength));
+		
 	cout << "Id descriptor: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength: " << stParametros.datosRecibidos.payloadLength << endl;
