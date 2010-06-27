@@ -110,9 +110,11 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// ################## Variables para el response ####################################
 	char *idDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *payloadDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-	char *payloadLength = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadLengthHandshake = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *payloadLengthXml = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *payloadXMLResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *handshakeResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *xmlResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	// ################## FIN Variables para el response ####################################
 	
 	// ################## INICIO MENSAJE HANDSHAKE ###################################
@@ -136,7 +138,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "payload handshake: " << stParametros.datosRecibidos.payloadXML << endl;
 
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
-	payloadLength = "0000";
+	payloadLengthHandshake = "0000";
 	
 	// ################## INICIO VALIDACION HANDSHAKE ##################
 
@@ -150,7 +152,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 		// Concateno los valores para responderle al publisher handshake OK.
 		handshakeResponse = strcat(idDescriptor, payloadDescriptor);
-		handshakeResponse = strcat(handshakeResponse, payloadLength);
+		handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
 
 		if ((bytesEnviados = send(stParametros.ficheroCliente, handshakeResponse, (int)strlen(handshakeResponse), 0)) == -1) {
 				cout << "Error al enviar response handshake" << endl;
@@ -179,7 +181,8 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	// Concateno los valores para responderle al publisher handshake OK.
 	handshakeResponse = strcat(idDescriptor, payloadDescriptor);
-	handshakeResponse = strcat(handshakeResponse, payloadLength);
+	handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
+	cout << "Enviare al publisher el siguiente response del handshake: " << handshakeResponse << endl;
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, handshakeResponse, (int)strlen(handshakeResponse), 0)) == -1)
 		cout << "Error al enviar response handshake" << endl;
@@ -190,13 +193,6 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// ################## INICIO MENSAJE CON XML ###################################
 	cout << "---------------- Arranco a procesar el mensaje con XML ----------------" << endl;
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
-	
-	//PASO LOS BYTES RECIBIDOS A LA ESTRUCTURA IPC/RPC
-	/* FGUERRA: Por el momento, desde el publisher recibe "12345678123456781030Esta es una prueba del payload" donde:
-			1234567812345678 deberia ser el idDescriptor,
-			1 deberia ser payloadDescriptor, 
-			030 deberia ser payloadLength,
-			Esta es una prueba del payload deberia ser payloadXML*/
 	
 	cout << "Recibi el xml: " << estructuraEnBytesIPCRPC << endl;
 
@@ -213,15 +209,19 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "payloadDescriptor: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength: " << stParametros.datosRecibidos.payloadLength << endl;
 	cout << "Payload: " << stParametros.datosRecibidos.payloadXML << endl;
+
 	
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
-	payloadDescriptor = "2";
-	payloadXMLResponse = "Esta es la respuesta al request";
-	payloadLength = (char*)strlen(payloadXMLResponse);
+	payloadXMLResponse = "RequestOK";
+	payloadLengthXml = "9";
 
+	strcpy(xmlResponse, idDescriptor);
+	xmlResponse = strcat(xmlResponse, payloadDescriptor);
+	xmlResponse = strcat(xmlResponse, payloadLengthXml);
+	xmlResponse = strcat(xmlResponse, payloadXMLResponse);
+	cout << "Enviare al publisher el siguiente response del xml: " << xmlResponse << endl;
 
-	// TODO - FGuerra: por el momento le mando el idDescriptor. Realmente le debo mandar los 4 strings de arriba concatenados segun protocolo.
-	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
+	if ((bytesEnviados = send(stParametros.ficheroCliente, xmlResponse, (int)strlen(xmlResponse), 0)) == -1)
 		cout << "Error al enviar response" << endl;
 
 	cout << "---------------- Termino de procesar el mensaje con XML ----------------" << endl;
