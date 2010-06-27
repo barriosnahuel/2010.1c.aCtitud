@@ -9,17 +9,23 @@
 	//			<HEAD>MARTIN PALEMO IDOLO</HEAD> 
 	//			<BODY>ARGENTINA CAMPEON MUNDIAL 2010</BODY> 
 	//		</news> 
+typedef struct largos_IRCIPC{
+	int lenIdDescriptor;
+	int lenPayloadDescriptor;
+	int lenPayloadLength;
+}
 typedef struct stIRC_IPC{
-
+   largos_IRCIPC largos;
    char idDescriptor[16+1];
    char payloadDescriptor[1+1];
    char payloadLength[4+1];
-   char payloadXML[1023+1]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
+   char* payloadXML; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
 
 #define LARGOID            17
 #define LARGOPAYLOAD	   2
-#define LARGOPAYLOADLENGHT 5
+#define LARGOPAYLOADLENGTH 5
+#define DEFAULT_BUFLEN 512
 
 
 xmlDocPtr crearXML(struct news* noticia, char* key)
@@ -46,7 +52,7 @@ xmlDocPtr crearXML(struct news* noticia, char* key)
 	return doc;
 }
 
-int enviarXML(xmlChar* memoriaXML,int* tamanioXML,char* ipNNTP,int puertoNNTP,HANDLE** memoryHandle)
+int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HANDLE** memoryHandle)
 {
 
 	//Handshake 
@@ -65,6 +71,10 @@ int enviarXML(xmlChar* memoriaXML,int* tamanioXML,char* ipNNTP,int puertoNNTP,HA
 	int lConnect;
 	int lLength;
 	int iResult;
+	
+	char recvbuf[DEFAULT_BUFLEN];
+	char recvbufXML[DEFAULT_BUFLEN];
+	int recvbuflen = DEFAULT_BUFLEN;
 
 	//PARA PROTOCOLO
 	struct stIRC_IPC* pkg;
@@ -73,14 +83,17 @@ int enviarXML(xmlChar* memoriaXML,int* tamanioXML,char* ipNNTP,int puertoNNTP,HA
 
 	char* handshakeEnBytes;
 	int  largoHandshake;
+	int i;
 	printf("################ ENVIO DE XML A NNTPSERVER ################\n");
-	
+	printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);
 	pkg = HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct stIRC_IPC));
 	
+	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
 	sprintf(pkg->idDescriptor, "%d", milisec);
 	strcpy(pkg->payloadDescriptor,"1"); //1=REQUEST;
 	strcpy(pkg->payloadLength,"0000");
+	strcat(pkg->idDescriptor,"123456");
 
 	printf("idDescriptor: %s \n", pkg->idDescriptor);
 	printf("payloadDescriptor : %s \n",pkg->payloadDescriptor);
@@ -88,21 +101,21 @@ int enviarXML(xmlChar* memoriaXML,int* tamanioXML,char* ipNNTP,int puertoNNTP,HA
 	
 	//ARMO ESTRUCTURA EN BYTES
 	ZeroMemory(handshakeEnBytes,0);
-	largoHandshake = LARGOID+LARGOPAYLOAD+LARGOPAYLOADLENGHT;//LOS LARGOS SON SIEMPRE FIJOS
+	largoHandshake = LARGOID+LARGOPAYLOAD+LARGOPAYLOADLENGTH;//LOS LARGOS SON SIEMPRE FIJOS
 	handshakeEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoHandshake);
 	CopyMemory(handshakeEnBytes,pkg->idDescriptor,LARGOID);
 	CopyMemory(handshakeEnBytes + LARGOID,pkg->payloadDescriptor,LARGOPAYLOAD);
-	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD,pkg->payloadLength,LARGOPAYLOADLENGHT);
+	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD,pkg->payloadLength,LARGOPAYLOADLENGTH);
 
-	printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);
+	
 	//HAGO LA CONEXION CON EL NNTP SERVER
 	if(WSAStartup(MAKEWORD(2,0),&wsaData) != 0){
-		printf("Socket Initialization Error. Program aborted\n");
+		printf("Error en inicializacion de Socket");
         return 1;
     }
     lhSocket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 	if(lhSocket == INVALID_SOCKET){
-      printf("Invalid Socket ");
+      printf("Socket Invalido ");
 	  return 1;
 	}
 
@@ -117,8 +130,54 @@ int enviarXML(xmlChar* memoriaXML,int* tamanioXML,char* ipNNTP,int puertoNNTP,HA
     }
     lLength = send(lhSocket,handshakeEnBytes,largoHandshake,0);
     
-	closesocket(lhSocket);
+	if (lLength == SOCKET_ERROR) {
+        printf("Fallo el send del Handshake: %d\n", WSAGetLastError());
+        closesocket(lhSocket);
+        WSACleanup();
+        return 1;
+    }
+	//Recibo la respuesta del NNTPServer
+	lLength = recv(lhSocket, recvbuf, recvbuflen, 0);
+        if ( iResult > 0 )
+            printf("Bytes recividos: %d\n", iResult);
+        else if ( iResult == 0 )
+            printf("Coneccion cerrada\n");
+        else
+            printf("recv fallo: %d\n", WSAGetLastError());
 
+	printf("Recibi del XML Process server como response del handshake lo siguiente -> %s\n", recvbuf);
+	
+
+	
+	//################################# ENVIO EL XML #################################
+	sprintf(pkg->payloadLength,"%d",tamanioXML);
+	printf("tamanioXML: %d \n",tamanioXML);
+	printf("pkg->payloadLength: %s \n",pkg->payloadLength);	
+	largoHandshake =  LARGOID+LARGOPAYLOAD+LARGOPAYLOADLENGTH+tamanioXML;
+	handshakeEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoHandshake);
+	
+	//COPIO EL MENSAJE XML AL PAYLOAD XML
+	pkg->payloadXML = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioXML);
+	strcpy(pkg->payloadXML,(char*)memoriaXML);
+
+	CopyMemory(handshakeEnBytes,pkg->idDescriptor,LARGOID);
+	CopyMemory(handshakeEnBytes + LARGOID,pkg->payloadDescriptor,LARGOPAYLOAD);
+	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD,pkg->payloadLength,LARGOPAYLOADLENGTH);
+	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD +LARGOPAYLOADLENGTH,pkg->payloadXML,tamanioXML);
+
+	lLength = send(lhSocket,handshakeEnBytes,largoHandshake,0);
+    
+	if (lLength == SOCKET_ERROR) {
+        printf("Fallo el send del XML: %d\n", WSAGetLastError());
+        closesocket(lhSocket);
+        WSACleanup();
+        return 1;
+    }
+
+	closesocket(lhSocket);
+/*	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg->idDescriptor);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg->payloadDescriptor);
+*/	
 	Sleep(100000);
 	//Tengo que hacer el request
 	printf((char*)memoriaXML);
