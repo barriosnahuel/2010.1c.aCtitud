@@ -193,11 +193,6 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
     }
 
 	closesocket(lhSocket);
-/*	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg->idDescriptor);
-	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg->payloadDescriptor);
-*/	
-	Sleep(100000);
-	//Tengo que hacer el request
-	printf((char*)memoriaXML);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg);
 	return 0;
 }
