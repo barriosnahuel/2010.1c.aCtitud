@@ -112,6 +112,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	char *payloadDescriptor = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *payloadLength = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *payloadXMLResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *handshakeResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	// ################## FIN Variables para el response ####################################
 	
 	// ################## INICIO MENSAJE HANDSHAKE ###################################
@@ -133,6 +134,9 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "payloadDescriptor handshake: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength handshake: " << stParametros.datosRecibidos.payloadLength << endl;
 	cout << "payload handshake: " << stParametros.datosRecibidos.payloadXML << endl;
+
+	idDescriptor = stParametros.datosRecibidos.idDescriptor;
+	payloadLength = "0000";
 	
 	// ################## INICIO VALIDACION HANDSHAKE ##################
 
@@ -140,6 +144,17 @@ unsigned __stdcall clientFunction(void* threadParameters)
 		|| (strlen(stParametros.datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros.datosRecibidos.payloadLength) != 4)
 		|| (strcmp(stParametros.datosRecibidos.payloadXML, "") != 0)) {
 	/*if(validarHandshake(&stParametros)) {*/
+
+		// Si el handshake es invalido mando 1, caso contrario 2.
+		payloadDescriptor = "1";
+
+		// Concateno los valores para responderle al publisher handshake OK.
+		handshakeResponse = strcat(idDescriptor, payloadDescriptor);
+		handshakeResponse = strcat(handshakeResponse, payloadLength);
+
+		if ((bytesEnviados = send(stParametros.ficheroCliente, handshakeResponse, (int)strlen(handshakeResponse), 0)) == -1) {
+				cout << "Error al enviar response handshake" << endl;
+		}
 		if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
 			cout << "HeapFree error en estructuraEnBytesIPCRPC." << endl;
 		}
@@ -159,11 +174,14 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	}
 	// ################## FIN VALIDACION HANDSHAKE ##################
 
-	idDescriptor = stParametros.datosRecibidos.idDescriptor;
+	// Si el handshake es invalido mando 1, caso contrario 2.
 	payloadDescriptor = "2";
 
-	// TODO - FGuerra: se deben concatenar los valores de arriba para mandarlos por este send.
-	if ((bytesEnviados = send(stParametros.ficheroCliente, idDescriptor, (int)strlen(idDescriptor), 0)) == -1)
+	// Concateno los valores para responderle al publisher handshake OK.
+	handshakeResponse = strcat(idDescriptor, payloadDescriptor);
+	handshakeResponse = strcat(handshakeResponse, payloadLength);
+
+	if ((bytesEnviados = send(stParametros.ficheroCliente, handshakeResponse, (int)strlen(handshakeResponse), 0)) == -1)
 		cout << "Error al enviar response handshake" << endl;
 	
 	cout << "---------------- Termino de procesar el Handshake ----------------" << endl;
