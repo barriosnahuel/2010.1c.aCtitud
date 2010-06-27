@@ -1,18 +1,20 @@
 #include"berkeleyFunctions.h"
 
-void createDb(DB** dbp, HANDLE** memoryHandle)
+void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName)
 {
 	char* ruta = "C:\\";
-	char* dbName = "aCtitud10.db";	//Aca debe levantar el nombre del newsgroup
+	//char* dbName = "aCtitud10.db";	//Aca debe levantar el nombre del newsgroup
+	char* extension=".db";
 	char* rutaDb = NULL;
 	int ret;
-	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+1;
+	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+strlen(extension)+1;
 	
 	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb); 
 	printf("strlen(%s): %d \n",ruta,strlen(ruta));
 	printf("strlen(%s): %d \n",dbName,strlen(dbName));
 	strcat(rutaDb,ruta);	
 	strcat(rutaDb,dbName);
+	strcat(rutaDb,extension);
 	printf("rutaDB: %s \n", rutaDb);
 	printf("strlen(%s): %d \n",rutaDb,strlen(rutaDb));
 	
@@ -29,7 +31,7 @@ void createDb(DB** dbp, HANDLE** memoryHandle)
 	return;
 }
 
-void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
+void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puertoNNTP)
 {
 	int ret;
 	struct news* noticia;
@@ -87,14 +89,17 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle)
 			xmlDocDumpFormatMemory(doc,&memoriaXML,&tamanioXML,1);
 			
 			//ENVIAR A NNTP
-
+			enviarXML(&memoriaXML,&tamanioXML,ipNNTP,puertoNNTP,&*memoryHandle);
 
 			//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
-			noticia->transmitted="1";
+			strcpy(noticia->transmitted,"1");
 			memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
 		    noticia->transmitted,noticia->largos.transmittedlen);
 			dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
+			
 		}
+	
+	
 	}
 	if ((ret = dbCursor->c_close(dbCursor)) != 0){
 		(*dbp)->err(*dbp, ret, "DBcursor->close");

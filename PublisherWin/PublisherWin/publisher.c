@@ -10,13 +10,18 @@ typedef struct stIRC_IPC{
 typedef struct stThreadParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
-	char newsgroup[1024];
+	char newsgroup[100];
 } stThreadParameters;
 
 typedef struct stSenderParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
+	int puertoNNTP;
+	char ipNNTP[16];
+	int tiempoEspera;
+	char newsgroup[100];
 } stSenderParameters;
+
 
 #define BUFFERSIZE 1024
 
@@ -93,7 +98,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		
 	printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
 	
-	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
+	createDb(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.newsgroup);
 	noticia.id = lastID(&stParametros.dbHandler) + 1 ;
 	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
 	//getArticle(&stParametros.dbHandler,&stParametros.memoryHandler);
@@ -121,10 +126,11 @@ unsigned __stdcall senderFunction(void* threadParameters)
 	if( stParametros.memoryHandler == NULL ) 
 		printf("Sender HeapCreate error.\n");
 	
-	createDb(&stParametros.dbHandler, &stParametros.memoryHandler);
+	createDb(&stParametros.dbHandler,&stParametros.memoryHandler,&stParametros.newsgroup);
 	
 	//Se fija las noticias que no estan enviadas, las pasa a XML y las envia a nntp
-	noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler);	
+	//noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler);	
+	noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.ipNNTP,stParametros.puertoNNTP);	
 	
 	closeDb(&stParametros.dbHandler);
 	
@@ -136,14 +142,14 @@ unsigned __stdcall senderFunction(void* threadParameters)
 
 int main(){
 
-	//Carga configuracion --> Ip y puerto del serividor
+	//Carga configuracion --> Ip y puerto del servidor NNTP
 	/*struct stConfiguracion configuracion;
-	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
-	GetPrivateProfileString("configuracion","IP", configuracion.szDefault,configuracion.serverIP,16,archivoConfiguracion);
+	
 	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
     cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
 	*/
-	unsigned int segundosEsperaSender;
+	char tempEsperaSender[32];
+	char tempPuerto[8];
 	//THREAD CLIENTE
 	stThreadParameters stParameters;
 	unsigned threadProcesarRequest;
@@ -152,8 +158,18 @@ int main(){
 	stSenderParameters stSender;
 	unsigned threadProcesarSender;
 	HANDLE threadSender;
-	
-	strcpy(stParameters.newsgroup,"LA NACION");
+	//CONFIGURACION PARA EL SENDER
+	LPCSTR archivoConfiguracion = "../configuracion.ini";
+	GetPrivateProfileString("configuracion","IPNNTP",0,stSender.ipNNTP,16,archivoConfiguracion);
+	GetPrivateProfileString("configuracion","PUERTONNTP",0,tempPuerto,8,archivoConfiguracion);
+	GetPrivateProfileString("configuracion","TIEMPO",0,tempEsperaSender,32,archivoConfiguracion);
+	stSender.puertoNNTP = atoi(tempPuerto);
+	stSender.tiempoEspera = atoi(tempEsperaSender);
+	//CONFIGURACION THREAD CLIENTE INTERFAZ
+	GetPrivateProfileString("configuracion","NEWSGROUP",0,stParameters.newsgroup,256,archivoConfiguracion);
+	strcpy(stSender.newsgroup,stParameters.newsgroup); //el sender tambien necesita el nombre del newsgroup para levantar db
+	//strcpy(stParameters.newsgroup,"LA NACION");
+
 	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stParameters, 
 		0, &threadProcesarRequest))!=0){
 		CloseHandle(threadCliente);
@@ -163,9 +179,9 @@ int main(){
 
 	printf("Sale del thread cliente\n");
 
-	segundosEsperaSender = 10000;
+	
 	while(1){
-		Sleep(segundosEsperaSender);
+		Sleep(stSender.tiempoEspera);
 		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 
 			0, &threadProcesarSender))!=0){
 			CloseHandle(threadSender);
