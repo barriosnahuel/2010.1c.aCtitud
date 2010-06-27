@@ -13,7 +13,7 @@ typedef struct largos_IRCIPC{
 	int lenIdDescriptor;
 	int lenPayloadDescriptor;
 	int lenPayloadLength;
-}
+}largos_IRCIPC;
 typedef struct stIRC_IPC{
    largos_IRCIPC largos;
    char idDescriptor[16+1];
@@ -82,7 +82,9 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	long milisec = seconds * 1000;
 
 	char* handshakeEnBytes;
+	char* xmlEnBytes;
 	int  largoHandshake;
+	int largoXmlEnBytes;
 	int i;
 	printf("################ ENVIO DE XML A NNTPSERVER ################\n");
 	printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);
@@ -90,6 +92,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	
 	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
+	printf((char*)memoriaXML);
 	sprintf(pkg->idDescriptor, "%d", milisec);
 	strcpy(pkg->payloadDescriptor,"1"); //1=REQUEST;
 	strcpy(pkg->payloadLength,"0000");
@@ -98,14 +101,19 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	printf("idDescriptor: %s \n", pkg->idDescriptor);
 	printf("payloadDescriptor : %s \n",pkg->payloadDescriptor);
 	printf("payloadLength: %s \n ",pkg->payloadLength);
-	
+
+	pkg->largos.lenIdDescriptor      = strlen(pkg->idDescriptor) +1;
+	pkg->largos.lenPayloadDescriptor = strlen(pkg->payloadDescriptor) + 1;
+	pkg->largos.lenPayloadLength     = strlen(pkg->payloadLength) + 1;
 	//ARMO ESTRUCTURA EN BYTES
 	ZeroMemory(handshakeEnBytes,0);
-	largoHandshake = LARGOID+LARGOPAYLOAD+LARGOPAYLOADLENGTH;//LOS LARGOS SON SIEMPRE FIJOS
+	largoHandshake = sizeof(pkg->largos) + pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor + pkg->largos.lenPayloadLength;//LOS LARGOS SON SIEMPRE FIJOS
 	handshakeEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoHandshake);
-	CopyMemory(handshakeEnBytes,pkg->idDescriptor,LARGOID);
-	CopyMemory(handshakeEnBytes + LARGOID,pkg->payloadDescriptor,LARGOPAYLOAD);
-	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD,pkg->payloadLength,LARGOPAYLOADLENGTH);
+
+	CopyMemory(handshakeEnBytes,(char*)&pkg->largos,sizeof(pkg->largos));
+	CopyMemory(handshakeEnBytes + sizeof(pkg->largos),pkg->idDescriptor,pkg->largos.lenIdDescriptor);
+	CopyMemory(handshakeEnBytes + sizeof(pkg->largos)+pkg->largos.lenIdDescriptor,pkg->payloadDescriptor,pkg->largos.lenPayloadDescriptor);
+	CopyMemory(handshakeEnBytes + sizeof(pkg->largos)+pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor,pkg->payloadLength, pkg->largos.lenPayloadLength);
 
 	
 	//HAGO LA CONEXION CON EL NNTP SERVER
@@ -150,22 +158,32 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 
 	
 	//################################# ENVIO EL XML #################################
-	sprintf(pkg->payloadLength,"%d",tamanioXML);
-	printf("tamanioXML: %d \n",tamanioXML);
+	sprintf(pkg->payloadLength,"%d",tamanioXML+1);
+	printf("tamanioXML: %d \n",tamanioXML+1);
 	printf("pkg->payloadLength: %s \n",pkg->payloadLength);	
-	largoHandshake =  LARGOID+LARGOPAYLOAD+LARGOPAYLOADLENGTH+tamanioXML;
-	handshakeEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoHandshake);
+
+	printf("idDescriptor: %s \n", pkg->idDescriptor);
+	printf("payloadDescriptor : %s \n",pkg->payloadDescriptor);
+	printf("payloadLength: %s \n ",pkg->payloadLength);
 	
+	pkg->largos.lenPayloadLength = strlen(pkg->payloadLength)+1;	
+
+	largoXmlEnBytes = sizeof(pkg->largos) + pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor + pkg->largos.lenPayloadLength + pkg->payloadLength;//LOS LARGOS SON SIEMPRE FIJOS
+	xmlEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoXmlEnBytes);
+
 	//COPIO EL MENSAJE XML AL PAYLOAD XML
 	pkg->payloadXML = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioXML);
-	strcpy(pkg->payloadXML,(char*)memoriaXML);
-
-	CopyMemory(handshakeEnBytes,pkg->idDescriptor,LARGOID);
-	CopyMemory(handshakeEnBytes + LARGOID,pkg->payloadDescriptor,LARGOPAYLOAD);
-	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD,pkg->payloadLength,LARGOPAYLOADLENGTH);
-	CopyMemory(handshakeEnBytes + LARGOID + LARGOPAYLOAD +LARGOPAYLOADLENGTH,pkg->payloadXML,tamanioXML);
-
-	lLength = send(lhSocket,handshakeEnBytes,largoHandshake,0);
+	strcpy(pkg->payloadXML,memoriaXML);
+	
+	CopyMemory(xmlEnBytes,(char*)&pkg->largos,sizeof(largos_IRCIPC));
+	CopyMemory(xmlEnBytes + sizeof(largos_IRCIPC),pkg->idDescriptor,pkg->largos.lenIdDescriptor);
+	CopyMemory(xmlEnBytes + sizeof(largos_IRCIPC)+pkg->largos.lenIdDescriptor,pkg->payloadDescriptor,pkg->largos.lenPayloadDescriptor);
+	CopyMemory(xmlEnBytes + sizeof(largos_IRCIPC)+pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor,pkg->payloadLength, pkg->largos.lenPayloadLength);
+	CopyMemory(xmlEnBytes + sizeof(largos_IRCIPC)+pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor +pkg->largos.lenPayloadLength,
+		       pkg->payloadXML,tamanioXML);
+	
+	
+	lLength = send(lhSocket,xmlEnBytes,largoXmlEnBytes,0);
     
 	if (lLength == SOCKET_ERROR) {
         printf("Fallo el send del XML: %d\n", WSAGetLastError());

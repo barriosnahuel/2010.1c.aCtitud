@@ -87,9 +87,10 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 			//PASAR A FORMATO XML
 			doc = crearXML(noticia,key.data);
 			xmlDocDumpFormatMemory(doc,&memoriaXML,&tamanioXML,1);
+			printf("TAMANIO XML: %d", tamanioXML);
 			
 			//ENVIAR A NNTP
-			enviarXML(&memoriaXML,&tamanioXML,ipNNTP,puertoNNTP,&*memoryHandle);
+			enviarXML(memoriaXML,tamanioXML,ipNNTP,puertoNNTP,&*memoryHandle);
 
 			//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
 			strcpy(noticia->transmitted,"1");
