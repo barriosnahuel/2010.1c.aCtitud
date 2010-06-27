@@ -79,7 +79,7 @@ int main(int argc, char** argv){
 	GetPrivateProfileString("configuracion","OpenDSPort", configuracion.szDefault, configuracion.acOpenDSPort, 6, archivoConfiguracion);
 	GetPrivateProfileString("configuracion","Interval", configuracion.szDefault, configuracion.acInterval, 10, archivoConfiguracion);
 	
-cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServer<<"; Interval:"<<configuracion.acInterval<<endl;
+	cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServer<<"; Interval:"<<configuracion.acInterval<<endl;
 
 	//	Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
@@ -92,14 +92,12 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	PLDAP_CONTEXT_OP stPLDAPContextOperations= newLDAPContextOperations(); /*	Me permite operar sobre un contexto	*/
 	PLDAP_SESSION stPLDAPSession;
 	PLDAP_SESSION_OP stPLDAPSessionOperations= newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
-/*	if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
+	if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		cout << "No se pudo conectar a OpenDS." << endl;
 		//LoguearError("No se pudo conectar a OpenDS.");
 		return -1;
-	}*/
-	//asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czOpenDSServer, stConf.uiOpenDSPort);
-	//LoguearInformacion(sLogMessage);
+	}
 	cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
 
 	//	Comienzo a iterar infinitamente, con un intervalo de X tiempo el cual logro llamando a
@@ -107,16 +105,14 @@ cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServ
 	//	del archivo de configuracion.
 	//while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
 
-	while(consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) {
-		cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
-	}
+		while(consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) {
+			cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
+		}
 
-	cout << "No hay mensajes nuevos!" << endl;
+		cout << "No hay mensajes nuevos!" << endl;
 	
 	//	Sleep(atoi(configuracion.acInterval));
 //	}
-
-	/*	ToDo: Cerrar la conexion (socket).	*/
 
 	/*	ToDo: Ver la memoria que haya que liberar.	*/
 	
@@ -155,6 +151,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		cout << "se parseo correctamente" << endl;
 	}
 
+	//	Preparo la estructura stArticle que preciso para persistir en la BD.
 	root = xmlDocGetRootElement(doc);
 	child = root->xmlChildrenNode;
 
@@ -171,7 +168,8 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	cout << "Head del articulo: " << articulo.sHead << endl;
 	cout << "Body del articulo: " << articulo.sBody << endl;
 
-	//insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
+	//	Persisto el articulo en la BD.
+	insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
 
 	if( ! HeapFree( handle, 0, xmlCompleto ) ) {
 			cout << "HeapFree error en handshake." << endl;
