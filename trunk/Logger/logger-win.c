@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <process.h>
 #include "logger-win.h"
 
 void LoguearInformacion(char *czData) {
@@ -62,6 +63,7 @@ void EscribirLog(char cTipoLog, char *czData) {
    /*registramos todo en el archivo */
    SetFilePointer(arch, 0, 0, FILE_END);
    WriteFile(arch,(LPCVOID)czWriteBuff,dwBytesToWrite,&dwBytesWritten,NULL);
+   free(czWriteBuff);
 
 	switch(cTipoLog) {
 		case _INFO:
@@ -72,7 +74,7 @@ void EscribirLog(char cTipoLog, char *czData) {
 			break;
 		case _ERROR:
             WriteFile(arch,"ERROR",5,&dwBytesWritten,NULL);
-            printf("%s: %s\n","ERROR",czData);
+            printf("ERROR: %s\n",czData);
 			break;
 		case _DEBUG:
 			WriteFile(arch,"DEBUG",5,&dwBytesWritten,NULL);
