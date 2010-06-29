@@ -129,6 +129,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="..\bin\$(ProjectName).exe"
 				AdditionalLibraryDirectories="&quot;..\lib&quot;;&quot;C:\Program Files\Oracle\Berkeley DB 4.8.26\lib&quot;"
 				GenerateDebugInformation="true"
