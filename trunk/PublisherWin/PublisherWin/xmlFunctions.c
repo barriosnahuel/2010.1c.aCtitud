@@ -93,7 +93,9 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
 	printf((char*)memoriaXML);
-	sprintf(pkg->idDescriptor, "%d", milisec);
+	// ToDo - FGuerra: Ver como asignarle la hora. Por el momento da un numero negativo, pero lo pruebo con este dummy.
+	strcpy(pkg->idDescriptor,"9876543210");
+	//sprintf(pkg->idDescriptor, "%d", milisec);
 	strcpy(pkg->payloadDescriptor,"1"); //1=REQUEST;
 	strcpy(pkg->payloadLength,"0000");
 	strcat(pkg->idDescriptor,"123456");
@@ -191,6 +193,17 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
         WSACleanup();
         return 1;
     }
+
+	//Recibo la respuesta del NNTPServer
+	lLength = recv(lhSocket, recvbuf, recvbuflen, 0);
+        if ( iResult > 0 )
+            printf("Bytes recividos: %d\n", iResult);
+        else if ( iResult == 0 )
+            printf("Coneccion cerrada\n");
+        else
+            printf("recv fallo: %d\n", WSAGetLastError());
+
+	printf("Recibi del XML Process server como response del XML lo siguiente -> %s\n", recvbuf);
 
 	closesocket(lhSocket);
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg);
