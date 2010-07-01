@@ -29,6 +29,9 @@ typedef struct stIRC_IPC{
    char payloadLength[4+1];
    char* payloadXML; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
 }stIRC_IPC;
+#define LARGOID            17
+#define LARGOPAYLOAD	   2
+#define LARGOPAYLOADLENGTH 5
 
 typedef struct stConfiguracion{
 	char	appPort[6];
@@ -104,7 +107,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	int bytesRecibidos;
 	int bytesEnviados;
 	// Reservamos 1024 bytes (BUFFERSIZE) que es lo q corresponde segun restriccion de TP.
-	char *handshake = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char* handshake = (char*) HeapAlloc( handle, 0, BUFFERSIZE);
 	if( handshake == NULL ) {
 		cout << "HeapAlloc error." << endl;
 	}
@@ -119,8 +122,8 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	char *payloadLengthHandshake = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *payloadLengthXml = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *payloadXMLResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
-	char *handshakeResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	char *xmlResponse = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
+	char *handshakeResponse;
 	// ################## FIN Variables para el response ####################################
 	
 	// ################## INICIO MENSAJE HANDSHAKE ###################################
@@ -161,6 +164,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 		// Si el handshake es invalido mando 1, caso contrario 2.
 		payloadDescriptor = "1";
+		handshakeResponse = (char*) HeapAlloc( handle, 0, strlen(idDescriptor)+strlen(payloadDescriptor)+strlen(payloadLengthHandshake)+3);
 		// Concateno los valores para responderle al publisher handshake OK.
 		handshakeResponse = strcat(idDescriptor, payloadDescriptor);
 		handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
@@ -189,7 +193,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	// Si el handshake es invalido mando 1, caso contrario 2.
 	payloadDescriptor = "2";
-
+	handshakeResponse = (char*) HeapAlloc( handle, 0, strlen(idDescriptor)+strlen(payloadDescriptor)+strlen(payloadLengthHandshake)+1);//el strcat deja un solo /0 ese es el problema
 	// Concateno los valores para responderle al publisher handshake OK.
 	handshakeResponse = strcat(idDescriptor, payloadDescriptor);
 	handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
@@ -212,7 +216,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	printf("largo payloadLength: %s",stParametros.datosRecibidos.payloadLength);
 
 	stParametros.datosRecibidos.payloadXML = (char*)HeapAlloc(handle,0,atoi(stParametros.datosRecibidos.payloadLength));
-		
+	
 	CopyMemory(stParametros.datosRecibidos.payloadXML,estructuraEnBytesIPCRPC+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor + stParametros.datosRecibidos.largos.lenPayloadLength,
 			   atoi(stParametros.datosRecibidos.payloadLength));
 		
