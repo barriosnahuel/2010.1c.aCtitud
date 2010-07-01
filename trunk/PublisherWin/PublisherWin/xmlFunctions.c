@@ -79,8 +79,6 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//PARA PROTOCOLO
 	struct stIRC_IPC* pkg;
 	time_t seconds = time(NULL);
-	
-
 	char* handshakeEnBytes;
 	char* xmlEnBytes;
 	int  largoHandshake;
@@ -146,7 +144,10 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
     }
 	//Recibo la respuesta del NNTPServer
 	lLength = recv(lhSocket, recvbuf, recvbuflen, 0);
-        if ( iResult > 0 )
+/**
+  * SI EL NNTPSERVER NUNCA ME RESPONDE ME QUEDO BLOQUEADO ? COMO HAGO PARA SALIR, COMO HAGO UN TIME OUT (??)
+ **/
+	if ( iResult > 0 )
             printf("Bytes recividos: %d\n", iResult);
         else if ( iResult == 0 )
             printf("Coneccion cerrada\n");
@@ -154,7 +155,14 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
             printf("recv fallo: %d\n", WSAGetLastError());
 
 	printf("Recibi del XML Process server como response del handshake lo siguiente -> %s\n", recvbuf);
-	
+	//Me interesa que payload recibi, 1 si es un es inválido , si es 2 es válido
+	CopyMemory(&pkg->payloadDescriptor,(char*)recv + LARGOID,LARGOPAYLOAD); 
+	//El NNTP no me pasa los largos, pero como son estáticos los sé de antemano. 
+		//Por eso acá uso constantes.
+	if(pkg->payloadDescriptor==1){
+		printf("Hanshake invalido. Se cerrará la conexión. La noticia no fue transmitida");
+		return 1;}	
+	else printf("Handshake valido. Se procedera a enviar la noticia en XML");
 
 	
 	//################################# ENVIO EL XML #################################
