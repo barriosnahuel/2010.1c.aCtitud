@@ -79,7 +79,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//PARA PROTOCOLO
 	struct stIRC_IPC* pkg;
 	time_t seconds = time(NULL);
-	long milisec = seconds * 1000;
+	
 
 	char* handshakeEnBytes;
 	char* xmlEnBytes;
@@ -93,9 +93,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
 	printf((char*)memoriaXML);
-	// ToDo - FGuerra: Ver como asignarle la hora. Por el momento da un numero negativo, pero lo pruebo con este dummy.
-	strcpy(pkg->idDescriptor,"9876543210");
-	//sprintf(pkg->idDescriptor, "%d", milisec);
+	sprintf(pkg->idDescriptor, "%d", seconds);
 	strcpy(pkg->payloadDescriptor,"1"); //1=REQUEST;
 	strcpy(pkg->payloadLength,"0000");
 	strcat(pkg->idDescriptor,"123456");
