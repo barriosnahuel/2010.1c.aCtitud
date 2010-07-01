@@ -216,15 +216,15 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	CopyMemory(&pkg->payloadDescriptor,(char*)recvbuf + LARGOID,LARGOPAYLOAD); 
 	CopyMemory(&pkg->payloadLength,(char*)recvbuf + LARGOID + LARGOPAYLOAD,LARGOPAYLOADLENGTH);
 	
-	responseNNTP= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,11);
-	CopyMemory((char*)responseNNTP,(char*)recvbuf + LARGOID + LARGOPAYLOAD+LARGOPAYLOADLENGTH,11); //responde "RequestOK"
-	printf("Response de NNTP: %s",responseNNTP);
-    
+	responseNNTP= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,10);
+	CopyMemory((char*)responseNNTP,(char*)recvbuf + (LARGOID - 1) + (LARGOPAYLOAD -1)+(LARGOPAYLOADLENGTH-1),9); //responde "RequestOK"
+	printf("Response de NNTP: %s",responseNNTP);    
 	closesocket(lhSocket);
-	
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg);
-	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,responseNNTP);
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,xmlEnBytes);
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,handshakeEnBytes);
-	return 0;
+	if(strcmp(responseNNTP,"RequestOK")==0){
+		HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,responseNNTP);return 0;} //TODO SE TRANSMITIO CORRECTAMENTE
+	else
+		HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,responseNNTP);return 1;
 }
