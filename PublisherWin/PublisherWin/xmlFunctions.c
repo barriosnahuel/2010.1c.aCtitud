@@ -81,6 +81,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	time_t seconds = time(NULL);
 	char* handshakeEnBytes;
 	char* xmlEnBytes;
+	char* responseNNTP;
 	int  largoHandshake;
 	int largoXmlEnBytes;
 	int i;
@@ -156,13 +157,14 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 
 	printf("Recibi del XML Process server como response del handshake lo siguiente -> %s\n", recvbuf);
 	//Me interesa que payload recibi, 1 si es un es inválido , si es 2 es válido
-	CopyMemory(&pkg->payloadDescriptor,(char*)recv + LARGOID,LARGOPAYLOAD); 
+	CopyMemory(&pkg->payloadDescriptor,recvbuf + (LARGOID-1),(LARGOPAYLOAD-1)); //PORQUE ME LO MANDA CON STRCAT
+	printf("PAYLOADDESCRIPTORRRRRRRRRRRRRRRR : %s \n",pkg->payloadDescriptor);
 	//El NNTP no me pasa los largos, pero como son estáticos los sé de antemano. 
 		//Por eso acá uso constantes.
-	if(pkg->payloadDescriptor==1){
-		printf("Hanshake invalido. Se cerrará la conexión. La noticia no fue transmitida");
+	if(pkg->payloadDescriptor == 1){
+		printf("Hanshake invalido: se cerrara la conexión. La noticia no fue transmitida");
 		return 1;}	
-	else printf("Handshake valido. Se procedera a enviar la noticia en XML");
+	else printf("Handshake valido: se procedera a enviar la noticia en XML");
 
 	
 	//################################# ENVIO EL XML #################################
@@ -204,14 +206,25 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	lLength = recv(lhSocket, recvbuf, recvbuflen, 0);
         if ( iResult > 0 )
             printf("Bytes recividos: %d\n", iResult);
-        else if ( iResult == 0 )
-            printf("Coneccion cerrada\n");
-        else
-            printf("recv fallo: %d\n", WSAGetLastError());
-
-	printf("Recibi del XML Process server como response del XML lo siguiente -> %s\n", recvbuf);
-
+		else if ( iResult == 0 ){
+			printf("Coneccion cerrada\n");return 1;}
+		else{
+			printf("recv fallo: %d\n", WSAGetLastError()); return 1;}
+	
+      //Reutilizo la estructura del envio para manejar el Response
+	CopyMemory(&pkg->idDescriptor,(char*)recvbuf,LARGOID);
+	CopyMemory(&pkg->payloadDescriptor,(char*)recvbuf + LARGOID,LARGOPAYLOAD); 
+	CopyMemory(&pkg->payloadLength,(char*)recvbuf + LARGOID + LARGOPAYLOAD,LARGOPAYLOADLENGTH);
+	
+	responseNNTP= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,11);
+	CopyMemory((char*)responseNNTP,(char*)recvbuf + LARGOID + LARGOPAYLOAD+LARGOPAYLOADLENGTH,11); //responde "RequestOK"
+	printf("Response de NNTP: %s",responseNNTP);
+    
 	closesocket(lhSocket);
+	
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,responseNNTP);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,xmlEnBytes);
+	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,handshakeEnBytes);
 	return 0;
 }
