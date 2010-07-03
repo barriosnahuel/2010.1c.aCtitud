@@ -33,5 +33,6 @@ typedef struct news{
 	void closeDb(DB** dbp);
 	void createDb(DB** dbp, HANDLE** memoryHandle);
 	int lastID(DB** dbp); //Recorre db y busca la ultima id asignada
+	void generateNewID(DB** dbp, char* buffer);
 
 #endif

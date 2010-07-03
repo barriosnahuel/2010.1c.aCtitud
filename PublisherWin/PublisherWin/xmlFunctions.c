@@ -19,7 +19,7 @@ typedef struct stIRC_IPC{
    char idDescriptor[16+1];
    char payloadDescriptor[1+1];
    char payloadLength[4+1];
-   char* payloadXML; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
+   char* payloadXML; 
 }stIRC_IPC;
 
 #define LARGOID            17

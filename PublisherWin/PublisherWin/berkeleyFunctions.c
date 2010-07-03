@@ -59,25 +59,25 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0)
 	{
 		//Obtengo el tamañano de cada campo
-		memcpy(&noticia->largos,(char*)data.data,sizeof(newslen));
+		CopyMemory(&noticia->largos,(char*)data.data,sizeof(newslen));
 		printf("++++++++++++++++++++++++ largos vale: %d\n", noticia->largos);
 		//Solo trabajo con aquellas que no estan trasmitidas.
 		noticia->transmitted = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.transmittedlen);
 		
-		memcpy(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+
+		CopyMemory(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+
 			   noticia->largos.bodylen,noticia->largos.transmittedlen);
 		printf("++++++++++++++++++++++++ transmited vale: %s\n", noticia->transmitted);				
 		if(strcmp(noticia->transmitted,"0")==0)
 		{	//No fue trasmitida
 			
 			noticia->newsgroup = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.newsgrouplen);
-			memcpy(noticia->newsgroup,(char*)data.data + sizeof(newslen), noticia->largos.newsgrouplen);
+			CopyMemory(noticia->newsgroup,(char*)data.data + sizeof(newslen), noticia->largos.newsgrouplen);
 			
 			noticia->head      = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.headlen);
-			memcpy(noticia->head,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen,noticia->largos.headlen);
+			CopyMemory(noticia->head,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen,noticia->largos.headlen);
 
 			noticia->body      = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.bodylen);
-			memcpy(noticia->body,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen,
+			CopyMemory(noticia->body,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen,
 								  noticia->largos.bodylen);
 
 			
@@ -97,7 +97,7 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 			if(transmitioANNTPServer == 0){ 
 				//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
 				strcpy(noticia->transmitted,"1");
-				memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
+				CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
 				noticia->transmitted,noticia->largos.transmittedlen);
 				dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
 	      }
@@ -193,17 +193,17 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	//idAuxLen = strlen(idAux) + 1;
 	idAuxLen = strlen(noticia->id) + 1;
 	key.data  = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,idAuxLen);		
-	//memcpy((char*)key.data,idAux,idAuxLen);
-	memcpy((char*)key.data,noticia->id,idAuxLen);
+	//CopyMemory((char*)key.data,idAux,idAuxLen);
+	CopyMemory((char*)key.data,noticia->id,idAuxLen);
 	key.size = idAuxLen;
 	printf("^^^^^^^^^^^^^^^^^^ key.data= %s\n", (char*)key.data);
 	printf("^^^^^^^^^^^^^^^^^^ key.size= %d\n", key.size);
-	memcpy((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
-	memcpy((char*)data.data + sizeof(noticia->largos),noticia->newsgroup,noticia->largos.newsgrouplen);
-	memcpy((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
-	memcpy((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen,
+	CopyMemory((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
+	CopyMemory((char*)data.data + sizeof(noticia->largos),noticia->newsgroup,noticia->largos.newsgrouplen);
+	CopyMemory((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
+	CopyMemory((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen,
 		   noticia->body,noticia->largos.bodylen);
-	memcpy((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
+	CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
 		   noticia->transmitted,noticia->largos.transmittedlen);
 	
 	
