@@ -1,12 +1,12 @@
 #include "berkeleyFunctions.h"
 #include<windows.h>
-typedef struct stIRC_IPC{
+/*typedef struct stIRC_IPC{
    char idDescriptor[16+1];
    char payloadDescriptor[1+1];
    char payloadLength[4+1];
-   char payloadXML[1023+1]; // o char * (??) , si lo dejo en char* hasta donde hago el memcpy ?
+   char payloadXML[1023+1]; 
 }stIRC_IPC;
-
+*/
 typedef struct stThreadParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
@@ -21,34 +21,37 @@ typedef struct stSenderParameters {
 	int tiempoEspera;
 	char newsgroup[100];
 } stSenderParameters;
-
-
 #define BUFFERSIZE 1024
+#define BUFFERCADSIZE 9
+void lecturaDinamica(char** cadena, HANDLE** handler){
 
-void LecturaDinamica(char** cadena,HANDLE** memoryHandler)
-{
-	int i;
-	char c;
-	int tamanioInicial= sizeof(char);
+	char tempCad[BUFFERCADSIZE+1];
+	char car;
+	int i,largo,size;
+	largo = 0;
+	*cadena[0]='\0';
+	size=1;
 
-	*cadena = (char*)HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,tamanioInicial);
-	
-	for(i=0;(c=getchar())!='\n';i++)
-	{
-		
-		*cadena		 = (char*)HeapReAlloc(*memoryHandler,HEAP_ZERO_MEMORY,*cadena,(2*tamanioInicial));
-		tamanioInicial += 1;
-		(*cadena)[i] = c;
-		/*if( *cadena == NULL )
-			printf( "HeapReAlloc error.");
-		else*/
-		
+	for(i=0;(car =getchar())!=EOF;i++){
+		tempCad[i]=car;
+		if( i ==BUFFERCADSIZE){
+			tempCad[BUFFERCADSIZE]='\0';
+			size = size + BUFFERCADSIZE;
+			HeapReAlloc(*handler,0,*cadena,(DWORD)size);
+			strcat(*cadena,tempCad);
+			tempCad[0]=car;
+			i=0;
+			}
 	}
-
-	*cadena     = (char*)HeapReAlloc(*memoryHandler,HEAP_ZERO_MEMORY,*cadena,2*(tamanioInicial+1));
-	(*cadena)[i]= '\0';
-	//printf("Cadena dentro de la funcion: %s \n",*cadena);
-	return;
+	
+	if(i!=0){
+		size = size + i;
+		tempCad[i]='\0';
+		HeapReAlloc(*handler,0,*cadena,(DWORD)size );
+		strcat(*cadena,tempCad);
+	}
+	printf("HEAD INGRESADO:%s",*cadena);
+	return 0;
 }
 
 
@@ -137,7 +140,8 @@ unsigned __stdcall senderFunction(void* threadParameters)
 	noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.ipNNTP,stParametros.puertoNNTP);	
 	
 	closeDb(&stParametros.dbHandler);
-	
+	HeapDestroy(stParametros.memoryHandler);
+	_endthreadex(0);
 	return 0;
 }
 
@@ -184,7 +188,7 @@ int main(){
 	printf("Sale del thread cliente\n");
 
 	
-//	while(1){		ToDo: Descomentar esto.
+	while(1){	
 		Sleep(stSender.tiempoEspera);
 		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 
 			0, &threadProcesarSender))!=0){
@@ -192,7 +196,7 @@ int main(){
 		}else{
 			printf("No se pudo crear el thread para procesar el envío de xml\n");
 		}
-//	}ToDo: Descomentar esto.
+	}
 
 
 /** Para probar lo de BERKELEY
