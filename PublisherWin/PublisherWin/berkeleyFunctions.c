@@ -1,4 +1,4 @@
-#include"berkeleyFunctions.h"
+#include "berkeleyFunctions.h"
 
 void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName)
 {
@@ -60,12 +60,13 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 	{
 		//Obtengo el tamañano de cada campo
 		memcpy(&noticia->largos,(char*)data.data,sizeof(newslen));
-		
+		printf("++++++++++++++++++++++++ largos vale: %d\n", noticia->largos);
 		//Solo trabajo con aquellas que no estan trasmitidas.
 		noticia->transmitted = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.transmittedlen);
+		
 		memcpy(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+
 			   noticia->largos.bodylen,noticia->largos.transmittedlen);
-		
+		printf("++++++++++++++++++++++++ transmited vale: %s\n", noticia->transmitted);				
 		if(strcmp(noticia->transmitted,"0")==0)
 		{	//No fue trasmitida
 			
@@ -114,6 +115,25 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia);
 	
 	return;
+}
+
+/**
+ *	Genero un nuevo ID con el formato: AAAAMMddHHmmss
+ *	El formato para la funcion strftime, es similar al de printf, lo saque de:
+ *	http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+ */
+void generateNewID(DB** dbp, char* buffer){
+	time_t rawtime;
+	struct tm * timeinfo;
+	
+	time (&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime (buffer, 15, "%Y%m%d%H%M%S", timeinfo);//	El 15 es la longitud, son 14 mas el \0
+
+	printf("+++++++++++++++++++++++++++\n");
+	printf("El nuevo ID generado es: %s\n", buffer);
+	printf("+++++++++++++++++++++++++++\n");
 }
 
 int lastID(DB** dbp)
@@ -169,12 +189,15 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
     data.size = noticiaEnBytesLargo;
 	
 	//ID NOTICIA -- Hago esto porque la id me llega como entero, y dps el memcpy se me simplifica
-	itoa(noticia->id,idAux,10);
-	idAuxLen = strlen(idAux) + 1;
+	//itoa(noticia->id,idAux,10);
+	//idAuxLen = strlen(idAux) + 1;
+	idAuxLen = strlen(noticia->id) + 1;
 	key.data  = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,idAuxLen);		
-	memcpy((char*)key.data,idAux,idAuxLen);
+	//memcpy((char*)key.data,idAux,idAuxLen);
+	memcpy((char*)key.data,noticia->id,idAuxLen);
 	key.size = idAuxLen;
-
+	printf("^^^^^^^^^^^^^^^^^^ key.data= %s\n", (char*)key.data);
+	printf("^^^^^^^^^^^^^^^^^^ key.size= %d\n", key.size);
 	memcpy((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
 	memcpy((char*)data.data + sizeof(noticia->largos),noticia->newsgroup,noticia->largos.newsgrouplen);
 	memcpy((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
