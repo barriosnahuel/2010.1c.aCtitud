@@ -1,9 +1,0 @@
-1- Levantar archivo de configuracion que posee el newsgroup asociado.
-2- Creacion de la base.
-3- Creacion del thread de interfaz de usuario.
-
-En este momento tengo 2 threads levantados: threadUI (se encarga de tomar datos del usuario y guardarlos en Berckeley) y threadPpal.
-
-El threadPpal tiene que crear otro thread (threadSender) que lo que hace es verificar en Berckeley si existen registros con el campo transmitted en 0. Si existen, debe convertir el registro a XML y enviarlo al NNTP Server. Caso contrario (o una vez que los envió) debe morir. El threadSender debe levantarse cada cierto tiempo segun archivo de configuración.
-
-El threadUI debe estar corriendo todo el tiempo y debe ser capaz de recibir BODY, HEAD y ID de la noticia. Posteriormente guardarla en Berckeley.
