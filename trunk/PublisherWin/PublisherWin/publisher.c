@@ -79,11 +79,13 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	noticia.largos.headlen = strlen(head)+1;
 	noticia.largos.bodylen = strlen(body)+1;
 	noticia.largos.transmittedlen = strlen("0")+1;
+	noticia.largos.idlen= 15;
 	
 	noticia.newsgroup = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,10/*noticia->largos.newsgrouplen*/);
 	noticia.head	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
 	noticia.body	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.bodylen);
     noticia.transmitted = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.transmittedlen);
+	noticia.id = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.idlen);
 	noticia.newsgroup = stParametros.newsgroup;
 	noticia.head      = head;
 	noticia.body	  = body;
@@ -99,7 +101,9 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
 	
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.newsgroup);
-	noticia.id = lastID(&stParametros.dbHandler) + 1 ;
+	//noticia.id = lastID(&stParametros.dbHandler) + 1 ;
+	generateNewID(&stParametros.dbHandler, noticia.id);
+	
 	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
 	//getArticle(&stParametros.dbHandler,&stParametros.memoryHandler);
 	closeDb(&stParametros.dbHandler);
@@ -180,7 +184,7 @@ int main(){
 	printf("Sale del thread cliente\n");
 
 	
-	while(1){
+//	while(1){		ToDo: Descomentar esto.
 		Sleep(stSender.tiempoEspera);
 		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 
 			0, &threadProcesarSender))!=0){
@@ -188,7 +192,7 @@ int main(){
 		}else{
 			printf("No se pudo crear el thread para procesar el envío de xml\n");
 		}
-	}
+//	}ToDo: Descomentar esto.
 
 
 /** Para probar lo de BERKELEY
