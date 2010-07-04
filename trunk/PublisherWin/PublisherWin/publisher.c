@@ -21,8 +21,11 @@ typedef struct stSenderParameters {
 	int tiempoEspera;
 	char newsgroup[100];
 } stSenderParameters;
+
 #define BUFFERSIZE 1024
+#define BERKELEY_ID_LEN 11
 #define BUFFERCADSIZE 9
+
 void lecturaDinamica(char** cadena, HANDLE** handler){
 
 	char tempCad[BUFFERCADSIZE+1];
@@ -82,7 +85,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	noticia.largos.headlen = strlen(head)+1;
 	noticia.largos.bodylen = strlen(body)+1;
 	noticia.largos.transmittedlen = strlen("0")+1;
-	noticia.largos.idlen= 15;
+	noticia.largos.idlen= BERKELEY_ID_LEN;
 	
 	noticia.newsgroup = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,10/*noticia->largos.newsgrouplen*/);
 	noticia.head	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
@@ -105,7 +108,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.newsgroup);
 	//noticia.id = lastID(&stParametros.dbHandler) + 1 ;
-	generateNewID(&stParametros.dbHandler, noticia.id);
+	generateNewID(&stParametros.dbHandler, &noticia.id);
 	
 	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
 	//getArticle(&stParametros.dbHandler,&stParametros.memoryHandler);

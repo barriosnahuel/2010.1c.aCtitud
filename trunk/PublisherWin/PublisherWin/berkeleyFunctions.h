@@ -33,6 +33,14 @@ typedef struct news{
 	void closeDb(DB** dbp);
 	void createDb(DB** dbp, HANDLE** memoryHandle);
 	int lastID(DB** dbp); //Recorre db y busca la ultima id asignada
-	void generateNewID(DB** dbp, char* buffer);
+
+	
+	/**
+	 *	Genero un nuevo ID con el formato: MMddHHmmss
+	 *	Si el mes por ejemplo es 07 (Julio), entonces el cero a la izquierda se saca.
+	 *	El formato para la funcion strftime, es similar al de printf, lo saque de:
+	 *	http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+	 */
+	void generateNewID(DB** dbp, char** buffer);
 
 #endif
