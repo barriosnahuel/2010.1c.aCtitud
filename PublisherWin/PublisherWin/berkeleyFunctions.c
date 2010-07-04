@@ -60,13 +60,13 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 	{
 		//Obtengo el tamañano de cada campo
 		CopyMemory(&noticia->largos,(char*)data.data,sizeof(newslen));
-		printf("++++++++++++++++++++++++ largos vale: %d\n", noticia->largos);
+
 		//Solo trabajo con aquellas que no estan trasmitidas.
 		noticia->transmitted = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.transmittedlen);
 		
 		CopyMemory(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+
 			   noticia->largos.bodylen,noticia->largos.transmittedlen);
-		printf("++++++++++++++++++++++++ transmited vale: %s\n", noticia->transmitted);				
+
 		if(strcmp(noticia->transmitted,"0")==0)
 		{	//No fue trasmitida
 			
@@ -118,21 +118,26 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 }
 
 /**
- *	Genero un nuevo ID con el formato: AAAAMMddHHmmss
+ *	Genero un nuevo ID con el formato: MMddHHmmss
+ *	Si el mes por ejemplo es 07 (Julio), entonces el cero a la izquierda se saca.
  *	El formato para la funcion strftime, es similar al de printf, lo saque de:
  *	http://www.cplusplus.com/reference/clibrary/ctime/strftime/
  */
-void generateNewID(DB** dbp, char* buffer){
+void generateNewID(DB** dbp, char** buffer){
 	time_t rawtime;
 	struct tm * timeinfo;
 	
 	time (&rawtime);
 	timeinfo = localtime(&rawtime);
 
-	strftime (buffer, 15, "%Y%m%d%H%M%S", timeinfo);//	El 15 es la longitud, son 14 mas el \0
+	strftime (*buffer, 11, "%m%d%H%M%S", timeinfo);//	El 11 es la longitud, son 10 mas el \0, Deberia haber usado la constante BERKELEY_ID_LEN, pero pincha.
+
+	//	Borro los ceros a la izquierda.
+	while(**buffer=='0')
+		*buffer= (*buffer)+1;
 
 	printf("+++++++++++++++++++++++++++\n");
-	printf("El nuevo ID generado es: %s\n", buffer);
+	printf("El nuevo ID generado es: %s\n", *buffer);
 	printf("+++++++++++++++++++++++++++\n");
 }
 
