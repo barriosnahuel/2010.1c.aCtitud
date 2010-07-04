@@ -18,9 +18,6 @@
 
 using namespace std;
 
-/*	ToDo: Ver en todos los lugares donde haya asprintf(...) de reemplazarlo por otra forma porque esa funcion usa malloc. 
-Se tendria que usar lo del heap seguramente.	*/
-
 /*	Constantes de OpenDS	*/
 #define OPENDS_SCHEMA "ou=so,dn=utn,dn=edu"
 #define OPENDS_ATTRIBUTE_OBJECT_CLASS "objectClass"
