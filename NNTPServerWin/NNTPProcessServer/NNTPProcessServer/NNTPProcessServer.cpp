@@ -144,25 +144,55 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	}
 
 	strcpy(xmlCompleto, (char *)(_bstr_t) pMsg->Body);
-	cout << "El body del mensaje es: " << xmlCompleto << endl;
-
-	doc = xmlParseMemory(xmlCompleto, BUFFERSIZE);
+	cout << "Para logger: El xml completo es: " << xmlCompleto << "\n" << endl;
+	
+	cout << "Para logger: --> Comienzo a parsear el XML para obtener sus valores." << endl;
+	doc = xmlParseMemory(xmlCompleto, strlen(xmlCompleto));
 	if(doc!=NULL){ //si la variable doc devuelve un valor diferente a NULL, se dice que el documento se ha parseado correctamente.
-		cout << "se parseo correctamente" << endl;
+		cout << "Se parseo la memoria correctamente y se obtuvo el documento XML" << endl;
+	}
+	else{
+		//	Por algun motivo no se pudo parsear el documento, entonces salgo de la funcion sin poder procesar.
+		return 0;
 	}
 
 	//	Preparo la estructura stArticle que preciso para persistir en la BD.
 	root = xmlDocGetRootElement(doc);
-	child = root->xmlChildrenNode;
 
-	articulo.sNewsgroup = (char*)xmlNodeGetContent(child);
-	child = child->next;
-	articulo.uiArticleID = (unsigned int)xmlNodeGetContent(child);
-	child = child->next;
-	articulo.sHead = (char*)xmlNodeGetContent(child);
-	child = child->next;
-	articulo.sBody = (char*)xmlNodeGetContent(child);
+	xmlNodePtr cur_node = NULL;
+	int contadorNodosReales= 1;//	Esta variable la uso para trabajar con los nodos que son de tipo elemento, ya que la biblioteca usa algunos mas medios raros.
+	for (cur_node = root->children; cur_node; cur_node = cur_node->next) {
+		if (cur_node->type == XML_ELEMENT_NODE) {
+			switch (contadorNodosReales){
+				case 1:
+					cout << "Para logger: proceso el nodo newsgroup" << endl;
+					articulo.sNewsgroup= (char*) HeapAlloc(handle, 0, BUFFERSIZE);
+					strcpy(articulo.sNewsgroup, (char*)xmlNodeGetContent(cur_node));					
+					break;
+				case 2:
+					cout << "Para logger: proceso el nodo articleID" << endl;
+					articulo.uiArticleID= atoi((char*)xmlNodeGetContent(cur_node));
+					break;
+				case 3:
+					cout << "Para logger: proceso el nodo head" << endl;
+					articulo.sHead= (char*) HeapAlloc(handle, 0, BUFFERSIZE);
+					strcpy(articulo.sHead, (char*)xmlNodeGetContent(cur_node));
+					break;
+				case 4:
+					cout << "Para logger: proceso el nodo body" << endl;
+					articulo.sBody= (char*) HeapAlloc(handle, 0, BUFFERSIZE);
+					strcpy(articulo.sBody, (char*)xmlNodeGetContent(cur_node));
+					break;
+			}
+			contadorNodosReales++;//	Incremento el contador solo cuando trabaje con alguno de los nodos que me importan del XML.
+        }
+    }//	Fin for (cur_node = root->children; cur_node; cur_node = cur_node->next)
 
+	//	Libera las variables globales de la biblioteca que puedan haber sido usadas en el parseo
+	xmlCleanupParser();
+
+
+	cout << "\nPara logger: En la BD finalmente inserto:" << endl;
 	cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
 	cout << "Id del articulo: " << articulo.uiArticleID << endl;
 	cout << "Head del articulo: " << articulo.sHead << endl;
@@ -171,6 +201,15 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	//	Persisto el articulo en la BD.
 	insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
 
+	if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
+			cout << "HeapFree error en handshake." << endl;
+	}
+	if( ! HeapFree( handle, 0, articulo.sHead ) ) {
+			cout << "HeapFree error en handshake." << endl;
+	}
+	if( ! HeapFree( handle, 0, articulo.sBody) ) {
+			cout << "HeapFree error en handshake." << endl;
+	}
 	if( ! HeapFree( handle, 0, xmlCompleto ) ) {
 			cout << "HeapFree error en handshake." << endl;
 	}
