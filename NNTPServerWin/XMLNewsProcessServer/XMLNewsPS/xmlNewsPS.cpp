@@ -53,13 +53,11 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
 		return EXIT_FAILURE;
 	}
 	
-	unsigned int puerto = atoi(configuracion->appPort); 
-	cout<<"EL PUERTO QUE LE LLEGA: "<<configuracion->appPort<<endl;
+	unsigned int puerto = atoi(configuracion->appPort);
 	server->sin_family		 = AF_INET;
 	server->sin_addr.s_addr  = INADDR_ANY ;//Coloca nuestra direccion IP
     server->sin_port		 = htons((u_short)puerto);
 	
-	cout<<"LO QUE TIENE server->sin_port"<<server->sin_port<<endl;
 	if (bind(*ficheroServer, (SOCKADDR*) &(*server), sizeof(*server))==-1){
 	  cout<<"Error al asociar el puerto al socket."<<endl;
 	  return EXIT_FAILURE;
@@ -73,18 +71,6 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
 	return EXIT_SUCCESS;
 
 };
-
-
-/*
-int validarHandshake(stThreadParameters *stParametros) {
-	if((strcmp(stParametros->datosRecibidos.payloadLength, "0000") != 0) || (strlen(stParametros->datosRecibidos.idDescriptor) != 16)
-		|| (strlen(stParametros->datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros->datosRecibidos.payloadLength) != 4)
-		|| (strcmp(stParametros->datosRecibidos.payloadXML, "") != 0)) {
-		return 0;
-	}
-	return 1;
-
-}*/
 
 unsigned __stdcall clientFunction(void* threadParameters)
 {
@@ -130,18 +116,6 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	cout << "---------------- Arranco a procesar el Handshake ----------------" << endl;
 	bytesRecibidos = recv(stParametros.ficheroCliente, handshake, BUFFERSIZE, 0);
 	
-	cout << "Recibi el handshake: " << handshake << endl;
-
-/*
-	memcpy( &stParametros.datosRecibidos.idDescriptor , handshake , sizeof(stParametros.datosRecibidos.idDescriptor)-1);
-	stParametros.datosRecibidos.idDescriptor[sizeof(stParametros.datosRecibidos.idDescriptor)-1] = '\0';
-	memcpy( &stParametros.datosRecibidos.payloadDescriptor , handshake+sizeof(stParametros.datosRecibidos.idDescriptor)-1 , sizeof(stParametros.datosRecibidos.payloadDescriptor)-1);
-    stParametros.datosRecibidos.payloadDescriptor[sizeof(stParametros.datosRecibidos.payloadDescriptor)-1] = '\0';
-	memcpy( &stParametros.datosRecibidos.payloadLength, handshake+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)-2 , sizeof(stParametros.datosRecibidos.payloadLength)-1);
-    stParametros.datosRecibidos.payloadLength[sizeof(stParametros.datosRecibidos.payloadLength)-1] = '\0';
-	memcpy( &stParametros.datosRecibidos.payloadXML , handshake+sizeof(stParametros.datosRecibidos.idDescriptor)+sizeof(stParametros.datosRecibidos.payloadDescriptor)+sizeof(stParametros.datosRecibidos.payloadLength)-3 , sizeof(stParametros.datosRecibidos.payloadXML)-1);
-    stParametros.datosRecibidos.payloadXML[sizeof(stParametros.datosRecibidos.payloadXML)-1] = '\0';
-*/
 	CopyMemory(&stParametros.datosRecibidos.largos,handshake,sizeof(largos_IRCIPC));
 	CopyMemory(&stParametros.datosRecibidos.idDescriptor,handshake + sizeof(largos_IRCIPC),stParametros.datosRecibidos.largos.lenIdDescriptor);
 	CopyMemory(&stParametros.datosRecibidos.payloadDescriptor, handshake+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor , stParametros.datosRecibidos.largos.lenPayloadDescriptor);
@@ -160,8 +134,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	if((strcmp(stParametros.datosRecibidos.payloadLength, "0000") != 0) || (strlen(stParametros.datosRecibidos.idDescriptor) != 16)
 		|| (strlen(stParametros.datosRecibidos.payloadDescriptor) != 1) || (strlen(stParametros.datosRecibidos.payloadLength) != 4)) {
-	/*if(validarHandshake(&stParametros)) {*/
-
+	
 		// Si el handshake es invalido mando 1, caso contrario 2.
 		payloadDescriptor = "1";
 		handshakeResponse = (char*) HeapAlloc( handle, 0, strlen(idDescriptor)+strlen(payloadDescriptor)+strlen(payloadLengthHandshake)+3);
@@ -208,13 +181,12 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// ################## INICIO MENSAJE CON XML ###################################
 	cout << "---------------- Arranco a procesar el mensaje con XML ----------------" << endl;
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
-	
+
 	CopyMemory(&stParametros.datosRecibidos.largos,estructuraEnBytesIPCRPC,sizeof(largos_IRCIPC));
 	CopyMemory(&stParametros.datosRecibidos.idDescriptor,estructuraEnBytesIPCRPC + sizeof(largos_IRCIPC),stParametros.datosRecibidos.largos.lenIdDescriptor);
 	CopyMemory(&stParametros.datosRecibidos.payloadDescriptor, estructuraEnBytesIPCRPC+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor , stParametros.datosRecibidos.largos.lenPayloadDescriptor);
 	CopyMemory(&stParametros.datosRecibidos.payloadLength,estructuraEnBytesIPCRPC + sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor, stParametros.datosRecibidos.largos.lenPayloadLength);
-	printf("largo payloadLength: %s",stParametros.datosRecibidos.payloadLength);
-
+	
 	stParametros.datosRecibidos.payloadXML = (char*)HeapAlloc(handle,0,atoi(stParametros.datosRecibidos.payloadLength));
 	
 	CopyMemory(stParametros.datosRecibidos.payloadXML,estructuraEnBytesIPCRPC+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor + stParametros.datosRecibidos.largos.lenPayloadLength,
@@ -278,7 +250,7 @@ int main(){
 	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
 	GetPrivateProfileString("configuracion","IP", configuracion.szDefault,configuracion.serverIP,16,archivoConfiguracion);
 	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
-    cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
+	cout<<"Proceso levantado en la ip: "<<configuracion.serverIP<<" y en el puerto: "<<configuracion.appPort<<endl;
 
 
 	//Creo la cola MSMQ o me fijo que ya exista.
