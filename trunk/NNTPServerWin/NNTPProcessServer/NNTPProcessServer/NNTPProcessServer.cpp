@@ -23,15 +23,6 @@
 
 using namespace std;
 
-/*
-#include<libxml/tree.h>
-#include<libxml/parser.h>
-class xmlProcess
-{
-	//Lo privado
-public:
-}
-*/
 #define BUFFERSIZE 1024
 typedef struct stConfiguracion{
 	char	acOpenDSPort[6];
@@ -103,7 +94,7 @@ int main(int argc, char** argv){
 	//	Comienzo a iterar infinitamente, con un intervalo de X tiempo el cual logro llamando a
 	//	la funcion sleep(intervaloDeTiempo); donde intervaloDeTiempo es una variable que cargamos
 	//	del archivo de configuracion.
-	//while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
+	while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
 
 		while(consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) {
 			cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
@@ -111,10 +102,8 @@ int main(int argc, char** argv){
 
 		cout << "No hay mensajes nuevos!" << endl;
 	
-	//	Sleep(atoi(configuracion.acInterval));
-//	}
-
-	/*	ToDo: Ver la memoria que haya que liberar.	*/
+		Sleep(atoi(configuracion.acInterval));
+	}
 	
 	system("PAUSE");//	ToDo:	Esto para que es??
 	return 0;
@@ -140,6 +129,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 
 	if(pMsg == NULL) {
 		// No hay mensajes en la cola.
+		cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
 		return 0;
 	}
 
@@ -151,8 +141,8 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	if(doc!=NULL){ //si la variable doc devuelve un valor diferente a NULL, se dice que el documento se ha parseado correctamente.
 		cout << "Se parseo la memoria correctamente y se obtuvo el documento XML" << endl;
 	}
-	else{
-		//	Por algun motivo no se pudo parsear el documento, entonces salgo de la funcion sin poder procesar.
+	else {
+		cout << "El xml no se pudo parsear." << endl;
 		return 0;
 	}
 
