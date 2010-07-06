@@ -95,7 +95,12 @@ int main(int argn, char *argv[]){
 	if (!crearConexionLDAP(stConf.czOpenDSServer, stConf.uiOpenDSPort, &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		LoguearError("No se pudo conectar a OpenDS.");
-		return -1;
+
+		close(stConf.iSockServer);
+		if (stConf.iSockClient != -1)
+			close(stConf.iSockClient);
+
+		return 1;
 	}
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czOpenDSServer, stConf.uiOpenDSPort);
 	LoguearInformacion(sLogMessage);
