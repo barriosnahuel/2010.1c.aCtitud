@@ -93,7 +93,6 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   char* claveCache;
   int resultNoticiaEnBytes_largo, resultado;
 
-  LoguearDebugging("--> 1()");
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(grupoSinEspacios) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
