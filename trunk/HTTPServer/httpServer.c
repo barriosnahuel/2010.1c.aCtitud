@@ -524,9 +524,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 	LoguearDebugging("--> processRequestTypeUnaNoticia()");
 
 	stArticle stArticulo;
-	LoguearDebugging("--> 1()");
 	char* grupoSinEspacios = sacarEspaciosEnGrupo(sGrupoDeNoticias);
-	LoguearDebugging("--> 2()");
 	if (!buscarNoticiaEnCache(&stArticulo,sGrupoDeNoticias, sArticleID,grupoSinEspacios,&pstParametros->memCluster)) {
 		/*	Como no encontre la noticia en Cache, la busco en la BD	*/
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,

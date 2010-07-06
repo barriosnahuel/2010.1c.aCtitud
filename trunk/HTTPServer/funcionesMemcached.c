@@ -85,7 +85,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias,char* grupo
 
 int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* sArticleID,char* grupoSinEspacios,memcached_st **memc)
 {
-	LoguearInformacion("--> buscarNoticiaEnCache()");
+	LoguearDebugging("--> buscarNoticiaEnCache()");
   uint32_t flags;
   memcached_return rc;
   t_news *resultNoticia = malloc(sizeof(t_news));
@@ -93,11 +93,13 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   char* claveCache;
   int resultNoticiaEnBytes_largo, resultado;
 
+  LoguearDebugging("--> 1()");
   int largoID = strlen(sArticleID) + 1;
   int largoGrupoDeNoticias = strlen(grupoSinEspacios) + 1;
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",grupoSinEspacios,sArticleID);
   
+  LoguearDebugging("--> por hacer el get()");
   resultadoCache = memcached_get(*memc,claveCache,strlen(claveCache),&resultNoticiaEnBytes_largo,&flags,&rc);
   if(rc==MEMCACHED_SUCCESS){
 	LoguearInformacion("Se encontro el articulo en la cache.");
@@ -105,7 +107,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   	LoguearInformacion("No se encontro el articulo en la cache.");
 	free(claveCache);
 	free(resultNoticia);
-	LoguearInformacion("<-- buscarNoticiaEnCache()");
+	LoguearDebugging("<-- buscarNoticiaEnCache()");
 	return 0;
   }  	
   
@@ -121,6 +123,6 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   
   free(claveCache);
   free(resultNoticia);
-  LoguearInformacion("<-- buscarNoticiaEnCache()");
+  LoguearDebugging("<-- buscarNoticiaEnCache()");
   return 1;
 }
