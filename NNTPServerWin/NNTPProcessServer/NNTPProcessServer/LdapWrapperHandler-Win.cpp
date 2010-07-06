@@ -34,7 +34,7 @@ int crearConexionLDAP(	char* sIp
 						, PLDAP_SESSION* pstPLDAPSession
 						, PLDAP_SESSION_OP* pstPLDAPSessionOperations) {
 
-	HANDLE handle= HeapCreate(0, 0, 0); 
+	HANDLE handle= HeapCreate(0, 1024, 0); 
 	if(handle==NULL)
 		cout << "HeapCreate error." << endl; 
 
@@ -53,7 +53,7 @@ int crearConexionLDAP(	char* sIp
 	
 	strcat(sOpenDSLocation, sPort);
 	if( !HeapFree(handle, 0, sPort) )
-		cout << "HeapFree error en handshake." << endl; 
+		cout << "HeapFree error en sPort." << endl; 
 
 	cout << "La URL de LDAP es: " << sOpenDSLocation << endl;
 
@@ -63,7 +63,7 @@ int crearConexionLDAP(	char* sIp
 			*pstPLDAPContext, "cn=Directory Manager", "password");
 
 	if( !HeapFree(handle, 0, sOpenDSLocation) )
-		cout << "HeapFree error en handshake." << endl; 
+		cout << "HeapFree error en sOpenDSLocation." << endl; 
 
 	// Destruyo el heap. 
 	if( !HeapDestroy(handle) )
@@ -94,7 +94,7 @@ int crearConexionLDAP(	char* sIp
  * Retorna un char* de la forma: "utnArticleID=12345,ou=so,dn=utn,dn=edu"
  */
 char* getDNFor(int dArticleID){
-	HANDLE handle= HeapCreate(0, 0, 0); 
+	HANDLE handle= HeapCreate(0, 1024, 0); 
 	if(handle==NULL)
 		cout << "HeapCreate error." << endl; 
 
@@ -111,7 +111,7 @@ char* getDNFor(int dArticleID){
 	itoa(dArticleID, sArticleID, 10);
 	strcat(sDn, sArticleID);
 	if( !HeapFree(handle, 0, sArticleID) )
-		cout << "HeapFree error en handshake." << endl; 
+		cout << "HeapFree error en sArticleID." << endl; 
 
 	strcat(sDn, ",");
 	strcat(sDn, OPENDS_SCHEMA);
