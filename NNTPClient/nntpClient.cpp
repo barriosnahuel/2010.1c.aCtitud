@@ -111,6 +111,17 @@ int main(int argn, char *argv[]){
         if(comando.validacion()) {
             dao.enviarMensaje(comando.cadenaIngresada());
             comando.setRespuestaObtenida(dao.recibirRespuesta());
+            if(comando.respuestaObtenida() == "") {
+				//Cierro la conexion.
+				dao.cerrarConexion();
+
+				cout << "\n-------------------------------" << endl;
+				cout << "-- Gracias por usar NNTPClient." << endl;
+
+				pthread_mutex_unlock(&semConexion);
+				pthread_mutex_unlock(&semUI);
+				return EXIT_SUCCESS;
+            }
         }
         else
         	comando.setRespuestaObtenida("Comando invalido.");
