@@ -112,6 +112,7 @@ int main(int argn, char *argv[]){
             dao.enviarMensaje(comando.cadenaIngresada());
             comando.setRespuestaObtenida(dao.recibirRespuesta());
             if(comando.respuestaObtenida() == "") {
+            	cout << "Servidor caído" << endl;
 				//Cierro la conexion.
 				dao.cerrarConexion();
 
