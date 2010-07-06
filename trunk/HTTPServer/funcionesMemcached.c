@@ -78,6 +78,7 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias,char* grupo
   free(articuloEnBytes);
   free(articuloCache);
   free(claveCache);
+  rc = MEMCACHED_SUCCESS;
   return;
   
 }
