@@ -531,7 +531,7 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
 		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		//guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
+		/*guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);*/
 	}
 	if(stArticulo.uiArticleID != -1) {
 		
