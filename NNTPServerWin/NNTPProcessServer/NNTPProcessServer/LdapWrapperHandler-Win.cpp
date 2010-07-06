@@ -57,7 +57,7 @@ int crearConexionLDAP(	char* sIp
 
 	cout << "La URL de LDAP es: " << sOpenDSLocation << endl;
 
-	/* Inicializamos el contexto. */
+	/* Inicializamos el contexto. */	
 	(*pstPLDAPContextOperations)->initialize(*pstPLDAPContext, sOpenDSLocation);
 	(*pstPLDAPSession) = (*pstPLDAPContextOperations)->newSession(
 			*pstPLDAPContext, "cn=Directory Manager", "password");
@@ -72,7 +72,20 @@ int crearConexionLDAP(	char* sIp
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
-	/*	TODO: Ver alguna forma de retornar false cuando no me pueda conectar bien a la BD	*/	
+	/*	Esto es lo unico que se me ocurrio para probar si la conexion se pudo hacer o no. Intento insertar una noticia, si la pude insertar, la borro.
+	 *	Si no la pude insertar, entonces me fijo el codigo de error, y si es 81, quiere decir que no se pudo contactar al servidor LDAP, o sea, no estoy conectado.
+	 */
+	stArticle testConnectionArticle;
+	testConnectionArticle.sBody= "test";
+	testConnectionArticle.sHead= "test";
+	testConnectionArticle.sNewsgroup= "test";
+	testConnectionArticle.uiArticleID= (unsigned int)999999;
+	insertEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, testConnectionArticle);
+	if((*pstPLDAPSession)->errorCode==81)
+		return 0;
+	else
+		deleteEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, testConnectionArticle.uiArticleID);
+
 	return 1;
 }
 
