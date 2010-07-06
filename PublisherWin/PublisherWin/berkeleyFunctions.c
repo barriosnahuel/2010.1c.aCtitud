@@ -144,7 +144,6 @@ void generateNewID(DB** dbp, char** buffer){
 int lastID(DB** dbp)
 {
 	int ret;
-	int nextKey;
 	DBC* dbCursor;
 	DBT key,data;
 	int maxID = -1;
@@ -168,7 +167,6 @@ int lastID(DB** dbp)
 	if ((ret = dbCursor->c_close(dbCursor)) != 0){
 		(*dbp)->err(*dbp, ret, "DBcursor->close");
 	}
-	//nextKey = atoi(key.data);
 	return maxID;
 }
 
@@ -177,8 +175,6 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	int idAuxLen,ret;          
 	DBT key, data;
 	unsigned int noticiaEnBytesLargo;
-	char* noticiaEnBytes;
-	char  idAux[1000];
 	
 	printf("########### putArticle ###########\n");
 	
