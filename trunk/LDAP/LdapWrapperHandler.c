@@ -45,11 +45,16 @@ int crearConexionLDAP(	char* sIp
 	testConnectionArticle.sNewsgroup= "test";
 	testConnectionArticle.uiArticleID= (unsigned int)999999;
 	insertEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, testConnectionArticle);
+	printf("el error code vale: %d\n", (*pstPLDAPSession)->errorCode);
 	int returnValue= 1;
-	if((*pstPLDAPSession)->errorCode==81)
+	if((*pstPLDAPSession)->errorCode==81){
 		returnValue= 0;
-	else
+		printf("ya puse returnValue en 0\n");
+	}
+	else{
 		deleteEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, testConnectionArticle.uiArticleID);
+		printf("lo borre\n");
+	}
 
 	LoguearDebugging("<-- crearConexionLDAP()");
 	return returnValue;
