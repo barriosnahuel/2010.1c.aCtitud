@@ -36,8 +36,9 @@ int crearConexionLDAP(	char* sIp
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
 
-	//	Esto es lo unico que se me ocurrio para probar si la conexion se pudo hacer o no. Intento insertar una noticia, si la pude insertar, la borro.
-	//	Si no la pude insertar, entonces me fijo el codigo de error, y si es 81, quiere decir que no se pudo contactar al servidor LDAP, o sea, no estoy conectado.
+	/*	Esto es lo unico que se me ocurrio para probar si la conexion se pudo hacer o no. Intento insertar una noticia, si la pude insertar, la borro.
+	 *	Si no la pude insertar, entonces me fijo el codigo de error, y si es 81, quiere decir que no se pudo contactar al servidor LDAP, o sea, no estoy conectado.
+	 */
 	stArticle testConnectionArticle;
 	testConnectionArticle.sBody= "test";
 	testConnectionArticle.sHead= "test";
