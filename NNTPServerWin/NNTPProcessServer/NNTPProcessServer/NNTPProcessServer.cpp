@@ -87,6 +87,7 @@ int main(int argc, char** argv){
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		cout << "No se pudo conectar a OpenDS." << endl;
 		//LoguearError("No se pudo conectar a OpenDS.");
+		system("PAUSE");
 		return -1;
 	}
 	cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
@@ -105,7 +106,7 @@ int main(int argc, char** argv){
 		Sleep(atoi(configuracion.acInterval));
 	}
 	
-	system("PAUSE");//	ToDo:	Esto para que es??
+	system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
 	return 0;
 }
 
@@ -190,6 +191,8 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 
 	//	Persisto el articulo en la BD.
 	insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
+	if(stPLDAPSession->errorCode!=0)
+		printf("no se pudo conectar");
 
 	if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
 			cout << "HeapFree error en handshake." << endl;
