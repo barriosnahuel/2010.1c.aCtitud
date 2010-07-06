@@ -116,7 +116,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 									, PLDAP_SESSION_OP stPLDAPSessionOperations){
 	cout << "--> consumirMensajesYAlmacenarEnBD()" << endl;
 	
-	HANDLE handle = HeapCreate( 0, 0, 0 );
+	HANDLE handle = HeapCreate( 0, 1024, 0 );
 	if( handle == NULL ) {
 		cout << "HeapCreate error." << endl;
 	}
@@ -195,16 +195,16 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		printf("no se pudo conectar");
 
 	if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
-			cout << "HeapFree error en handshake." << endl;
+			cout << "HeapFree error en articulo.sNewsgroup." << endl;
 	}
 	if( ! HeapFree( handle, 0, articulo.sHead ) ) {
-			cout << "HeapFree error en handshake." << endl;
+			cout << "HeapFree error en articulo.sHead." << endl;
 	}
 	if( ! HeapFree( handle, 0, articulo.sBody) ) {
-			cout << "HeapFree error en handshake." << endl;
+			cout << "HeapFree error en articulo.sBody." << endl;
 	}
 	if( ! HeapFree( handle, 0, xmlCompleto ) ) {
-			cout << "HeapFree error en handshake." << endl;
+			cout << "HeapFree error en xmlCompleto." << endl;
 	}
 
 	// Destruyo el heap.
