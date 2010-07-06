@@ -80,9 +80,9 @@ unsigned __stdcall clientFunction(void* threadParameters)
 					Opciones del heap, 
 					tamaño inicial del heap (en bytes). Si es cero provee el tamaño de una pagina,
 					tamaño maximo del heap (en bytes). Si es cero puede crecer y su unica restriccion es la memoria disponible )
-	---- En este caso se setea 0 0 0 porque no me interesa el tamaño del heap.---- */
+	---- En este caso se setea 0 1024 0 porque quiero q arranque en 1024.---- */
 
-	HANDLE handle = HeapCreate( 0, 0, 0 );
+	HANDLE handle = HeapCreate( 0, 1024, 0 );
 	if( handle == NULL ) {
 		cout << "HeapCreate error." << endl;
 	}
