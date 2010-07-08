@@ -428,15 +428,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
 	printf("Se cerrará el servidor.\n");
-	/*printf("Valor de ficher antes del close: %d\n", ficheroServer);*/
 	close(ficheroServer);
-	/*printf("Valor de ficher dps del close: %d\n", ficheroServer);
-	int resultadoClose = close(&ficheroServer);
-	if(resultadoClose == 0) {
-		printf("Pase por el close y cerro joya\n");
-	} else {
-		printf("Pase por el close y cerro mal\n");
-	}*/
+	printf("Pase por el close.\n");
 	exit(1);
 }
 
