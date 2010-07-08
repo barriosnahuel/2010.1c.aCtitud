@@ -21,7 +21,6 @@
 #define MAX_CHARACTERS_FOR_RESPONSE 5000	/*	TODO: La cantidad maxima de caracteres para el response esta bien 5000?	*/
 
 char czNombreProceso[20];
-int ficheroServer; 			/* Fichero descriptor de nuestro server. */
 
 /*int thr_create(void *stack_base
  , size_t stack_size
@@ -76,9 +75,6 @@ char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametro
  */
 char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias,
 		stThreadParameters* pstParametros);
-
-void gestor_ctrlc (int senial);
-void gestor_ctrlz (int senial);
 /**
  * Procesa un request del tipo news. Es decir, busca una noticia en particular en base al sCriterio
  * y devuelve un response en formato HTML.
@@ -119,6 +115,7 @@ int llevaNoticia(char* sRecursoPedido);
  */
 char* obtenerNoticia(char* sRecursoPedido);
 
+void gestionarSenialCtrlC(int senial);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -146,13 +143,13 @@ int main(int argn, char *argv[]) {
     strcpy(czNombreProceso, "HTTPServer\0");
     strcpy(argv[0], czNombreProceso);
 
-    signal(SIGTSTP, gestor_ctrlz);
-    signal(SIGINT, gestor_ctrlc);
 
 	/****************************************
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
 	stConfiguracion stConf;
+	
+	signal(SIGINT, gestionarSenialCtrlC);
 
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
@@ -192,9 +189,92 @@ int main(int argn, char *argv[]) {
 	asprintf(&sLogMessage, "Conectado a OpenDS en: IP=%s; Port=%d.", stConf.czBDServer, stConf.uiBDPuerto);
 	LoguearInformacion(sLogMessage);
 
+
+/*	Esto es prueba!!	*/
+/*
+  	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 2);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 3);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 4);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 5);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 6);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 7);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 8);
+*/
+/*		stArticle stArticulo;
+
+		stArticulo.sBody = "un body para la 1";
+		stArticulo.sHead = "un head para la 1";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 1;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 2";
+		stArticulo.sHead = "un head para la 2";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 2;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 3";
+		stArticulo.sHead = "un head para la 3";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 3;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 4";
+		stArticulo.sHead = "un head para la 4";
+		stArticulo.sNewsgroup = "Pagina 12";
+		stArticulo.uiArticleID = 4;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 5";
+		stArticulo.sHead = "un head para la 5";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 5;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 6";
+		stArticulo.sHead = "un head para la 6";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 6;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 7";
+		stArticulo.sHead = "un head para la 7";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 7;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 8 (clarin en minuscula)";
+		stArticulo.sHead = "un head para la 8 (clarin en minuscula)";
+		stArticulo.sNewsgroup = "clarin";
+		stArticulo.uiArticleID = 8;
+
+		stArticulo.sBody = "un body para la 9";
+		stArticulo.sHead = "un head para la 9";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 9;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 10";
+		stArticulo.sHead = "un head para la 10";
+		stArticulo.sNewsgroup = "Fruta";
+		stArticulo.uiArticleID = 10;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 11";
+		stArticulo.sHead = "un head para la 11";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 11;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		selectAndPrintEntries(stPLDAPSession, stPLDAPSessionOperations, "(utnArticleID=*)");
+*/
+
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
+	int ficheroServer; 			/* Fichero descriptor de nuestro server. */
 	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
 		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.");
@@ -344,6 +424,12 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	thr_exit(0);
 }
 
+void gestionarSenialCtrlC(int senial){
+	printf("Acabo de entrar a gestionarSenialCtrlC con la senial %d", senial);
+	exit(1);
+}
+
+
 /**
  * Crea el socket, lo bindea, y lo deja listo para escuchar conexiones entrantes.
  */
@@ -377,21 +463,6 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 	LoguearDebugging("<-- crearConexionConSocket()");
 	return 1;
 }
-
-void gestor_ctrlc (int senial) {
-	printf("***** Ha pulsado CTRL + C (señal numero %d) \n", senial);
-	close(ficheroServer);
-	printf("Se cerro el socket del servidor que recibe conexiones\n");
-	
-}
-
-void gestor_ctrlz (int senial) {
-	printf("***** Ha pulsado CTRL + Z (señal numero %d) \n", senial);
-	close(ficheroServer);
-	printf("Se cerro el socket del servidor que recibe conexiones\n");
-	
-}
-
 
 /**
  * 1. Cierra el socket.
