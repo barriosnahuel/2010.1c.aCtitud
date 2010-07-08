@@ -21,6 +21,7 @@
 #define MAX_CHARACTERS_FOR_RESPONSE 5000	/*	TODO: La cantidad maxima de caracteres para el response esta bien 5000?	*/
 
 char czNombreProceso[20];
+int ficheroServer; 			/* Fichero descriptor de nuestro server. */
 
 /*int thr_create(void *stack_base
  , size_t stack_size
@@ -276,7 +277,6 @@ int main(int argn, char *argv[]) {
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
-	int ficheroServer; 			/* Fichero descriptor de nuestro server. */
 	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
 	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
 		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.");
@@ -427,13 +427,17 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 }
 
 void gestionarSenialCtrlC(int senial){
-	printf("\nAcabo de entrar a gestionarSenialCtrlC con la senial %d\n", senial);
-	/*exit(1);*/
+	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
+	printf("Se cerrarán los sockets asociados y el servidor.\n");
+	close(ficheroServer);
+	exit(1);
 }
 
 void gestionarSenialCtrlZ(int senial){
-	printf("\nAcabo de entrar a gestionarSenialCtrlZ con la senial %d\n", senial);
-	/*exit(1);*/
+	printf("\nHa pulsado CTRL + Z (señal numero %d)\n", senial);
+	printf("Se cerrarán los sockets asociados y el servidor.\n");
+	close(ficheroServer);
+	exit(1);
 }
 
 
