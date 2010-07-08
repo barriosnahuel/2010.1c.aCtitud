@@ -52,15 +52,14 @@ typedef struct stThreadParameters {
 /**
  * Crea el socket y lo deja listo para escuchar conexiones entrantes.
  */
-int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
+int crearConexionConSocket(stConfiguracion* stConf,
 		struct sockaddr_in* server);
 /**
  * Esta funcion es la funcion principal desde la que "arranca" cada nuevo
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-void liberarRecursos( int 				ficheroServer
-					, PLDAP_CONTEXT		stPLDAPContext
+void liberarRecursos(  PLDAP_CONTEXT		stPLDAPContext
 					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
 					, PLDAP_SESSION 	stPLDAPSession
 					, PLDAP_SESSION_OP 	stPLDAPSessionOperations
@@ -276,7 +275,7 @@ int main(int argn, char *argv[]) {
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
 	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
-	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
+	if (!crearConexionConSocket(&stConf,&server)){
 		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.");
 		return -1;
 	}
@@ -318,7 +317,7 @@ int main(int argn, char *argv[]) {
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
-	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
+	liberarRecursos(stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
 	memcached_free(memc);
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
@@ -435,7 +434,7 @@ void gestionarSenialCtrlC(int senial){
 /**
  * Crea el socket, lo bindea, y lo deja listo para escuchar conexiones entrantes.
  */
-int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
+int crearConexionConSocket(stConfiguracion* stConf,
 		struct sockaddr_in* server) {
 	LoguearDebugging("--> crearConexionConSocket()");
 
@@ -470,8 +469,7 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
  * 1. Cierra el socket.
  * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
  */
-void liberarRecursos(int 				ficheroServer
-					, PLDAP_CONTEXT		stPLDAPContext
+void liberarRecursos( PLDAP_CONTEXT		stPLDAPContext
 					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
 					, PLDAP_SESSION 	stPLDAPSession
 					, PLDAP_SESSION_OP	stPLDAPSessionOperations
