@@ -44,13 +44,13 @@ void guardarNoticiaEnCache(stArticle article, char *sGrupoDeNoticias,char* grupo
   int largoID;
   int largoGrupoDeNoticias;
   
-  largoID = sizeof(article.uiArticleID);
-  ID = malloc(largoID);
-  sprintf(ID,"%d",article.uiArticleID);
-  largoID = strlen(ID) + 1;
-  largoGrupoDeNoticias = strlen(grupoSinEspacios)+1;
-  claveCache = malloc(largoGrupoDeNoticias+largoID);
-  sprintf(claveCache,"%s%s",grupoSinEspacios,ID);
+  /*largoID = strlen(itoa(article.uiArticleID)) + 1;*/
+  /*ID = malloc(1024);*/
+  /*asprintf(ID,"%d",article.uiArticleID);*/
+  /*largoID = strlen(ID) + 1;*/
+  /*largoGrupoDeNoticias = strlen(grupoSinEspacios);*/
+  /*claveCache = malloc(largoGrupoDeNoticias+largoID);*/
+  asprintf(&claveCache,"%s%d",grupoSinEspacios,article.uiArticleID);
  
   articuloCache->body = NULL;
   articuloCache->head = NULL;
@@ -94,7 +94,7 @@ int buscarNoticiaEnCache(stArticle* pstArticulo, char* sGrupoDeNoticias, char* s
   int resultNoticiaEnBytes_largo, resultado;
 
   int largoID = strlen(sArticleID) + 1;
-  int largoGrupoDeNoticias = strlen(grupoSinEspacios) + 1;
+  int largoGrupoDeNoticias = strlen(grupoSinEspacios);
   claveCache = malloc(largoGrupoDeNoticias+largoID);
   sprintf(claveCache,"%s%s",grupoSinEspacios,sArticleID);
   
