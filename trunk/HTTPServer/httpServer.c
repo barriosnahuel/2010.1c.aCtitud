@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
 #include "../util.h"
 #include "../Logger/logger.h"
@@ -52,14 +53,15 @@ typedef struct stThreadParameters {
 /**
  * Crea el socket y lo deja listo para escuchar conexiones entrantes.
  */
-int crearConexionConSocket(stConfiguracion* stConf,
+int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		struct sockaddr_in* server);
 /**
  * Esta funcion es la funcion principal desde la que "arranca" cada nuevo
  * thread encargado de procesar una conexion entrante.
  */
 void* procesarRequestFuncionThread(void* parametro);
-void liberarRecursos(  PLDAP_CONTEXT		stPLDAPContext
+void liberarRecursos( int 				ficheroServer
+					, PLDAP_CONTEXT		stPLDAPContext
 					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
 					, PLDAP_SESSION 	stPLDAPSession
 					, PLDAP_SESSION_OP 	stPLDAPSessionOperations
@@ -275,7 +277,7 @@ int main(int argn, char *argv[]) {
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
 	struct sockaddr_in server;	/* Para la informacion de la direccion del servidor. */
-	if (!crearConexionConSocket(&stConf,&server)){
+	if (!crearConexionConSocket(&stConf, &ficheroServer, &server)){
 		LoguearError("No se pudo crear la conexion con el socket y dejarlo listo para escuchar conexiones entrantes.");
 		return -1;
 	}
@@ -317,7 +319,7 @@ int main(int argn, char *argv[]) {
 	printf("Le doy al thread 8 segundos para responderle al cliente antes que cierre todo... ;)\n");
 	sleep(8);
 
-	liberarRecursos(stPLDAPContext, stPLDAPContextOperations,
+	liberarRecursos(ficheroServer, stPLDAPContext, stPLDAPContextOperations,
 			stPLDAPSession, stPLDAPSessionOperations, stConf);
 	memcached_free(memc);
 	/*	TODO: Libero lo ultimo que pueda llegar a quedar de memoria pedida. */
@@ -434,11 +436,11 @@ void gestionarSenialCtrlC(int senial){
 /**
  * Crea el socket, lo bindea, y lo deja listo para escuchar conexiones entrantes.
  */
-int crearConexionConSocket(stConfiguracion* stConf,
+int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 		struct sockaddr_in* server) {
 	LoguearDebugging("--> crearConexionConSocket()");
 
-	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		LoguearError("No se pudo obtener el fichero descriptor del socket.");
 		exit(-1);
 	}
@@ -449,14 +451,14 @@ int crearConexionConSocket(stConfiguracion* stConf,
 	(*server).sin_port = htons((*stConf).uiAppPuerto); /* htons transforma el short de maquina a short de red */
 	bzero(&((*server).sin_zero), 8); /* Escribimos ceros en el resto de la estructura*/
 
-	if (bind(ficheroServer, (const struct sockaddr *) &(*server),
+	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
 		LoguearError("Error al asociar el puerto al socket.");
 		exit(-1);
 	}
 	LoguearInformacion("Se asocio bien el puerto al socket.");
 
-	if (listen(ficheroServer, BACKLOG) == -1) {
+	if (listen(*ficheroServer, BACKLOG) == -1) {
 		LoguearError("No se pudo dejar escuchando al puerto.");
 		exit(-1);
 	}
@@ -469,7 +471,8 @@ int crearConexionConSocket(stConfiguracion* stConf,
  * 1. Cierra el socket.
  * 2. Cierra contexto, sesion y demas "cosas" de OpenDS y LDAP Wrapper.
  */
-void liberarRecursos( PLDAP_CONTEXT		stPLDAPContext
+void liberarRecursos(int 				ficheroServer
+					, PLDAP_CONTEXT		stPLDAPContext
 					, PLDAP_CONTEXT_OP	stPLDAPContextOperations
 					, PLDAP_SESSION 	stPLDAPSession
 					, PLDAP_SESSION_OP	stPLDAPSessionOperations
