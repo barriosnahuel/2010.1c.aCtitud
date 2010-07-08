@@ -23,7 +23,6 @@
 
 char czNombreProceso[20];
 int ficheroServer; 			/* Fichero descriptor de nuestro server. */
-int ficheroCliente;
 
 /*int thr_create(void *stack_base
  , size_t stack_size
@@ -193,6 +192,87 @@ int main(int argn, char *argv[]) {
 	LoguearInformacion(sLogMessage);
 
 
+/*	Esto es prueba!!	*/
+/*
+  	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 1);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 2);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 3);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 4);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 5);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 6);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 7);
+	deleteEntry(stPLDAPSession, stPLDAPSessionOperations, 8);
+*/
+/*		stArticle stArticulo;
+
+		stArticulo.sBody = "un body para la 1";
+		stArticulo.sHead = "un head para la 1";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 1;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 2";
+		stArticulo.sHead = "un head para la 2";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 2;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 3";
+		stArticulo.sHead = "un head para la 3";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 3;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 4";
+		stArticulo.sHead = "un head para la 4";
+		stArticulo.sNewsgroup = "Pagina 12";
+		stArticulo.uiArticleID = 4;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 5";
+		stArticulo.sHead = "un head para la 5";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 5;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 6";
+		stArticulo.sHead = "un head para la 6";
+		stArticulo.sNewsgroup = "La Nacion";
+		stArticulo.uiArticleID = 6;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 7";
+		stArticulo.sHead = "un head para la 7";
+		stArticulo.sNewsgroup = "Clarin";
+		stArticulo.uiArticleID = 7;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 8 (clarin en minuscula)";
+		stArticulo.sHead = "un head para la 8 (clarin en minuscula)";
+		stArticulo.sNewsgroup = "clarin";
+		stArticulo.uiArticleID = 8;
+
+		stArticulo.sBody = "un body para la 9";
+		stArticulo.sHead = "un head para la 9";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 9;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 10";
+		stArticulo.sHead = "un head para la 10";
+		stArticulo.sNewsgroup = "Fruta";
+		stArticulo.uiArticleID = 10;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		stArticulo.sBody = "un body para la 11";
+		stArticulo.sHead = "un head para la 11";
+		stArticulo.sNewsgroup = "Cronica";
+		stArticulo.uiArticleID = 11;
+		insertEntry(stPLDAPSession, stPLDAPSessionOperations, stArticulo);
+
+		selectAndPrintEntries(stPLDAPSession, stPLDAPSessionOperations, "(utnArticleID=*)");
+*/
+
 	/********************************************************
 	 *	Creo la conexion con el socket y lo dejo listo		*
 	 ********************************************************/
@@ -213,7 +293,7 @@ int main(int argn, char *argv[]) {
 		int sin_size = sizeof(struct sockaddr_in);
 		struct sockaddr_in client; /* para la informacion de la direccion del cliente */
 
-		ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
+		int ficheroCliente = accept(ficheroServer, (struct sockaddr *) &client, &sin_size);
 		if (ficheroCliente != -1) {
 			/*	Si no hubo errores aceptando la conexion, entonces la gestiono. */
 
@@ -349,7 +429,6 @@ void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
 	printf("Se cerrarán los sockets asociados y el servidor.\n");
 	close(ficheroServer);
-	close(ficheroCliente);
 	exit(1);
 }
 
