@@ -427,8 +427,9 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
-	printf("Se cerrarán los sockets asociados y el servidor.\n");
+	printf("Se cerrará el servidor.\n");
 	close(ficheroServer);
+	printf("Pase por el close.\n");
 	exit(1);
 }
 
