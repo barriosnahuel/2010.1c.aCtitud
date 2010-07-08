@@ -116,6 +116,7 @@ int llevaNoticia(char* sRecursoPedido);
 char* obtenerNoticia(char* sRecursoPedido);
 
 void gestionarSenialCtrlC(int senial);
+void gestionarSenialCtrlZ(int senial);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -148,8 +149,9 @@ int main(int argn, char *argv[]) {
 	 *	Cargo el archivo de configuracion	*
 	 ****************************************/
 	stConfiguracion stConf;
-	
+
 	signal(SIGINT, gestionarSenialCtrlC);
+	signal(SIGTSTP, gestionarSenialCtrlZ);
 
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
@@ -426,6 +428,11 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 void gestionarSenialCtrlC(int senial){
 	printf("\nAcabo de entrar a gestionarSenialCtrlC con la senial %d\n", senial);
+	//exit(1);
+}
+
+void gestionarSenialCtrlZ(int senial){
+	printf("\nAcabo de entrar a gestionarSenialCtrlZ con la senial %d\n", senial);
 	//exit(1);
 }
 
