@@ -429,7 +429,7 @@ void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
 	printf("Se cerrará el servidor.\n");
 	printf("Valor de ficher antes del close: %d\n", ficheroServer);
-	close(ficheroServer);
+	//close(ficheroServer);
 	printf("Valor de ficher dps del close: %d\n", ficheroServer);
 	/*int resultadoClose = close(&ficheroServer);
 	if(resultadoClose == 0) {
