@@ -438,7 +438,7 @@ int crearConexionConSocket(stConfiguracion* stConf,
 		struct sockaddr_in* server) {
 	LoguearDebugging("--> crearConexionConSocket()");
 
-	if ((*ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+	if ((ficheroServer = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		LoguearError("No se pudo obtener el fichero descriptor del socket.");
 		exit(-1);
 	}
@@ -449,14 +449,14 @@ int crearConexionConSocket(stConfiguracion* stConf,
 	(*server).sin_port = htons((*stConf).uiAppPuerto); /* htons transforma el short de maquina a short de red */
 	bzero(&((*server).sin_zero), 8); /* Escribimos ceros en el resto de la estructura*/
 
-	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
+	if (bind(ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
 		LoguearError("Error al asociar el puerto al socket.");
 		exit(-1);
 	}
 	LoguearInformacion("Se asocio bien el puerto al socket.");
 
-	if (listen(*ficheroServer, BACKLOG) == -1) {
+	if (listen(ficheroServer, BACKLOG) == -1) {
 		LoguearError("No se pudo dejar escuchando al puerto.");
 		exit(-1);
 	}
