@@ -428,12 +428,12 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 void gestionarSenialCtrlC(int senial){
 	printf("\nAcabo de entrar a gestionarSenialCtrlC con la senial %d\n", senial);
-	//exit(1);
+	/*exit(1);*/
 }
 
 void gestionarSenialCtrlZ(int senial){
 	printf("\nAcabo de entrar a gestionarSenialCtrlZ con la senial %d\n", senial);
-	//exit(1);
+	/*exit(1);*/
 }
 
 
