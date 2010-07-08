@@ -425,7 +425,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 }
 
 void gestionarSenialCtrlC(int senial){
-	printf("Acabo de entrar a gestionarSenialCtrlC con la senial %d", senial);
+	printf("\nAcabo de entrar a gestionarSenialCtrlC con la senial %d\n", senial);
 	//exit(1);
 }
 
