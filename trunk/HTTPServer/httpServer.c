@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 
 #include "../util.h"
 #include "../Logger/logger.h"
@@ -118,7 +117,6 @@ int llevaNoticia(char* sRecursoPedido);
 char* obtenerNoticia(char* sRecursoPedido);
 
 void gestionarSenialCtrlC(int senial);
-void gestionarSenialCtrlZ(int senial);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -153,7 +151,6 @@ int main(int argn, char *argv[]) {
 	stConfiguracion stConf;
 
 	signal(SIGINT, gestionarSenialCtrlC);
-	signal(SIGTSTP, gestionarSenialCtrlZ);
 
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
@@ -434,12 +431,6 @@ void gestionarSenialCtrlC(int senial){
 	exit(1);
 }
 
-void gestionarSenialCtrlZ(int senial){
-	printf("\nHa pulsado CTRL + Z (señal numero %d)\n", senial);
-	printf("Se cerrarán los sockets asociados y el servidor.\n");
-	close(ficheroServer);
-	exit(1);
-}
 
 
 /**
