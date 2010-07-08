@@ -429,7 +429,7 @@ void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
 	printf("Se cerrará el servidor.\n");
 	
-	int resultadoClose = close(ficheroServer);
+	int resultadoClose = close(&ficheroServer);
 	if(resultadoClose == 0) {
 		printf("Pase por el close y cerro joya\n");
 	} else {
