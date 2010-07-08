@@ -118,6 +118,7 @@ int llevaNoticia(char* sRecursoPedido);
 char* obtenerNoticia(char* sRecursoPedido);
 
 void gestionarSenialCtrlC(int senial);
+void gestionarSenialCtrlZ(int senial);
 
 /************************************************
  *	Declaracion funciones relacionadas al HTML	*
@@ -152,6 +153,7 @@ int main(int argn, char *argv[]) {
 	stConfiguracion stConf;
 
 	signal(SIGINT, gestionarSenialCtrlC);
+	signal(SIGTSTP, gestionarSenialCtrlZ);
 
 	if (!CargaConfiguracion("config.conf\0", &stConf)) {
 		printf("Archivo de configuracion no valido.\n");
@@ -427,8 +429,15 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 
 void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
-	printf("Se cerrará el servidor.\n");
-	/*close(ficheroServer);*/
+	printf("Se cerrarán los sockets asociados y el servidor.\n");
+	close(ficheroServer);
+	exit(1);
+}
+
+void gestionarSenialCtrlZ(int senial){
+	printf("\nHa pulsado CTRL + Z (señal numero %d)\n", senial);
+	printf("Se cerrarán los sockets asociados y el servidor.\n");
+	close(ficheroServer);
 	exit(1);
 }
 
