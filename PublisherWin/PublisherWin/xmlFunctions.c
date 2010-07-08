@@ -1,7 +1,6 @@
-#include <winsock2.h>
-#include "berkeleyFunctions.h" //Dentro tiene la llamada a #include"xmlFunctions"
+#include<winsock2.h>
+#include"berkeleyFunctions.h" //Dentro tiene la llamada a #include"xmlFunctions"
 #include <time.h>
-
 //El formato propuesto para los mensajes XML es el siguiente: 
 	//	<?xml version="1.0" encoding="iso-8859-1" ?> 
 	//		<news> 
@@ -10,13 +9,11 @@
 	//			<HEAD>MARTIN PALEMO IDOLO</HEAD> 
 	//			<BODY>ARGENTINA CAMPEON MUNDIAL 2010</BODY> 
 	//		</news> 
-
 typedef struct largos_IRCIPC{
 	int lenIdDescriptor;
 	int lenPayloadDescriptor;
 	int lenPayloadLength;
 }largos_IRCIPC;
-
 typedef struct stIRC_IPC{
    largos_IRCIPC largos;
    char idDescriptor[16+1];
@@ -33,7 +30,7 @@ typedef struct stIRC_IPC{
 
 xmlDocPtr crearXML(struct news* noticia, char* key)
  {
-	xmlNodePtr root;
+	xmlNodePtr root,news;
 	xmlDocPtr doc;
 	char* NEWS     = "news";
 	char* ENCODING = "iso-8859-1";
@@ -76,6 +73,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	int iResult;
 	
 	char recvbuf[DEFAULT_BUFLEN];
+	char recvbufXML[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
 
 	//PARA PROTOCOLO
@@ -86,6 +84,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	char* responseNNTP;
 	int  largoHandshake;
 	int largoXmlEnBytes;
+	int i;
 	printf("################ ENVIO DE XML A NNTPSERVER ################\n");
 	printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);
 	pkg = HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct stIRC_IPC));

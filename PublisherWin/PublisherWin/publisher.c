@@ -1,7 +1,12 @@
 #include "berkeleyFunctions.h"
-#include <windows.h>
-#include <stdio.h>
-
+#include<windows.h>
+/*typedef struct stIRC_IPC{
+   char idDescriptor[16+1];
+   char payloadDescriptor[1+1];
+   char payloadLength[4+1];
+   char payloadXML[1023+1]; 
+}stIRC_IPC;
+*/
 typedef struct stThreadParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
@@ -22,6 +27,7 @@ typedef struct stSenderParameters {
 #define BUFFERCADSIZE 9
 
 void lecturaDinamica(char** cadena, HANDLE** handler){
+
 	char tempCad[BUFFERCADSIZE+1];
 	char car;
 	int i,largo,size;
@@ -29,7 +35,7 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 	*cadena[0]='\0';
 	size=1;
 
-	for(i=0;(car = getchar())!='\n';i++){
+	for(i=0;(car =getchar())!=EOF;i++){
 		tempCad[i]=car;
 		if( i ==BUFFERCADSIZE){
 			tempCad[BUFFERCADSIZE]='\0';
@@ -38,8 +44,9 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 			strcat(*cadena,tempCad);
 			tempCad[0]=car;
 			i=0;
-		}
+			}
 	}
+	
 	if(i!=0){
 		size = size + i;
 		tempCad[i]='\0';
@@ -47,7 +54,10 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 		strcat(*cadena,tempCad);
 	}
 	printf("HEAD INGRESADO:%s",*cadena);
+	return 0;
 }
+
+
 
 unsigned __stdcall publisherFunction(void* threadParameters)
 {
