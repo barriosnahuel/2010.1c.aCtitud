@@ -3,7 +3,6 @@
 void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName)
 {
 	char* ruta = "C:\\";
-	//char* dbName = "aCtitud10.db";	//Aca debe levantar el nombre del newsgroup
 	char* extension=".db";
 	char* rutaDb = NULL;
 	int ret;
@@ -64,8 +63,7 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 		//Solo trabajo con aquellas que no estan trasmitidas.
 		noticia->transmitted = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,noticia->largos.transmittedlen);
 		
-		CopyMemory(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+
-			   noticia->largos.bodylen,noticia->largos.transmittedlen);
+		CopyMemory(noticia->transmitted,(char*)data.data+sizeof(newslen)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,noticia->largos.transmittedlen);
 
 		if(strcmp(noticia->transmitted,"0")==0)
 		{	//No fue trasmitida
@@ -97,8 +95,7 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 			if(transmitioANNTPServer == 0){ 
 				//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
 				strcpy(noticia->transmitted,"1");
-				CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
-				noticia->transmitted,noticia->largos.transmittedlen);
+				CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,noticia->transmitted,noticia->largos.transmittedlen);
 				dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
 	      }
 		}
@@ -183,8 +180,7 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	
 	
 	//NOTICIA
-	noticiaEnBytesLargo = sizeof(noticia->largos) + noticia->largos.newsgrouplen + 
-		                  noticia->largos.headlen + noticia->largos.bodylen + noticia->largos.transmittedlen;
+	noticiaEnBytesLargo = sizeof(noticia->largos) + noticia->largos.newsgrouplen + noticia->largos.headlen + noticia->largos.bodylen + noticia->largos.transmittedlen;
 
 	data.data = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,noticiaEnBytesLargo);
     data.size = noticiaEnBytesLargo;
@@ -204,8 +200,7 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	CopyMemory((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
 	CopyMemory((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen,
 		   noticia->body,noticia->largos.bodylen);
-	CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,
-		   noticia->transmitted,noticia->largos.transmittedlen);
+	CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,noticia->transmitted,noticia->largos.transmittedlen);
 	
 	
 	switch (ret = (*dbp)->put(*dbp, NULL, &key, &data, DB_NOOVERWRITE)) {
