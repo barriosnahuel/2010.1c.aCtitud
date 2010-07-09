@@ -1,5 +1,6 @@
 #include "berkeleyFunctions.h"
-#include<windows.h>
+#include <windows.h>
+#include <stdio.h>
 
 typedef struct stThreadParameters {
 	DB* dbHandler;
