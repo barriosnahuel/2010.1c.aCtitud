@@ -6,7 +6,7 @@ void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName)
 	char* extension=".db";
 	char* rutaDb = NULL;
 	int ret;
-	int tamanioRutaDb = strlen(ruta) + strlen(dbName)+strlen(extension)+1;
+	size_t tamanioRutaDb = strlen(ruta) + strlen(dbName) + strlen(extension) + 1;
 	
 	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb); 
 	printf("strlen(%s): %d \n",ruta,strlen(ruta));
@@ -94,7 +94,7 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 			
 			if(transmitioANNTPServer == 0){ 
 				//LA TENGO QUE VOLVER A GUARDAR PERO CON EL TRANSMITTED EN 1 !!!!!
-				strcpy(noticia->transmitted,"1");
+				strcpy_s(noticia->transmitted,2,"1");
 				CopyMemory((char*)data.data+ sizeof(noticia->largos)+noticia->largos.newsgrouplen+noticia->largos.headlen+noticia->largos.bodylen,noticia->transmitted,noticia->largos.transmittedlen);
 				dbCursor->put(dbCursor, &key, &data, DB_CURRENT);
 	      }
@@ -127,7 +127,7 @@ void generateNewID(DB** dbp, char** buffer){
 	time (&rawtime);
     _localtime64_s(&timeinfo,&rawtime);
 
-	strftime (*buffer, 11, "%m%d%H%M%S", &timeinfo);//	El 11 es la longitud, son 10 mas el \0, Deberia haber usado la constante BERKELEY_ID_LEN, pero pincha.
+	strftime (*buffer, (DWORD)BERKELEY_ID_LEN, "%m%d%H%M%S", &timeinfo);
 
 	//	Borro los ceros a la izquierda.
 	while(**buffer=='0')
@@ -171,7 +171,7 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 {
 	int idAuxLen,ret;          
 	DBT key, data;
-	unsigned int noticiaEnBytesLargo;
+	size_t noticiaEnBytesLargo;
 	
 	printf("########### putArticle ###########\n");
 	
@@ -183,7 +183,7 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	noticiaEnBytesLargo = sizeof(noticia->largos) + noticia->largos.newsgrouplen + noticia->largos.headlen + noticia->largos.bodylen + noticia->largos.transmittedlen;
 
 	data.data = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,noticiaEnBytesLargo);
-    data.size = noticiaEnBytesLargo;
+    data.size = (unsigned int)noticiaEnBytesLargo;
 	
 	//ID NOTICIA -- Hago esto porque la id me llega como entero, y dps el memcpy se me simplifica
 	//itoa(noticia->id,idAux,10);
@@ -239,51 +239,9 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	return;
 }
 
-void getArticle(DB** dbp)
-{
-	int ret;          
-	DBT key, data;
 
-	printf("############## Lee en BerkeleyDB ##############\n");
-	memset(&key, 0, sizeof(key));
-	memset(&data, 0, sizeof(data));
-	key.data = "1";
-	key.size = strlen(key.data) + 1 ;
-/*	data.data = "Alan";
-	data.size = strlen(data.data) + 1;
-*/	
-	if (!(ret = (*dbp)->get(*dbp, NULL, &key, &data, 0)))
-		printf("db: %s: key encontrada: datos: %s.\n",(char *)key.data, (char *)data.data);
-	else 
-		(*dbp)->err(*dbp, ret, "DB->get");
-
-	return;
-}
 void closeDb(DB** dbp)
 {
 	(*dbp)->close(*dbp,0);
 	return;
 }
-
-/**
-int main()
-{
-	/**
-		apCreate(0,             // sin banderas: por defecto es sincronizado
-                 15 * 1024,     // compromiso inicial: 15 KB
-                 25 * 1024 );   // reserva inicial y tamaño máximo:
-	**/
-/**	HANDLE* memoryHandler = HeapCreate( 0, 1024, 0); //esto debería ir en cada hilo
-	DB* dbHandler;
-	printf("<------------------- Berkeley aCtitud -------------------> \n");
-	
-	
-	createDb(&dbHandler, &memoryHandler);
-	putArticle(&dbHandler);	
-	getArticle(&dbHandler);
-	closeDb(&dbHandler);
-	getchar();
-	return 0;
-}
-
-**/
