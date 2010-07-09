@@ -34,6 +34,11 @@ char* formatearEspacios(char* sRecursoPedido, char* sRecursoPedidoSinEspacios);
 char* substringFrom(char** sDest, const char* sSource, unsigned int begin);
 
 /**
+ * Recorre el char* completo y reemplaza cada ocurrencia del caracter \n por un tag <BR /> de HTML.
+ */
+char* reemplazarBarraNPorBR(char** unaCadena);
+
+/**
  * Setea en sDest un substring de sSource a partir de la posicion 0, hasta la posicion till,
  * donde se setea un \0 para marcar la finalizacion del string.
  * Se asegura de que sDest tiene un espacio en memoria suficiente para almacenar el substring.

@@ -425,8 +425,8 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 }
 
 void gestionarSenialCtrlC(int senial){
-	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
-	printf("Se cerrarán los sockets asociados y el servidor.\n");
+	printf("\nHa pulsado CTRL + C (seï¿½al numero %d)\n", senial);
+	printf("Se cerrarï¿½n los sockets asociados y el servidor.\n");
 	int resultado = close(ficheroServer);
 	/*if(resultado == 0) {
 		printf("CLOSE OK");
@@ -460,7 +460,7 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
 		LoguearError("Error al asociar el puerto al socket.");
-		/*TODO borrar la línea que sigue */
+		/*TODO borrar la lï¿½nea que sigue */
 		printf("--error %s \n",  strerror(errno));
 		exit(-1);
 	}
@@ -517,7 +517,7 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()");
 
 	char* response;
-	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, (*pstArticulo).sBody);
+	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", reemplazarBarraNPorBR(&(*pstArticulo).sHead), (*pstArticulo).sNewsgroup, reemplazarBarraNPorBR(&(*pstArticulo).sBody));
 
 	LoguearDebugging("<-- formatearArticuloAHTML()");
 	return response;
@@ -675,7 +675,7 @@ char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoD
 		stArticle stArticle= listadoDeNoticias[i];
 
 		sprintf(sURL, "%s/%d%s", sGrupoDeNoticias, stArticle.uiArticleID, ".html");
-		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, stArticle.sHead));
+		sprintf(response, "%s<LI>%s</LI>", response, armarLinkCon(sURL, reemplazarBarraNPorBR(&stArticle.sHead)));
 	}
 	free(sURL);
 	sprintf(response, "%s%s", response, "</OL></BODY></HTML>");
