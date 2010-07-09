@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <process.h>
+#include <string.h>
 
 typedef struct stConfigParameters {
 	int puertoNNTP;
@@ -23,7 +24,7 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 	*cadena[0]='\0';
 	size=1;
 
-	for(i=0;(car = getchar())!= EOF ;i++){
+	for(i=0;(car = getchar())!= '^' ;i++){
 		tempCad[i]=car;
 		if( i ==BUFFERCADSIZE){
 			tempCad[BUFFERCADSIZE]='\0';
@@ -52,68 +53,85 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	DB* dbHandler;
 	char *head;
 	char *body;
+	char respuesta[100];
+	DWORD dwThreadId = GetCurrentThreadId();
 
 	stConfigParameters stParametros = *((stConfigParameters*) threadParameters);
 	memoryHandler =  HeapCreate(0,1024,0);
 	dbHandler = NULL;
-	
+
+	strcpy(respuesta,"S");
+
 	if( memoryHandler == NULL ) 
 		printf("HeapCreate error.\n");
 
 	printf("<------------------- Ingreso de Noticia aCtitud -------------------> \n");
 
-	head = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
-	ZeroMemory(head,2);
-	printf("Ingrese el HEAD de la noticia: ");
-	lecturaDinamica(&head,&memoryHandler);
-	printf("HEAD INGRESADO: %s",head);
+	while(strcmp(respuesta,"S")==0){
+		head = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
+		ZeroMemory(head,2);
+		printf("Ingrese el HEAD de la noticia: ");
+		lecturaDinamica(&head,&memoryHandler);
+		printf("HEAD INGRESADO: %s",head);
+		//fflush(stdin);
 
-	body = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
-	ZeroMemory(body,2);
-	printf("Ingrese el body de la noticia: ");
-	lecturaDinamica(&body,&(memoryHandler));
-	printf("body INGRESADO: %s",body);
+		body = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
+		ZeroMemory(body,2);
+		printf("Ingrese el body de la noticia: ");
+		lecturaDinamica(&body,&(memoryHandler));
+		printf("body INGRESADO: %s",body);
+		//fflush(stdin);
 
-	noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
-	noticia.newsgroup = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,10/*noticia->largos.newsgrouplen*/);
-	noticia.newsgroup = stParametros.newsgroup;
+		noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
+		noticia.newsgroup = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.newsgrouplen);
+		strcpy(noticia.newsgroup,stParametros.newsgroup);
 
-	noticia.largos.headlen = strlen(head)+1;
-	noticia.head	  = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
-	noticia.head      = head;
+		noticia.largos.headlen = strlen(head)+1;
+		noticia.head	  = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
+		strcpy(noticia.head,head);
 
-	noticia.largos.bodylen = strlen(body)+1;
-	noticia.body	  = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.bodylen);
-	noticia.body	  = body;
+		noticia.largos.bodylen = strlen(body)+1;
+		noticia.body	  = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.bodylen);
+		strcpy(noticia.body,body);
 
-	noticia.largos.transmittedlen = strlen("0")+1;
-	noticia.transmitted = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.transmittedlen);
-	noticia.transmitted = "0" ;
+		noticia.largos.transmittedlen = strlen("0")+1;
+		noticia.transmitted = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.transmittedlen);
+		strcpy(noticia.transmitted,"0");
 
-	noticia.largos.idlen= BERKELEY_ID_LEN;
-	noticia.id = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.idlen);
-	
-	printf("noticia.newsgroup: %s \n",noticia.newsgroup);
-	printf("noticia.head: %s \n",noticia.head);
-	printf("noticia.body: %s \n",noticia.body);
-	printf("noticia.transmitted: %s \n",noticia.transmitted);	
-	
+		noticia.largos.idlen= BERKELEY_ID_LEN;
+		noticia.id = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.idlen);
 		
-	printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
-	
-	createDb(&dbHandler, &memoryHandler,&stParametros.newsgroup);
-	generateNewID(&dbHandler, &noticia.id);
-	
-	putArticle(&noticia,&dbHandler,&memoryHandler);	
-	closeDb(&dbHandler);
+		printf("noticia.newsgroup: %s \n",noticia.newsgroup);
+		printf("noticia.head: %s \n",noticia.head);
+		printf("noticia.body: %s \n",noticia.body);
+		printf("noticia.transmitted: %s \n",noticia.transmitted);	
+		
+			
+		printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
+		
+		createDb(&dbHandler, &memoryHandler,&stParametros.newsgroup);
+		generateNewID(&dbHandler, &noticia.id);
+		
+		putArticle(&noticia,&dbHandler,&memoryHandler);	
+		closeDb(&dbHandler);
 
+		printf("Desea publicar otra noticia S/N:");
+		scanf("%s",&respuesta);
+		fflush(stdin);
+		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,head);
+		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,body);
+		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,noticia.newsgroup);
+		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,noticia.head);
+		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,noticia.body);
+		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,noticia.transmitted);
+
+	}
 
 	printf("TERMINA DE PROCESAR EL THREAD CLIENTE\n");
-	getchar();
-	_endthreadex(0);
+	HeapDestroy(memoryHandler);
+	_endthreadex(dwThreadId);
 	return 0;
 }
-
 
 
 unsigned __stdcall senderFunction(void* threadParameters)
@@ -126,6 +144,7 @@ unsigned __stdcall senderFunction(void* threadParameters)
 	stConfigParameters stParametros = *((stConfigParameters*) threadParameters);
 	HANDLE* memoryHandler;
 	DB* dbHandler;
+	DWORD dwThreadId = GetCurrentThreadId();
 
 	printf("<------------------- SENDER - aCtitud -------------------> \n");
 	memoryHandler =  HeapCreate(0,1024,0); 
@@ -136,12 +155,11 @@ unsigned __stdcall senderFunction(void* threadParameters)
 	createDb(&dbHandler,&memoryHandler,&stParametros.newsgroup);
 	
 	//Se fija las noticias que no estan enviadas, las pasa a XML y las envia a nntp
-	//noticiasNoEnviadas(&dbHandler, &memoryHandler);	
-	noticiasNoEnviadas(&dbHandler, &memoryHandler,&stParametros.ipNNTP,stParametros.puertoNNTP);	
-	
+	noticiasNoEnviadas(&dbHandler, &memoryHandler,(char*)stParametros.ipNNTP,stParametros.puertoNNTP);
+
 	closeDb(&dbHandler);
 	HeapDestroy(memoryHandler);
-	_endthreadex(0);
+	_endthreadex(dwThreadId);
 	return 0;
 }
 
