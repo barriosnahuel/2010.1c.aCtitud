@@ -94,4 +94,10 @@ VOID updateEntry(PLDAP_SESSION stSession, PLDAP_SESSION_OP stSessionOperations,
 VOID deleteEntry(PLDAP_SESSION stSession, PLDAP_SESSION_OP stSessionOperations,
 		unsigned int uiArticleID);
 
+/**
+ *	Libera los recursos utilizados para usar Ldap.
+ */
+VOID liberarRecursosLdap(PLDAP_CONTEXT stPLDAPContext, PLDAP_CONTEXT_OP stPLDAPContextOperations, 
+						 PLDAP_SESSION stPLDAPSession, PLDAP_SESSION_OP stPLDAPSessionOperations);
+
 #endif /* LDAPWRAPPERHANDLER_H_ */

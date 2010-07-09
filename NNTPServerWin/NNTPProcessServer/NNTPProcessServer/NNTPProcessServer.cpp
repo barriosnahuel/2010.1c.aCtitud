@@ -17,7 +17,6 @@
 #include "../../funcionesMSMQ.hpp"
 #include "LdapWrapperHandler-Win.hpp"
 #include "xmlFunctions.hpp"
-
 //	Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #define DEFAULT_BUFLEN 512/*	ESTO CREO QUE NO HACE FALTA.*/
 
@@ -88,6 +87,8 @@ int main(int argc, char** argv){
 	if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
 		cout << "No se pudo conectar a OpenDS." << endl;
+		
+		//LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.");
 		//LoguearError("No se pudo conectar a OpenDS.");
 		system("PAUSE");
 		return -1;
@@ -101,13 +102,32 @@ int main(int argc, char** argv){
 	while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
 
 		Sleep(atoi(configuracion.acInterval));
+
+		if(openDSEstaCaido == 1) {
+			liberarRecursosLdap(stPLDAPContext, stPLDAPContextOperations, stPLDAPSession, stPLDAPSessionOperations);
+			//LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.");
+			PLDAP_CONTEXT stPLDAPContext= newLDAPContext();
+			PLDAP_CONTEXT_OP stPLDAPContextOperations= newLDAPContextOperations(); /*	Me permite operar sobre un contexto	*/
+			PLDAP_SESSION stPLDAPSession;
+			PLDAP_SESSION_OP stPLDAPSessionOperations= newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
+			if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
+				&stPLDAPSession, &stPLDAPSessionOperations)) {
+				cout << "No se pudo conectar a OpenDS." << endl;
+			} else {
+				openDSEstaCaido = 0;
+				cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
+			}
+		}
+
 		while((consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) && !openDSEstaCaido) {
 			cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
 		}
-
-		openDSEstaCaido = 0;
 	
 	}
+	
+	 /*        Cierro/Libero lo relacionado a la BD        */
+	liberarRecursosLdap(stPLDAPContext, stPLDAPContextOperations, stPLDAPSession, stPLDAPSessionOperations);
+	cout << "Libere recursos Ldap." << endl;
 	
 	system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
 	return 0;
@@ -198,7 +218,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		cout << "Debido a que hubo un problema con OpenDS el mensaje se reencolara para su posterior procesamiento." << endl;
 		colaMsmq.insertarMensaje(pMsg);
 		openDSEstaCaido = 1;
-		cout << "El NNTP Process Server se cerrara. Por favor, levante OpenDS y vuelva a correr este servidor." << endl;
+	/*	cout << "El NNTP Process Server se cerrara. Por favor, levante OpenDS y vuelva a correr este servidor." << endl;
 		if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
 			cout << "HeapFree error en articulo.sNewsgroup." << endl;
 		}
@@ -217,7 +237,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 			cout << "HeapDestroy error." << endl;
 		}
 		cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
-		exit(1);
+		exit(1);*/
 	} else {
 		cout << "\nPara logger: Se inserto el siguiente mensaje en OpenDS: " << endl;
 		cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
