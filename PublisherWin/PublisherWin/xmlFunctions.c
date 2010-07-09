@@ -1,6 +1,8 @@
-#include<winsock2.h>
-#include"berkeleyFunctions.h" //Dentro tiene la llamada a #include"xmlFunctions"
+#include< winsock2.h>
+#include "berkeleyFunctions.h" //Dentro tiene la llamada a #include"xmlFunctions"
 #include <time.h>
+#include <string.h>
+
 //El formato propuesto para los mensajes XML es el siguiente: 
 	//	<?xml version="1.0" encoding="iso-8859-1" ?> 
 	//		<news> 
@@ -9,6 +11,7 @@
 	//			<HEAD>MARTIN PALEMO IDOLO</HEAD> 
 	//			<BODY>ARGENTINA CAMPEON MUNDIAL 2010</BODY> 
 	//		</news> 
+
 typedef struct largos_IRCIPC{
 	int lenIdDescriptor;
 	int lenPayloadDescriptor;
@@ -30,7 +33,7 @@ typedef struct stIRC_IPC{
 
 xmlDocPtr crearXML(struct news* noticia, char* key)
  {
-	xmlNodePtr root,news;
+	xmlNodePtr root;
 	xmlDocPtr doc;
 	char* NEWS     = "news";
 	char* ENCODING = "iso-8859-1";
@@ -73,7 +76,6 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	int iResult;
 	
 	char recvbuf[DEFAULT_BUFLEN];
-	char recvbufXML[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
 
 	//PARA PROTOCOLO
@@ -84,7 +86,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	char* responseNNTP;
 	int  largoHandshake;
 	int largoXmlEnBytes;
-	int i;
+
 	printf("################ ENVIO DE XML A NNTPSERVER ################\n");
 	printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);
 	pkg = HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct stIRC_IPC));
@@ -92,7 +94,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
 	printf((char*)memoriaXML);
-	sprintf(pkg->idDescriptor, "%d", seconds);
+	sprintf_s(pkg->idDescriptor, 16, "%d", seconds);
 	strcpy(pkg->payloadDescriptor,"1"); //1=REQUEST;
 	strcpy(pkg->payloadLength,"0000");
 	strcat(pkg->idDescriptor,"123456");
@@ -105,9 +107,9 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	pkg->largos.lenPayloadDescriptor = strlen(pkg->payloadDescriptor) + 1;
 	pkg->largos.lenPayloadLength     = strlen(pkg->payloadLength) + 1;
 	//ARMO ESTRUCTURA EN BYTES
-	ZeroMemory(handshakeEnBytes,0);
 	largoHandshake = sizeof(pkg->largos) + pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor + pkg->largos.lenPayloadLength;//LOS LARGOS SON SIEMPRE FIJOS
 	handshakeEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoHandshake);
+	ZeroMemory(handshakeEnBytes,largoHandshake);
 
 	CopyMemory(handshakeEnBytes,(char*)&pkg->largos,sizeof(pkg->largos));
 	CopyMemory(handshakeEnBytes + sizeof(pkg->largos),pkg->idDescriptor,pkg->largos.lenIdDescriptor);
@@ -148,9 +150,9 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 /**
   * SI EL NNTPSERVER NUNCA ME RESPONDE ME QUEDO BLOQUEADO ? COMO HAGO PARA SALIR, COMO HAGO UN TIME OUT (??)
  **/
-	if ( iResult > 0 )
-            printf("Bytes recividos: %d\n", iResult);
-        else if ( iResult == 0 )
+	if ( lLength > 0 )
+            printf("Bytes recividos: %d\n", lLength);
+        else if ( lLength == 0 )
             printf("Coneccion cerrada\n");
         else
             printf("recv fallo: %d\n", WSAGetLastError());
@@ -168,7 +170,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 
 	
 	//################################# ENVIO EL XML #################################
-	sprintf(pkg->payloadLength,"%d",tamanioXML+1);
+	sprintf_s(pkg->payloadLength,5, "%d",tamanioXML+1);
 	printf("tamanioXML: %d \n",tamanioXML+1);
 	printf("pkg->payloadLength: %s \n",pkg->payloadLength);	
 
@@ -204,9 +206,9 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 
 	//Recibo la respuesta del NNTPServer
 	lLength = recv(lhSocket, recvbuf, recvbuflen, 0);
-        if ( iResult > 0 )
-            printf("Bytes recividos: %d\n", iResult);
-		else if ( iResult == 0 ){
+        if ( lLength > 0 )
+            printf("Bytes recividos: %d\n", lLength);
+		else if ( lLength == 0 ){
 			printf("Coneccion cerrada\n");return 1;}
 		else{
 			printf("recv fallo: %d\n", WSAGetLastError()); return 1;}
