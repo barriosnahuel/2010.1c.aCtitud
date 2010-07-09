@@ -13,9 +13,9 @@
 	//		</news> 
 
 typedef struct largos_IRCIPC{
-	int lenIdDescriptor;
-	int lenPayloadDescriptor;
-	int lenPayloadLength;
+	size_t lenIdDescriptor;
+	size_t lenPayloadDescriptor;
+	size_t lenPayloadLength;
 }largos_IRCIPC;
 typedef struct stIRC_IPC{
    largos_IRCIPC largos;

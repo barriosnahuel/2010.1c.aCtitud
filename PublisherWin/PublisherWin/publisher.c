@@ -1,21 +1,14 @@
 #include "berkeleyFunctions.h"
 #include <windows.h>
 #include <stdio.h>
+#include <process.h>
 
-typedef struct stThreadParameters {
-	DB* dbHandler;
-	HANDLE* memoryHandler;
-	char newsgroup[100];
-} stThreadParameters;
-
-typedef struct stSenderParameters {
-	DB* dbHandler;
-	HANDLE* memoryHandler;
+typedef struct stConfigParameters {
 	int puertoNNTP;
-	char ipNNTP[16];
+	char ipNNTP[15+1];
 	int tiempoEspera;
 	char newsgroup[100];
-} stSenderParameters;
+} stConfigParameters;
 
 #define BUFFERSIZE 1024
 #define BERKELEY_ID_LEN 11
@@ -30,7 +23,7 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 	*cadena[0]='\0';
 	size=1;
 
-	for(i=0;(car = getchar())!='\n';i++){
+	for(i=0;(car = getchar())!= EOF ;i++){
 		tempCad[i]=car;
 		if( i ==BUFFERCADSIZE){
 			tempCad[BUFFERCADSIZE]='\0';
@@ -51,49 +44,54 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 
 
 
+
 unsigned __stdcall publisherFunction(void* threadParameters)
 {
 	struct news noticia;
+	HANDLE* memoryHandler;
+	DB* dbHandler;
 	char *head;
 	char *body;
 
-	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
-	stParametros.memoryHandler =  HeapCreate(0,1024,0); //esto debería ir en cada hilo
-	stParametros.dbHandler = NULL;
+	stConfigParameters stParametros = *((stConfigParameters*) threadParameters);
+	memoryHandler =  HeapCreate(0,1024,0);
+	dbHandler = NULL;
 	
-	if( stParametros.memoryHandler == NULL ) 
+	if( memoryHandler == NULL ) 
 		printf("HeapCreate error.\n");
 
 	printf("<------------------- Ingreso de Noticia aCtitud -------------------> \n");
 
-	head = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
+	head = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
 	ZeroMemory(head,2);
 	printf("Ingrese el HEAD de la noticia: ");
-	lecturaDinamica(&head,&(stParametros.memoryHandler));
+	lecturaDinamica(&head,&memoryHandler);
 	printf("HEAD INGRESADO: %s",head);
 
-	body = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
+	body = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
 	ZeroMemory(body,2);
 	printf("Ingrese el body de la noticia: ");
-	lecturaDinamica(&body,&(stParametros.memoryHandler));
+	lecturaDinamica(&body,&(memoryHandler));
 	printf("body INGRESADO: %s",body);
 
 	noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
-	noticia.largos.headlen = strlen(head)+1;
-	noticia.largos.bodylen = strlen(body)+1;
-	noticia.largos.transmittedlen = strlen("0")+1;
-	noticia.largos.idlen= BERKELEY_ID_LEN;
-	
-	noticia.newsgroup = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,10/*noticia->largos.newsgrouplen*/);
-	noticia.head	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
-	noticia.body	  = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.bodylen);
-    noticia.transmitted = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.transmittedlen);
-	noticia.id = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.idlen);
+	noticia.newsgroup = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,10/*noticia->largos.newsgrouplen*/);
 	noticia.newsgroup = stParametros.newsgroup;
-	noticia.head      = head;
-	noticia.body	  = body;
-	noticia.transmitted = "0" ; 
 
+	noticia.largos.headlen = strlen(head)+1;
+	noticia.head	  = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.headlen);
+	noticia.head      = head;
+
+	noticia.largos.bodylen = strlen(body)+1;
+	noticia.body	  = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.bodylen);
+	noticia.body	  = body;
+
+	noticia.largos.transmittedlen = strlen("0")+1;
+	noticia.transmitted = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.transmittedlen);
+	noticia.transmitted = "0" ;
+
+	noticia.largos.idlen= BERKELEY_ID_LEN;
+	noticia.id = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.idlen);
 	
 	printf("noticia.newsgroup: %s \n",noticia.newsgroup);
 	printf("noticia.head: %s \n",noticia.head);
@@ -103,11 +101,11 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		
 	printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
 	
-	createDb(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.newsgroup);
-	generateNewID(&stParametros.dbHandler, &noticia.id);
+	createDb(&dbHandler, &memoryHandler,&stParametros.newsgroup);
+	generateNewID(&dbHandler, &noticia.id);
 	
-	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
-	closeDb(&stParametros.dbHandler);
+	putArticle(&noticia,&dbHandler,&memoryHandler);	
+	closeDb(&dbHandler);
 
 
 	printf("TERMINA DE PROCESAR EL THREAD CLIENTE\n");
@@ -117,6 +115,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 }
 
 
+
 unsigned __stdcall senderFunction(void* threadParameters)
 {
 	/**
@@ -124,57 +123,52 @@ unsigned __stdcall senderFunction(void* threadParameters)
 	 * Las paso a formato XML
 	 * Las envio al NNTP 
 	**/
-	stSenderParameters stParametros = *((stSenderParameters*) threadParameters);
+	stConfigParameters stParametros = *((stConfigParameters*) threadParameters);
+	HANDLE* memoryHandler;
+	DB* dbHandler;
+
 	printf("<------------------- SENDER - aCtitud -------------------> \n");
-	stParametros.memoryHandler =  HeapCreate(0,1024,0); 
-	stParametros.dbHandler = NULL;
-	if( stParametros.memoryHandler == NULL ) 
+	memoryHandler =  HeapCreate(0,1024,0); 
+	dbHandler = NULL;
+	if( memoryHandler == NULL ) 
 		printf("Sender HeapCreate error.\n");
 	
-	createDb(&stParametros.dbHandler,&stParametros.memoryHandler,&stParametros.newsgroup);
+	createDb(&dbHandler,&memoryHandler,&stParametros.newsgroup);
 	
 	//Se fija las noticias que no estan enviadas, las pasa a XML y las envia a nntp
-	//noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler);	
-	noticiasNoEnviadas(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.ipNNTP,stParametros.puertoNNTP);	
+	//noticiasNoEnviadas(&dbHandler, &memoryHandler);	
+	noticiasNoEnviadas(&dbHandler, &memoryHandler,&stParametros.ipNNTP,stParametros.puertoNNTP);	
 	
-	closeDb(&stParametros.dbHandler);
-	HeapDestroy(stParametros.memoryHandler);
+	closeDb(&dbHandler);
+	HeapDestroy(memoryHandler);
 	_endthreadex(0);
 	return 0;
 }
-
-
-
 
 int main(){
 
 	char tempEsperaSender[32];
 	char tempPuerto[8];
+	stConfigParameters stSender;
 
-	//THREAD CLIENTE
-	stThreadParameters stParameters;
+	/* THREAD CLIENTE */
 	unsigned threadProcesarRequest;
 	HANDLE threadCliente; 
 
-	//THREAD SENDER
-	stSenderParameters stSender;
+	/* THREAD SENDER */
 	unsigned threadProcesarSender;
 	HANDLE threadSender;
 
-	//CONFIGURACION PARA EL SENDER
-	LPCSTR archivoConfiguracion = "../configuracion.ini";
+	/* CONFIGURACION */
+	LPCSTR archivoConfiguracion = ".\\PublisherWin.ini";
 	GetPrivateProfileString("configuracion","IPNNTP",0,stSender.ipNNTP,16,archivoConfiguracion);
 	GetPrivateProfileString("configuracion","PUERTONNTP",0,tempPuerto,8,archivoConfiguracion);
 	GetPrivateProfileString("configuracion","TIEMPO",0,tempEsperaSender,32,archivoConfiguracion);
+	GetPrivateProfileString("configuracion","NEWSGROUP",0,stSender.newsgroup,100,archivoConfiguracion);
 	stSender.puertoNNTP = atoi(tempPuerto);
 	stSender.tiempoEspera = atoi(tempEsperaSender);
 
-	//CONFIGURACION THREAD CLIENTE INTERFAZ
-	GetPrivateProfileString("configuracion","NEWSGROUP",0,stParameters.newsgroup,256,archivoConfiguracion);
-	strcpy(stSender.newsgroup,stParameters.newsgroup); //el sender tambien necesita el nombre del newsgroup para levantar db
-
-	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stParameters, 
-		0, &threadProcesarRequest))!=0){
+	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stSender, 0, &threadProcesarRequest))!= 0){
 		CloseHandle(threadCliente);
 	}else{
 		printf("No se pudo crear el thread para procesar el request\n");
@@ -182,37 +176,17 @@ int main(){
 
 	printf("Sale del thread cliente\n");
 
-	
-	while(1){	
+	/* TODO nunca puede salir de este bucle. ¿cómo mato al cliente? */
+	while(1){
 		Sleep(stSender.tiempoEspera);
-		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 
-			0, &threadProcesarSender))!=0){
+		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 0, &threadProcesarSender))!= 0){
 			CloseHandle(threadSender);
 		}else{
 			printf("No se pudo crear el thread para procesar el envío de xml\n");
 		}
 	}
 
-
-/** Para probar lo de BERKELEY
-	
-	HANDLE* memoryHandler = HeapCreate( 0, 1024, 0); //esto debería ir en cada hilo
-	DB* dbHandler;
-	printf("<------------------- Berkeley aCtitud -------------------> \n");
-	
-	
-	createDb(&dbHandler, &memoryHandler);
-	putArticle(&dbHandler);	
-	getArticle(&dbHandler);
-	closeDb(&dbHandler);
-	getchar();
-	return 0;
-
-
-**/
-
 /**	
-
 	Leo archivo de configuracion para saber el newsgroup
     Creo la base Berkeley para dicho newsgroup
 

@@ -12,11 +12,11 @@
 #define BUFFERSIZE 1024
 
 typedef struct newslen{
-    int newsgrouplen;
-    int bodylen;
-    int headlen;
-	int transmittedlen;
-	int idlen;
+    size_t newsgrouplen;
+    size_t bodylen;
+    size_t headlen;
+	size_t transmittedlen;
+	size_t idlen;
 }newslen;
 
 typedef struct news{
@@ -28,11 +28,11 @@ typedef struct news{
    char* transmitted; // 0 NO FUE TRANSMITIDA , 1 SI .
 }news;
 
-	void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler);
-	void getArticle(DB** dbp);
-	void closeDb(DB** dbp);
-	void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName);
-	int lastID(DB** dbp); //Recorre db y busca la ultima id asignada
+void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler);
+void getArticle(DB** dbp);
+void closeDb(DB** dbp);
+void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName);
+int lastID(DB** dbp); //Recorre db y busca la ultima id asignada
 
 	
 	/**
