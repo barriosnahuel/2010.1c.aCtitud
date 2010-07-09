@@ -73,7 +73,6 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
     WSADATA wsaData;
 	int lConnect;
 	int lLength;
-	int iResult;
 	
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
@@ -84,7 +83,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	char* handshakeEnBytes;
 	char* xmlEnBytes;
 	char* responseNNTP;
-	int  largoHandshake;
+	size_t largoHandshake;
 	int largoXmlEnBytes;
 
 	printf("################ ENVIO DE XML A NNTPSERVER ################\n");
@@ -94,10 +93,10 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
 	printf((char*)memoriaXML);
-	sprintf_s(pkg->idDescriptor, 16, "%d", seconds);
-	strcpy(pkg->payloadDescriptor,"1"); //1=REQUEST;
-	strcpy(pkg->payloadLength,"0000");
-	strcat(pkg->idDescriptor,"123456");
+	sprintf_s(pkg->idDescriptor, _countof(pkg->idDescriptor), "%d", seconds);
+	strcpy_s(pkg->payloadDescriptor, _countof(pkg->payloadDescriptor),"1"); //1=REQUEST;
+	strcpy_s(pkg->payloadLength, _countof(pkg->payloadLength),"0000");
+	strcat_s(pkg->idDescriptor, _countof(pkg->idDescriptor),"123456");
 
 	printf("idDescriptor: %s \n", pkg->idDescriptor);
 	printf("payloadDescriptor : %s \n",pkg->payloadDescriptor);
@@ -137,7 +136,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 		printf("Connect Error\n");
         return 1;
     }
-    lLength = send(lhSocket,handshakeEnBytes,largoHandshake,0);
+    lLength = send(lhSocket,handshakeEnBytes,(int)largoHandshake,0);
     
 	if (lLength == SOCKET_ERROR) {
         printf("Fallo el send del Handshake: %d\n", WSAGetLastError());
@@ -185,7 +184,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 
 	//COPIO EL MENSAJE XML AL PAYLOAD XML
 	pkg->payloadXML = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioXML);
-	strcpy(pkg->payloadXML,memoriaXML);
+	strcpy_s(pkg->payloadXML,tamanioXML,memoriaXML);
 	
 	CopyMemory(xmlEnBytes,(char*)&pkg->largos,sizeof(largos_IRCIPC));
 	CopyMemory(xmlEnBytes + sizeof(largos_IRCIPC),pkg->idDescriptor,pkg->largos.lenIdDescriptor);

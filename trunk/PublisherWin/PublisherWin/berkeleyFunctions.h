@@ -9,31 +9,30 @@
 #include "xmlFunctions.h"
 #pragma comment(lib,"libdb48.lib")
 
-#define BUFFERSIZE 1024
+#define BERKELEY_ID_LEN 10+1
 
-typedef struct newslen{
+typedef struct newslen {
     size_t newsgrouplen;
     size_t bodylen;
     size_t headlen;
 	size_t transmittedlen;
-	size_t idlen;
-}newslen;
+} newslen;
 
 typedef struct news{
    newslen largos;
    char*   head;
    char*   body;
    char*   newsgroup;
-   char*	id;
-   char* transmitted; // 0 NO FUE TRANSMITIDA , 1 SI .
+   char*   id;
+   char*   transmitted; // 0 NO FUE TRANSMITIDA , 1 SI .
 }news;
 
 void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler);
-void getArticle(DB** dbp);
 void closeDb(DB** dbp);
 void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName);
 int lastID(DB** dbp); //Recorre db y busca la ultima id asignada
 
+void noticiasNoEnviadas(DB** dbp, HANDLE** memoryHandle, char* ipNNTP, int puertoNNTP);
 	
 	/**
 	 *	Genero un nuevo ID con el formato: MMddHHmmss
