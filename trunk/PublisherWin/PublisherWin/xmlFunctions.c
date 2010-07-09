@@ -45,7 +45,7 @@ xmlDocPtr crearXML(struct news* noticia, char* key)
 	
 	//Hijos
 	xmlNewChild (root, NULL, "newsgroup",  noticia->newsgroup);
-	xmlNewChild (root, NULL,"idNoticia", key);
+	xmlNewChild (root, NULL, "idNoticia", key);
 	xmlNewChild (root, NULL, "HEAD",  noticia->head);
 	xmlNewChild (root, NULL, "BODY",  noticia->body);
 

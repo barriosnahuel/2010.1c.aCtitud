@@ -4,10 +4,11 @@
 #include<db.h>
 #include<windows.h>
 #include<stdio.h>
-#include<string.h>
+#include <string.h>
 #include <time.h>
-#include"xmlFunctions.h"
+#include "xmlFunctions.h"
 #pragma comment(lib,"libdb48.lib")
+
 #define BUFFERSIZE 1024
 
 typedef struct newslen{
@@ -23,7 +24,6 @@ typedef struct news{
    char*   head;
    char*   body;
    char*   newsgroup;
-   //unsigned int id;
    char*	id;
    char* transmitted; // 0 NO FUE TRANSMITIDA , 1 SI .
 }news;
