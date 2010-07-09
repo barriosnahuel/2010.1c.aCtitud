@@ -1,12 +1,6 @@
 #include "berkeleyFunctions.h"
 #include<windows.h>
-/*typedef struct stIRC_IPC{
-   char idDescriptor[16+1];
-   char payloadDescriptor[1+1];
-   char payloadLength[4+1];
-   char payloadXML[1023+1]; 
-}stIRC_IPC;
-*/
+
 typedef struct stThreadParameters {
 	DB* dbHandler;
 	HANDLE* memoryHandler;
@@ -35,7 +29,7 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 	*cadena[0]='\0';
 	size=1;
 
-	for(i=0;(car =getchar())!=EOF;i++){
+	for(i=0;(car = getchar())!='\n';i++){
 		tempCad[i]=car;
 		if( i ==BUFFERCADSIZE){
 			tempCad[BUFFERCADSIZE]='\0';
@@ -44,16 +38,14 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 			strcat(*cadena,tempCad);
 			tempCad[0]=car;
 			i=0;
-			}
+		}
 	}
-	
 	if(i!=0){
 		size = size + i;
 		tempCad[i]='\0';
 		HeapReAlloc(*handler,0,*cadena,(DWORD)size );
 		strcat(*cadena,tempCad);
 	}
-	return 0;
 }
 
 
@@ -62,7 +54,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 {
 	struct news noticia;
 	char *head;
-	char body[BUFFERSIZE] = "LINUX NO EXISTIS";
+	char *body;
 
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
 	stParametros.memoryHandler =  HeapCreate(0,1024,0); //esto debería ir en cada hilo
@@ -73,17 +65,17 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 
 	printf("<------------------- Ingreso de Noticia aCtitud -------------------> \n");
 
-head = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
-ZeroMemory(head,2);
-printf("Ingrese el HEAD de la noticia: ");
-lecturaDinamica(&head,&(stParametros.memoryHandler));
-printf("HEAD INGRESADO: %s",head);
+	head = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
+	ZeroMemory(head,2);
+	printf("Ingrese el HEAD de la noticia: ");
+	lecturaDinamica(&head,&(stParametros.memoryHandler));
+	printf("HEAD INGRESADO: %s",head);
 
-body = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
-ZeroMemory(body,2);
-printf("Ingrese el body de la noticia: ");
-lecturaDinamica(&body,&(stParametros.memoryHandler));
-printf("body INGRESADO: %s",body);
+	body = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
+	ZeroMemory(body,2);
+	printf("Ingrese el body de la noticia: ");
+	lecturaDinamica(&body,&(stParametros.memoryHandler));
+	printf("body INGRESADO: %s",body);
 
 	noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
 	noticia.largos.headlen = strlen(head)+1;
@@ -114,7 +106,6 @@ printf("body INGRESADO: %s",body);
 	generateNewID(&stParametros.dbHandler, &noticia.id);
 	
 	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
-	//getArticle(&stParametros.dbHandler,&stParametros.memoryHandler);
 	closeDb(&stParametros.dbHandler);
 
 
