@@ -83,8 +83,9 @@ int crearConexionLDAP(	char* sIp
 	insertEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, testConnectionArticle);
 	if((*pstPLDAPSession)->errorCode==81)
 		return 0;
-	else
+	else {
 		deleteEntry(*pstPLDAPSession, *pstPLDAPSessionOperations, testConnectionArticle.uiArticleID);
+	}
 
 	return 1;
 }
@@ -226,4 +227,12 @@ VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
     /* libero los recursos */
     freeLDAPIterator(iterator);
     freeLDAPRecordOperations(recordOp);
+}
+
+VOID liberarRecursosLdap(PLDAP_CONTEXT stPLDAPContext, PLDAP_CONTEXT_OP stPLDAPContextOperations, 
+						 PLDAP_SESSION stPLDAPSession, PLDAP_SESSION_OP stPLDAPSessionOperations) {
+	freeLDAPSessionOperations(stPLDAPSessionOperations);
+	freeLDAPSession(stPLDAPSession);
+	freeLDAPContext(stPLDAPContext);
+	freeLDAPContextOperations(stPLDAPContextOperations);
 }
