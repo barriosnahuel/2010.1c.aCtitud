@@ -39,6 +39,8 @@ typedef struct news{
    unsigned int id;
 }news;
 
+int openDSEstaCaido;
+
 /***********************************************************************************************
 							Declaraciones de funciones
  ***********************************************************************************************/ 
@@ -91,19 +93,20 @@ int main(int argc, char** argv){
 		return -1;
 	}
 	cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
+	openDSEstaCaido = 0;
 
 	//	Comienzo a iterar infinitamente, con un intervalo de X tiempo el cual logro llamando a
 	//	la funcion sleep(intervaloDeTiempo); donde intervaloDeTiempo es una variable que cargamos
 	//	del archivo de configuracion.
 	while(1){/*	ToDo: Ver como salir de aca, hacer algo como el NNTPServerBam porque sino no puedo desvincular el puerto.	*/
 
-		while(consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) {
+		Sleep(atoi(configuracion.acInterval));
+		while((consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) && !openDSEstaCaido) {
 			cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
 		}
 
-		cout << "No hay mensajes nuevos!" << endl;
+		openDSEstaCaido = 0;
 	
-		Sleep(atoi(configuracion.acInterval));
 	}
 	
 	system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
@@ -183,7 +186,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	xmlCleanupParser();
 
 
-	cout << "\nPara logger: En la BD finalmente inserto:" << endl;
+	cout << "\nPara logger: En la BD se intentara insertar:" << endl;
 	cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
 	cout << "Id del articulo: " << articulo.uiArticleID << endl;
 	cout << "Head del articulo: " << articulo.sHead << endl;
@@ -191,8 +194,37 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 
 	//	Persisto el articulo en la BD.
 	insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
-	if(stPLDAPSession->errorCode!=0)
-		printf("no se pudo conectar");
+	if(stPLDAPSession->errorCode!=0) {
+		cout << "Debido a que hubo un problema con OpenDS el mensaje se reencolara para su posterior procesamiento." << endl;
+		colaMsmq.insertarMensaje(pMsg);
+		openDSEstaCaido = 1;
+		cout << "El NNTP Process Server se cerrara. Por favor, levante OpenDS y vuelva a correr este servidor." << endl;
+		if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
+			cout << "HeapFree error en articulo.sNewsgroup." << endl;
+		}
+		if( ! HeapFree( handle, 0, articulo.sHead ) ) {
+				cout << "HeapFree error en articulo.sHead." << endl;
+		}
+		if( ! HeapFree( handle, 0, articulo.sBody) ) {
+				cout << "HeapFree error en articulo.sBody." << endl;
+		}
+		if( ! HeapFree( handle, 0, xmlCompleto ) ) {
+				cout << "HeapFree error en xmlCompleto." << endl;
+		}
+
+		// Destruyo el heap.
+		if( ! HeapDestroy( handle ) ) {
+			cout << "HeapDestroy error." << endl;
+		}
+		cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
+		exit(1);
+	} else {
+		cout << "\nPara logger: Se inserto el siguiente mensaje en OpenDS: " << endl;
+		cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
+		cout << "Id del articulo: " << articulo.uiArticleID << endl;
+		cout << "Head del articulo: " << articulo.sHead << endl;
+		cout << "Body del articulo: " << articulo.sBody << endl;	
+	}
 
 	if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
 			cout << "HeapFree error en articulo.sNewsgroup." << endl;
