@@ -428,12 +428,12 @@ void gestionarSenialCtrlC(int senial){
 	printf("\nHa pulsado CTRL + C (señal numero %d)\n", senial);
 	printf("Se cerrarán los sockets asociados y el servidor.\n");
 	int resultado = close(ficheroServer);
-	if(resultado == 0) {
+	/*if(resultado == 0) {
 		printf("CLOSE OK");
 	}
 	else {
 		printf("CLOSE PAL ORTO");
-	}
+	}*/
 	exit(1);
 }
 
