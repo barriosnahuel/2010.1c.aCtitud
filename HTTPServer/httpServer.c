@@ -460,6 +460,8 @@ int crearConexionConSocket(stConfiguracion* stConf, int* ficheroServer,
 	if (bind(*ficheroServer, (const struct sockaddr *) &(*server),
 			sizeof(struct sockaddr)) == -1) {
 		LoguearError("Error al asociar el puerto al socket.");
+		/*TODO borrar la línea que sigue */
+		printf("--error %s \n",  strerror(errno));
 		exit(-1);
 	}
 	LoguearInformacion("Se asocio bien el puerto al socket.");
