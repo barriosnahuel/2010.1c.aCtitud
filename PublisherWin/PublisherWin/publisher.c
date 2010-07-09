@@ -53,7 +53,6 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 		HeapReAlloc(*handler,0,*cadena,(DWORD)size );
 		strcat(*cadena,tempCad);
 	}
-	printf("HEAD INGRESADO:%s",*cadena);
 	return 0;
 }
 
@@ -62,7 +61,7 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 unsigned __stdcall publisherFunction(void* threadParameters)
 {
 	struct news noticia;
-	char head[BUFFERSIZE] = "NACE UN NUEVO BILL GATES";
+	char *head;
 	char body[BUFFERSIZE] = "LINUX NO EXISTIS";
 
 	stThreadParameters stParametros = *((stThreadParameters*) threadParameters);
@@ -73,14 +72,19 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		printf("HeapCreate error.\n");
 
 	printf("<------------------- Ingreso de Noticia aCtitud -------------------> \n");
-	//VOY A USAR CAMPOS ESTATICOS PERO LA FUNCION LECTURADINAMICA ESTA AHIII DE SALIR JAJA
-/*	printf("Ingrese el HEAD de la noticia:");
-	gets(head);
-	printf("Ingrese el BODY de la noticia:");
-	gets(body);
-*/	
-	printf("HEAD LEIDO: %s \n",head);
-	printf("BODY LEIDA: %s \n", body);
+
+head = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
+ZeroMemory(head,2);
+printf("Ingrese el HEAD de la noticia: ");
+lecturaDinamica(&head,&(stParametros.memoryHandler));
+printf("HEAD INGRESADO: %s",head);
+
+body = (char*)HeapAlloc(stParametros.memoryHandler,HEAP_ZERO_MEMORY,2);
+ZeroMemory(body,2);
+printf("Ingrese el body de la noticia: ");
+lecturaDinamica(&body,&(stParametros.memoryHandler));
+printf("body INGRESADO: %s",body);
+
 	noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
 	noticia.largos.headlen = strlen(head)+1;
 	noticia.largos.bodylen = strlen(body)+1;
@@ -98,16 +102,15 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	noticia.transmitted = "0" ; 
 
 	
-	printf("noticia.newsgroup : %s \n",noticia.newsgroup);
-	printf("noticia.head : %s \n",noticia.head);
-	printf("noticia.body : %s \n",noticia.body);
-	printf("noticia.transmitted : %s \n",noticia.transmitted);	
+	printf("noticia.newsgroup: %s \n",noticia.newsgroup);
+	printf("noticia.head: %s \n",noticia.head);
+	printf("noticia.body: %s \n",noticia.body);
+	printf("noticia.transmitted: %s \n",noticia.transmitted);	
 	
 		
 	printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
 	
 	createDb(&stParametros.dbHandler, &stParametros.memoryHandler,&stParametros.newsgroup);
-	//noticia.id = lastID(&stParametros.dbHandler) + 1 ;
 	generateNewID(&stParametros.dbHandler, &noticia.id);
 	
 	putArticle(&noticia,&stParametros.dbHandler,&stParametros.memoryHandler);	
@@ -153,22 +156,19 @@ unsigned __stdcall senderFunction(void* threadParameters)
 
 int main(){
 
-	//Carga configuracion --> Ip y puerto del servidor NNTP
-	/*struct stConfiguracion configuracion;
-	
-	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
-    cout<<"Puerto:"<<configuracion.appPort<<" IP:"<<configuracion.serverIP<<endl;
-	*/
 	char tempEsperaSender[32];
 	char tempPuerto[8];
+
 	//THREAD CLIENTE
 	stThreadParameters stParameters;
 	unsigned threadProcesarRequest;
 	HANDLE threadCliente; 
+
 	//THREAD SENDER
 	stSenderParameters stSender;
 	unsigned threadProcesarSender;
 	HANDLE threadSender;
+
 	//CONFIGURACION PARA EL SENDER
 	LPCSTR archivoConfiguracion = "../configuracion.ini";
 	GetPrivateProfileString("configuracion","IPNNTP",0,stSender.ipNNTP,16,archivoConfiguracion);
@@ -176,10 +176,10 @@ int main(){
 	GetPrivateProfileString("configuracion","TIEMPO",0,tempEsperaSender,32,archivoConfiguracion);
 	stSender.puertoNNTP = atoi(tempPuerto);
 	stSender.tiempoEspera = atoi(tempEsperaSender);
+
 	//CONFIGURACION THREAD CLIENTE INTERFAZ
 	GetPrivateProfileString("configuracion","NEWSGROUP",0,stParameters.newsgroup,256,archivoConfiguracion);
 	strcpy(stSender.newsgroup,stParameters.newsgroup); //el sender tambien necesita el nombre del newsgroup para levantar db
-	//strcpy(stParameters.newsgroup,"LA NACION");
 
 	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stParameters, 
 		0, &threadProcesarRequest))!=0){
