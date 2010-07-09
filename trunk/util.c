@@ -18,6 +18,44 @@ char* substringTill(char** sDest, const char* sSource, unsigned int till){
 	*((*sDest)+till)= '\0';
 }
 
+char* reemplazarBarraNPorBR(char** unaCadena){
+	char* aux;
+	asprintf(&aux, "%s", *unaCadena);
+	asprintf(unaCadena, "%s", "");
+	int index= 0;
+
+	while(index<strlen(aux)){
+
+		/*	Busco el index del \n	*/
+		for(index= 0; aux[index]!='\n' && index!=strlen(aux); index++)
+			;
+
+		/*	Le asigno el resto de lo que le queda, es decir desde el \n en adelante.	*/
+		if(index==strlen(aux)){
+			asprintf(unaCadena, "%s%s", *unaCadena, aux);
+			return *unaCadena;
+		}
+
+		/*	Obtengo un char* desde el inicio hasta el \n	*/
+		char* tmp;
+		substringTill(&tmp, aux, index);
+
+		/*	Al char* anterior le concateno el tag <BR />	*/
+		strcat(tmp, "<BR />");
+
+		/*	Concateno la parte nueva, con lo que ya tenia	*/
+		asprintf(unaCadena, "%s%s", *unaCadena, tmp);
+
+		/*	Le asigno el resto de lo que le queda, es decir desde el \n en adelante.	*/
+		substringFrom(&aux, aux, index+1);
+
+		/*	Vuelvo a cero el index, por la linea anterior.	*/
+		index= 0;
+	}
+
+	return *unaCadena;
+}
+
 
 void pasarAMayusculas(char* sCadena){
 	LoguearDebugging("--> pasarAMayusculas()");
