@@ -125,12 +125,12 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
  */
 void generateNewID(DB** dbp, char** buffer){
 	time_t rawtime;
-	struct tm * timeinfo;
+	struct tm timeinfo;
 	
 	time (&rawtime);
-	timeinfo = localtime(&rawtime);
+    _localtime64_s(&timeinfo,&rawtime);
 
-	strftime (*buffer, 11, "%m%d%H%M%S", timeinfo);//	El 11 es la longitud, son 10 mas el \0, Deberia haber usado la constante BERKELEY_ID_LEN, pero pincha.
+	strftime (*buffer, 11, "%m%d%H%M%S", &timeinfo);//	El 11 es la longitud, son 10 mas el \0, Deberia haber usado la constante BERKELEY_ID_LEN, pero pincha.
 
 	//	Borro los ceros a la izquierda.
 	while(**buffer=='0')

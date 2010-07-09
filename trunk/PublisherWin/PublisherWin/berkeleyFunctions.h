@@ -28,10 +28,10 @@ typedef struct news{
    char* transmitted; // 0 NO FUE TRANSMITIDA , 1 SI .
 }news;
 
-	void putArticle(DB** dbp);
+	void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler);
 	void getArticle(DB** dbp);
 	void closeDb(DB** dbp);
-	void createDb(DB** dbp, HANDLE** memoryHandle);
+	void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName);
 	int lastID(DB** dbp); //Recorre db y busca la ultima id asignada
 
 	
