@@ -17,7 +17,7 @@
 #include "../../funcionesMSMQ.hpp"
 #include "LdapWrapperHandler-Win.hpp"
 #include "xmlFunctions.hpp"
-#include "logger-win.hpp"
+#include "../../logger-win.hpp"
 
 //	Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #define DEFAULT_BUFLEN 512/*	ESTO CREO QUE NO HACE FALTA.*/
