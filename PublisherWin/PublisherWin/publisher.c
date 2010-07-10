@@ -22,13 +22,14 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 	*cadena[0]='\0';
 	size=1;
 
+	fflush(stdin);
 	for(i=0;(car = getchar())!= '^' ;i++){
 		tempCad[i]=car;
 		if( i ==BUFFERCADSIZE){
 			tempCad[BUFFERCADSIZE]='\0';
 			size = size + BUFFERCADSIZE;
 			HeapReAlloc(*handler,0,*cadena,(DWORD)size);
-			strcat_s(*cadena,strlen(*cadena),tempCad);
+			strcat_s(*cadena,(DWORD)size,tempCad);
 			tempCad[0]=car;
 			i=0;
 		}
@@ -37,8 +38,9 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 		size = size + i;
 		tempCad[i]='\0';
 		HeapReAlloc(*handler,0,*cadena,(DWORD)size );
-		strcat_s(*cadena,strlen(*cadena),tempCad);
+		strcat_s(*cadena,(DWORD)size,tempCad);
 	}
+	fflush(stdin);
 }
 
 
@@ -71,14 +73,12 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		printf("Ingrese el HEAD de la noticia: ");
 		lecturaDinamica(&head,&memoryHandler);
 		printf("HEAD INGRESADO: %s",head);
-		fflush(stdin);
 
 		body = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
 		ZeroMemory(body,2);
 		printf("Ingrese el body de la noticia: ");
 		lecturaDinamica(&body,&(memoryHandler));
 		printf("body INGRESADO: %s",body);
-		fflush(stdin);
 
 		noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
 		noticia.newsgroup = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.newsgrouplen);
@@ -116,6 +116,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		scanf_s("%c",&respuesta,1);
 		respuesta = toupper(respuesta);
 		fflush(stdin);
+
 		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,head);
 		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,body);
 		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,noticia.newsgroup);
