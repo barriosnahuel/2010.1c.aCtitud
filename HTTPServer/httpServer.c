@@ -369,7 +369,7 @@ void* procesarRequestFuncionThread(void* threadParameters) {
 	
 	/*	Obtengo la operacion, el grupo de noticia y noticia	segun corresponda*/
 	unsigned int uiOperation;
-	if (strlen(sRecursoPedido) == 1)
+	if (strlen(sRecursoPedido) == 1 || (strcmp(sRecursoPedido, "/index")==0))
 		uiOperation= REQUEST_TYPE_NEWSGROUP;
 	else {
 		/* Obtengo el grupo de noticias. */
