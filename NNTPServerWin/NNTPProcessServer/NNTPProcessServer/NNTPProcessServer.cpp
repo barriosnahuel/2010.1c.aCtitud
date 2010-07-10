@@ -142,8 +142,8 @@ int main(int argc, char** argv){
 		}
 
 		while((consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) && !openDSEstaCaido) {
-			cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
-			logger.LoguearInformacion("Se consumio un mensaje de la cola y se lo guardo en OpenDS");
+			cout << "Se consumio un mensaje de la cola" << endl;
+			logger.LoguearInformacion("Se consumio un mensaje de la cola");
 		}
 	
 	}
@@ -244,31 +244,14 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 
 	//	Persisto el articulo en la BD.
 	insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
-	if(stPLDAPSession->errorCode!=0) {
+	if(stPLDAPSession->errorCode == 81) {
 		logger.LoguearError("Debido a que hubo un problema con OpenDS el mensaje se reencolara para su posterior procesamiento.");
 		colaMsmq.insertarMensaje(pMsg);
 		openDSEstaCaido = 1;
-	/*	cout << "El NNTP Process Server se cerrara. Por favor, levante OpenDS y vuelva a correr este servidor." << endl;
-		if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
-			cout << "HeapFree error en articulo.sNewsgroup." << endl;
-		}
-		if( ! HeapFree( handle, 0, articulo.sHead ) ) {
-				cout << "HeapFree error en articulo.sHead." << endl;
-		}
-		if( ! HeapFree( handle, 0, articulo.sBody) ) {
-				cout << "HeapFree error en articulo.sBody." << endl;
-		}
-		if( ! HeapFree( handle, 0, xmlCompleto ) ) {
-				cout << "HeapFree error en xmlCompleto." << endl;
-		}
-
-		// Destruyo el heap.
-		if( ! HeapDestroy( handle ) ) {
-			cout << "HeapDestroy error." << endl;
-		}
-		cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
-		exit(1);*/
-	} else {
+	} else if((stPLDAPSession->errorCode != 0) && (stPLDAPSession->errorCode != 81)) {
+		logger.LoguearError("Problema al insertar el articulo. El articulo se descartara");
+	}
+	else {
 		logger.LoguearDebugging("Se inserto correctamente el articulo.");
 	}
 
