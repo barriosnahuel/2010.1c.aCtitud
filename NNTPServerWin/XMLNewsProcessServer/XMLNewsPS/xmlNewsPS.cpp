@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <process.h>
 #include "funcionesMSMQ.hpp"
+#include "logger-win.hpp"
 using namespace std;
 /*
 #include<libxml/tree.h>
@@ -33,6 +34,10 @@ typedef struct stIRC_IPC{
 #define LARGOPAYLOAD	   2
 #define LARGOPAYLOADLENGTH 5
 
+/* nombre del proceso */
+char czNombreProceso[20];
+Logger logger;
+
 typedef struct stConfiguracion{
 	char	appPort[6];
     char	serverIP[16]; 
@@ -48,8 +53,9 @@ typedef struct stThreadParameters {
 
 int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct stConfiguracion* configuracion)
 {
+	logger.LoguearDebugging("--> crearConexionSocket()");
 	if((*ficheroServer = socket (AF_INET, SOCK_STREAM, 0))== INVALID_SOCKET){
-		cout<<"No se pudo crear el socket"<<endl;
+		logger.LoguearError("No se pudo crear el socket");
 		return EXIT_FAILURE;
 	}
 	
@@ -59,22 +65,23 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
     server->sin_port		 = htons((u_short)puerto);
 	
 	if (bind(*ficheroServer, (SOCKADDR*) &(*server), sizeof(*server))==-1){
-	  cout<<"Error al asociar el puerto al socket."<<endl;
+	  logger.LoguearError("Error al asociar el puerto al socket.");
 	  return EXIT_FAILURE;
 	}	
 	if(listen(*ficheroServer,1)==-1){
-	  cout<<"No se pudo dejar el socket a la escucha de conexiones entrantes"<<endl;
+	  logger.LoguearError("No se pudo dejar el socket a la escucha de conexiones entrantes");
 	  return EXIT_FAILURE;
 	}
 	
-	cout <<"Se creo el socket correctamente"<<endl;	
+	logger.LoguearInformacion("Se creo el socket correctamente");
+	logger.LoguearDebugging("<-- crearConexionSocket()");
 	return EXIT_SUCCESS;
 
 };
 
 unsigned __stdcall clientFunction(void* threadParameters)
 {
-	cout<<"Entro al threadCliente"<<endl;
+	logger.LoguearDebugging("--> clientFunction()");
 	
 	/* HeapCreate( 
 					Opciones del heap, 
@@ -84,7 +91,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	HANDLE handle = HeapCreate( 0, 1024, 0 );
 	if( handle == NULL ) {
-		cout << "HeapCreate error." << endl;
+		logger.LoguearError("HeapCreate error.");
 	}
 
 	
@@ -95,11 +102,11 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// Reservamos 1024 bytes (BUFFERSIZE) que es lo q corresponde segun restriccion de TP.
 	char* handshake = (char*) HeapAlloc( handle, 0, BUFFERSIZE);
 	if( handshake == NULL ) {
-		cout << "HeapAlloc error." << endl;
+		logger.LoguearError("HeapAlloc error.");
 	}
 	char *estructuraEnBytesIPCRPC = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	if( estructuraEnBytesIPCRPC == NULL ) {
-		cout << "HeapAlloc error." << endl;
+		logger.LoguearError("HeapAlloc error.");
 	}
 
 	// ################## Variables para el response ####################################
@@ -113,7 +120,7 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// ################## FIN Variables para el response ####################################
 	
 	// ################## INICIO MENSAJE HANDSHAKE ###################################
-	cout << "---------------- Arranco a procesar el Handshake ----------------" << endl;
+	logger.LoguearDebugging("---------------- Arranco a procesar el Handshake ----------------");
 	bytesRecibidos = recv(stParametros.ficheroCliente, handshake, BUFFERSIZE, 0);
 	
 	CopyMemory(&stParametros.datosRecibidos.largos,handshake,sizeof(largos_IRCIPC));
@@ -121,10 +128,10 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	CopyMemory(&stParametros.datosRecibidos.payloadDescriptor, handshake+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor , stParametros.datosRecibidos.largos.lenPayloadDescriptor);
 	CopyMemory(&stParametros.datosRecibidos.payloadLength,handshake+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor, stParametros.datosRecibidos.largos.lenPayloadLength);
 	
-	cout << "Id descriptor handshake: " << stParametros.datosRecibidos.idDescriptor << endl;
+/*	cout << "Id descriptor handshake: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor handshake: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength handshake: " << stParametros.datosRecibidos.payloadLength << endl;
-	
+*/	
 	//cout << "payload handshake: " << stParametros.datosRecibidos.payloadXML << endl;
 
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
@@ -143,23 +150,24 @@ unsigned __stdcall clientFunction(void* threadParameters)
 		handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
 
 		if ((bytesEnviados = send(stParametros.ficheroCliente, handshakeResponse, (int)strlen(handshakeResponse), 0)) == -1) {
-				cout << "Error al enviar response handshake" << endl;
+				logger.LoguearError("Error al enviar response handshake");
 		}
 		if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
-			cout << "HeapFree error en estructuraEnBytesIPCRPC." << endl;
+			logger.LoguearError("HeapFree error en estructuraEnBytesIPCRPC.");
 		}
 		if( ! HeapFree( handle, 0, handshake ) ) {
-			cout << "HeapFree error en handshake." << endl;
+			logger.LoguearError("HeapFree error en handshake.");
 		}
 
 		// Destruyo el heap.
 		if( ! HeapDestroy( handle ) ) {
-			cout << "HeapDestroy error." << endl;
+			logger.LoguearError("HeapDestroy error.");
 		}
 
 		cout << "Se cerrara el thread ya que el handshake es invalido." << endl;
 
 		_endthreadex(0);
+		logger.LoguearDebugging("<-- clientFunction()");
 		return 1;
 	}
 	// ################## FIN VALIDACION HANDSHAKE ##################
@@ -170,16 +178,16 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	// Concateno los valores para responderle al publisher handshake OK.
 	handshakeResponse = strcat(idDescriptor, payloadDescriptor);
 	handshakeResponse = strcat(handshakeResponse, payloadLengthHandshake);
-	cout << "Enviare al publisher el siguiente response del handshake: " << handshakeResponse << endl;
+	logger.LoguearInformacion("Enviare al publisher el response del handshake");
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, handshakeResponse, (int)strlen(handshakeResponse), 0)) == -1)
-		cout << "Error al enviar response handshake" << endl;
+		logger.LoguearError("Error al enviar response handshake");
 	
-	cout << "---------------- Termino de procesar el Handshake ----------------" << endl;
+	logger.LoguearDebugging("---------------- Termino de procesar el Handshake ----------------");
 	// ################## FIN MENSAJE HANDSHAKE ###################################
 
 	// ################## INICIO MENSAJE CON XML ###################################
-	cout << "---------------- Arranco a procesar el mensaje con XML ----------------" << endl;
+	logger.LoguearDebugging("---------------- Arranco a procesar el mensaje con XML ----------------");
 	bytesRecibidos = recv(stParametros.ficheroCliente, estructuraEnBytesIPCRPC, BUFFERSIZE, 0);
 
 	CopyMemory(&stParametros.datosRecibidos.largos,estructuraEnBytesIPCRPC,sizeof(largos_IRCIPC));
@@ -191,13 +199,13 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	
 	CopyMemory(stParametros.datosRecibidos.payloadXML,estructuraEnBytesIPCRPC+ sizeof(largos_IRCIPC) + stParametros.datosRecibidos.largos.lenIdDescriptor + stParametros.datosRecibidos.largos.lenPayloadDescriptor + stParametros.datosRecibidos.largos.lenPayloadLength,
 			   atoi(stParametros.datosRecibidos.payloadLength));
-		
+	/*	
 	cout << "Id descriptor: " << stParametros.datosRecibidos.idDescriptor << endl;
 	cout << "payloadDescriptor: " << stParametros.datosRecibidos.payloadDescriptor << endl;
 	cout << "payloadLength: " << stParametros.datosRecibidos.payloadLength << endl;
 	cout << "Payload: " << stParametros.datosRecibidos.payloadXML << endl;
 
-	
+	*/
 	idDescriptor = stParametros.datosRecibidos.idDescriptor;
 	payloadXMLResponse = "RequestOK";
 	payloadLengthXml = "0009";
@@ -206,12 +214,12 @@ unsigned __stdcall clientFunction(void* threadParameters)
 	xmlResponse = strcat(xmlResponse, payloadDescriptor);
 	xmlResponse = strcat(xmlResponse, payloadLengthXml);
 	xmlResponse = strcat(xmlResponse, payloadXMLResponse);
-	cout << "Enviare al publisher el siguiente response del xml: " << xmlResponse << endl;
+	logger.LoguearInformacion("Enviare al publisher el response del xml");
 
 	if ((bytesEnviados = send(stParametros.ficheroCliente, xmlResponse, (int)strlen(xmlResponse), 0)) == -1)
-		cout << "Error al enviar response" << endl;
+		logger.LoguearError("Error al enviar response");
 
-	cout << "---------------- Termino de procesar el mensaje con XML ----------------" << endl;
+	logger.LoguearDebugging("---------------- Termino de procesar el mensaje con XML ----------------");
 
 	// ################## FIN MENSAJE CON XML ###################################
 
@@ -227,24 +235,29 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 	// Libero la memoria reservada.
 	if( ! HeapFree( handle, 0, estructuraEnBytesIPCRPC ) ) {
-		cout << "HeapFree error en estructuraEnBytesIPCRPC." << endl;
+		logger.LoguearError("HeapFree error en estructuraEnBytesIPCRPC.");
 	}
 	if( ! HeapFree( handle, 0, handshake ) ) {
-		cout << "HeapFree error en handshake." << endl;
+		logger.LoguearError("HeapFree error en handshake.");
 	}
 
 	// Destruyo el heap.
 	if( ! HeapDestroy( handle ) ) {
-		cout << "HeapDestroy error." << endl;
+		logger.LoguearError("HeapDestroy error.");
 	}
 
 	DeleteObject(pMsg);
 	_endthreadex(0);
+	logger.LoguearDebugging("<-- clientFunction()");
     return 0;
 }
 
 
-int main(){
+int main(int argc, char** argv){
+	memset(czNombreProceso, 0, 20);
+	strcpy(czNombreProceso, "Xml_News_Process_Server\0");
+	strcpy(argv[0], czNombreProceso);
+    logger.LoguearDebugging("--> Main()");
 	//Carga configuracion --> Ip y puerto del serividor
 	struct stConfiguracion configuracion;
 	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
@@ -266,7 +279,7 @@ int main(){
 	
 	/* Se crea el socket que quedara a la escucha de conexiones */
 	if(crearConexionSocket(&ficheroServer,&server,&configuracion)==1){
-		cout<<"No se pudo crear la conexion"<<endl;
+		logger.LoguearError("No se pudo crear la conexion");
 		return EXIT_FAILURE;
 	}
 	
@@ -275,7 +288,7 @@ int main(){
 		struct sockaddr_in cliente;
 		SOCKET ficheroCliente = accept(ficheroServer,(sockaddr*)&cliente,&addrlen);
 		if(ficheroCliente != -1){
-			cout<<"Conexion entrante.."<<endl;
+			logger.LoguearInformacion("Conexion entrante..");
 			
 		    //Le seteo los parametros al nuevo thread
 			
@@ -291,15 +304,16 @@ int main(){
 			
 				CloseHandle(threadCliente);
 			}else{
-				cout<<"No se pudo crear el thread para procesar el request"<<endl;
+				logger.LoguearError("No se pudo crear el thread para procesar el request");
 			}
 			
 		}
 		else{
-			cout<<"Problemas al aceptar conexion cliente."<<endl;
+			logger.LoguearError("Problemas al aceptar conexion cliente.");
 		}
 	}
 	
 	system("PAUSE");
+	logger.LoguearDebugging("<-- Main()");
 	return 0;
 }
