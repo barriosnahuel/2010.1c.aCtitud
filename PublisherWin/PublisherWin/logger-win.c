@@ -96,4 +96,5 @@ void EscribirLog(char cTipoLog, char *czData) {
    CloseHandle(arch);
    HeapFree(memoryHandler,HEAP_ZERO_MEMORY,czNombreArch);
    HeapFree(memoryHandler,HEAP_ZERO_MEMORY,czWriteBuff);
+   HeapDestroy(memoryHandler);
 }
