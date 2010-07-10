@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\logger-win.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\NNTPProcessServer.cpp"
 				>
 			</File>
@@ -234,6 +238,10 @@
 			</File>
 			<File
 				RelativePath=".\LdapWrapperHandler-Win.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\logger-win.hpp"
 				>
 			</File>
 			<File
