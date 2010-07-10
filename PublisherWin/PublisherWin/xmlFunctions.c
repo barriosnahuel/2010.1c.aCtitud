@@ -31,6 +31,30 @@ typedef struct stIRC_IPC{
 #define LARGOPAYLOADLENGTH 5
 #define DEFAULT_BUFLEN 512
 
+void encoding(char*cadena)
+{
+	int i ;
+	for (i=0;cadena[i]!='\0';i++){
+		switch(cadena[i]) 
+		{
+		case(-91):
+			{cadena[i]='N';break;}
+		case (-92):
+			{cadena[i]='n';break;}
+		case -96:
+			{cadena[i]='a';break;}
+		case -126:
+			{cadena[i]='e';break;}
+		case -95:
+			{cadena[i]='i';break;}
+		case -94:
+			{cadena[i]='o';break;}
+		case -93:
+			{cadena[i]='u';break;}
+		}
+	}
+	return;
+}
 
 xmlDocPtr crearXML(struct news* noticia, char* key)
  {
@@ -46,7 +70,8 @@ xmlDocPtr crearXML(struct news* noticia, char* key)
 	//Nodo padre
 	root = xmlNewDocNode (doc, NULL, NEWS, NULL);
 	xmlDocSetRootElement (doc, root);
-	
+	encoding(noticia->head);
+	encoding(noticia->body);
 	//Hijos
 	xmlNewChild (root, NULL, "newsgroup",  noticia->newsgroup);
 	xmlNewChild (root, NULL, "idNoticia", key);
