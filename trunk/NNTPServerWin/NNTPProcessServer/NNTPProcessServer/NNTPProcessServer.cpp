@@ -17,6 +17,8 @@
 #include "../../funcionesMSMQ.hpp"
 #include "LdapWrapperHandler-Win.hpp"
 #include "xmlFunctions.hpp"
+#include "logger-win.hpp"
+
 //	Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #define DEFAULT_BUFLEN 512/*	ESTO CREO QUE NO HACE FALTA.*/
 
@@ -37,6 +39,10 @@ typedef struct news{
    char*   newsgroup;
    unsigned int id;
 }news;
+
+/* nombre del proceso */
+char czNombreProceso[20];
+Logger logger;
 
 int openDSEstaCaido;
 
@@ -64,18 +70,30 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server, struc
 							Definiciones de funciones
  ***********************************************************************************************/ 
 int main(int argc, char** argv){
+	memset(czNombreProceso, 0, 20);
+    strcpy(czNombreProceso, "NNTP_Process_Srvr\0");
+    strcpy(argv[0], czNombreProceso);
+	logger.LoguearDebugging("--> Main()");
+	
 	//	Carga configuracion
 	struct stConfiguracion configuracion;
 	LPCSTR archivoConfiguracion= "..\\configuracion.ini";
 	GetPrivateProfileString("configuracion","OpenDSServer", configuracion.szDefault, configuracion.acOpenDSServer, 16, archivoConfiguracion);
 	GetPrivateProfileString("configuracion","OpenDSPort", configuracion.szDefault, configuracion.acOpenDSPort, 6, archivoConfiguracion);
 	GetPrivateProfileString("configuracion","Interval", configuracion.szDefault, configuracion.acInterval, 10, archivoConfiguracion);
-	
-	cout<<"Puerto:"<<configuracion.acOpenDSPort<<"; IP:"<<configuracion.acOpenDSServer<<"; Interval:"<<configuracion.acInterval<<endl;
+	logger.LoguearDebugging("Archivo de configuracion cargado correctamente.");
+	logger.LoguearInformacion("Archivo de configuracion cargado con:");
+	logger.LoguearInformacion("Puerto OpenDS:");
+	logger.LoguearInformacion(configuracion.acOpenDSPort);
+	logger.LoguearInformacion("IP OpenDS:");
+	logger.LoguearInformacion(configuracion.acOpenDSServer);
+	logger.LoguearInformacion("Intervalo de tiempo:");
+	logger.LoguearInformacion(configuracion.acInterval);
 
 	//	Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
+	logger.LoguearDebugging("Cola MSMQ Creada.");
 
 	/****************************************************
 	 *	Conecto a OpenDS por medio del LDAP Wrapper		*
@@ -86,15 +104,19 @@ int main(int argc, char** argv){
 	PLDAP_SESSION_OP stPLDAPSessionOperations= newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 	if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
 			&stPLDAPSession, &stPLDAPSessionOperations)) {
-		cout << "No se pudo conectar a OpenDS." << endl;
-		
-		//LoguearInformacion("Se libero la memoria de LDAP/OpenDS correctamente.");
-		//LoguearError("No se pudo conectar a OpenDS.");
+		logger.LoguearError("No se pudo conectar con OpenDS");
+
 		system("PAUSE");
 		return -1;
 	}
-	cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
 	openDSEstaCaido = 0;
+	logger.LoguearDebugging("Conectado a OpenDS correctamente.");
+	logger.LoguearInformacion("OpenDS conectado correctamente en:");
+	logger.LoguearInformacion("IP:");
+	logger.LoguearInformacion(configuracion.acOpenDSServer);
+	logger.LoguearInformacion("Puerto");
+	logger.LoguearInformacion(configuracion.acOpenDSPort);
+	
 
 	//	Comienzo a iterar infinitamente, con un intervalo de X tiempo el cual logro llamando a
 	//	la funcion sleep(intervaloDeTiempo); donde intervaloDeTiempo es una variable que cargamos
@@ -112,22 +134,23 @@ int main(int argc, char** argv){
 			PLDAP_SESSION_OP stPLDAPSessionOperations= newLDAPSessionOperations(); /*	Me permite operar sobre una sesion	*/
 			if (!crearConexionLDAP(configuracion.acOpenDSServer, atoi(configuracion.acOpenDSPort), &stPLDAPContext, &stPLDAPContextOperations,
 				&stPLDAPSession, &stPLDAPSessionOperations)) {
-				cout << "No se pudo conectar a OpenDS." << endl;
+				logger.LoguearError("No se pudo reconectar con OpenDS");
 			} else {
 				openDSEstaCaido = 0;
-				cout << "Conectado a OpenDS en: IP= " << configuracion.acOpenDSServer << "; Port= " << configuracion.acOpenDSPort << endl;
+				logger.LoguearDebugging("Reconexion con OpenDS OK.");
 			}
 		}
 
 		while((consumirMensajesYAlmacenarEnBD(colaMsmq, stPLDAPSession, stPLDAPSessionOperations) != 0) && !openDSEstaCaido) {
 			cout << "Se consumio un mensaje de la cola y se guardo en OpenDS" << endl;
+			logger.LoguearInformacion("Se consumio un mensaje de la cola y se lo guardo en OpenDS");
 		}
 	
 	}
 	
 	 /*        Cierro/Libero lo relacionado a la BD        */
 	liberarRecursosLdap(stPLDAPContext, stPLDAPContextOperations, stPLDAPSession, stPLDAPSessionOperations);
-	cout << "Libere recursos Ldap." << endl;
+	logger.LoguearDebugging("Libere los recursos de LDAP.");
 	
 	system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
 	return 0;
@@ -137,11 +160,11 @@ int main(int argc, char** argv){
 int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 									, PLDAP_SESSION stPLDAPSession
 									, PLDAP_SESSION_OP stPLDAPSessionOperations){
-	cout << "--> consumirMensajesYAlmacenarEnBD()" << endl;
+	logger.LoguearDebugging("--> consumirMensajesYAlmacenarEnBD()");
 	
 	HANDLE handle = HeapCreate( 0, 1024, 0 );
 	if( handle == NULL ) {
-		cout << "HeapCreate error." << endl;
+		logger.LoguearDebugging("Error en HeapCreate()");
 	}
 
 	xmlDocPtr doc;
@@ -153,20 +176,22 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 
 	if(pMsg == NULL) {
 		// No hay mensajes en la cola.
-		cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
+		logger.LoguearInformacion("No hay mensajes en la cola.");
+		logger.LoguearDebugging("<-- consumirMensajesYAlmacenarEnBD()");
 		return 0;
 	}
 
 	strcpy(xmlCompleto, (char *)(_bstr_t) pMsg->Body);
-	cout << "Para logger: El xml completo es: " << xmlCompleto << "\n" << endl;
-	
-	cout << "Para logger: --> Comienzo a parsear el XML para obtener sus valores." << endl;
+	logger.LoguearDebugging("El XML recibido completo es:");
+	logger.LoguearDebugging(xmlCompleto);
+
+	logger.LoguearDebugging("Comienzo a parsear el XML para obtener sus valores.");
 	doc = xmlParseMemory(xmlCompleto, strlen(xmlCompleto));
 	if(doc!=NULL){ //si la variable doc devuelve un valor diferente a NULL, se dice que el documento se ha parseado correctamente.
-		cout << "Se parseo la memoria correctamente y se obtuvo el documento XML" << endl;
+		logger.LoguearInformacion("Se parseo la memoria correctamente y se obtuvo el documento XML.");
 	}
 	else {
-		cout << "El xml no se pudo parsear." << endl;
+		logger.LoguearError("El xml no se pudo parsear.");
 		return 0;
 	}
 
@@ -179,21 +204,21 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		if (cur_node->type == XML_ELEMENT_NODE) {
 			switch (contadorNodosReales){
 				case 1:
-					cout << "Para logger: proceso el nodo newsgroup" << endl;
+					logger.LoguearDebugging("Se procesa el nodo newsgroup.");
 					articulo.sNewsgroup= (char*) HeapAlloc(handle, 0, BUFFERSIZE);
 					strcpy(articulo.sNewsgroup, (char*)xmlNodeGetContent(cur_node));					
 					break;
 				case 2:
-					cout << "Para logger: proceso el nodo articleID" << endl;
+					logger.LoguearDebugging("Se procesa el nodo articleID.");
 					articulo.uiArticleID= atoi((char*)xmlNodeGetContent(cur_node));
 					break;
 				case 3:
-					cout << "Para logger: proceso el nodo head" << endl;
+					logger.LoguearDebugging("Se procesa el nodo head.");
 					articulo.sHead= (char*) HeapAlloc(handle, 0, BUFFERSIZE);
 					strcpy(articulo.sHead, (char*)xmlNodeGetContent(cur_node));
 					break;
 				case 4:
-					cout << "Para logger: proceso el nodo body" << endl;
+					logger.LoguearDebugging("Se procesa el nodo body.");
 					articulo.sBody= (char*) HeapAlloc(handle, 0, BUFFERSIZE);
 					strcpy(articulo.sBody, (char*)xmlNodeGetContent(cur_node));
 					break;
@@ -205,17 +230,22 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	//	Libera las variables globales de la biblioteca que puedan haber sido usadas en el parseo
 	xmlCleanupParser();
 
-
-	cout << "\nPara logger: En la BD se intentara insertar:" << endl;
-	cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
-	cout << "Id del articulo: " << articulo.uiArticleID << endl;
-	cout << "Head del articulo: " << articulo.sHead << endl;
-	cout << "Body del articulo: " << articulo.sBody << endl;
+	logger.LoguearDebugging("En la Bd se insertara:");
+	logger.LoguearDebugging("Newsgroup:\t");
+	logger.LoguearDebugging(articulo.sNewsgroup);
+	logger.LoguearDebugging("ArticleID:\t");
+	char sArticleID[20];
+	itoa(articulo.uiArticleID, sArticleID, 10);
+	logger.LoguearDebugging(sArticleID);
+	logger.LoguearDebugging("Head:\t");
+	logger.LoguearDebugging(articulo.sHead);
+	logger.LoguearDebugging("Body:\t");
+	logger.LoguearDebugging(articulo.sBody);
 
 	//	Persisto el articulo en la BD.
 	insertEntry(stPLDAPSession, stPLDAPSessionOperations, articulo);
 	if(stPLDAPSession->errorCode!=0) {
-		cout << "Debido a que hubo un problema con OpenDS el mensaje se reencolara para su posterior procesamiento." << endl;
+		logger.LoguearError("Debido a que hubo un problema con OpenDS el mensaje se reencolara para su posterior procesamiento.");
 		colaMsmq.insertarMensaje(pMsg);
 		openDSEstaCaido = 1;
 	/*	cout << "El NNTP Process Server se cerrara. Por favor, levante OpenDS y vuelva a correr este servidor." << endl;
@@ -239,30 +269,27 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
 		exit(1);*/
 	} else {
-		cout << "\nPara logger: Se inserto el siguiente mensaje en OpenDS: " << endl;
-		cout << "Newsgroup del articulo: " << articulo.sNewsgroup << endl;
-		cout << "Id del articulo: " << articulo.uiArticleID << endl;
-		cout << "Head del articulo: " << articulo.sHead << endl;
-		cout << "Body del articulo: " << articulo.sBody << endl;	
+		logger.LoguearDebugging("Se inserto correctamente el articulo.");
 	}
 
 	if( ! HeapFree( handle, 0, articulo.sNewsgroup ) ) {
-			cout << "HeapFree error en articulo.sNewsgroup." << endl;
+		logger.LoguearError("HeapFree error en articulo.sNewsgroup.");
 	}
 	if( ! HeapFree( handle, 0, articulo.sHead ) ) {
-			cout << "HeapFree error en articulo.sHead." << endl;
+		logger.LoguearError("HeapFree error en articulo.sHead.");
 	}
 	if( ! HeapFree( handle, 0, articulo.sBody) ) {
-			cout << "HeapFree error en articulo.sBody." << endl;
+		logger.LoguearError("HeapFree error en articulo.sBody.");
 	}
 	if( ! HeapFree( handle, 0, xmlCompleto ) ) {
-			cout << "HeapFree error en xmlCompleto." << endl;
+		logger.LoguearError("HeapFree error en xmlCompleto.");
 	}
 
 	// Destruyo el heap.
 	if( ! HeapDestroy( handle ) ) {
-		cout << "HeapDestroy error." << endl;
+		logger.LoguearError("Hubo un error en HeapDestroy()");
 	}
-	cout << "<-- consumirMensajesYAlmacenarEnBD()" << endl;
+
+	logger.LoguearDebugging("<-- consumirMensajesYAlmacenarEnBD()");
 	return 1;
 }
