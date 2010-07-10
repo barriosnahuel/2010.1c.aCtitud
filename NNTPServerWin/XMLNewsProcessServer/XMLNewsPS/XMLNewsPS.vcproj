@@ -176,7 +176,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\logger-win.cpp"
+				RelativePath="..\..\logger-win.cpp"
 				>
 			</File>
 			<File
@@ -194,7 +194,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\logger-win.hpp"
+				RelativePath="..\..\logger-win.hpp"
 				>
 			</File>
 		</Filter>

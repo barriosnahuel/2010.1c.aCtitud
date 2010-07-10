@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <process.h>
 #include "funcionesMSMQ.hpp"
-#include "logger-win.hpp"
+#include "../../logger-win.hpp"
 using namespace std;
 /*
 #include<libxml/tree.h>
