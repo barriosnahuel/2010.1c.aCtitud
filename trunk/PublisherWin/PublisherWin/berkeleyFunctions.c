@@ -20,7 +20,7 @@ void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName)
 		
 	if (!(ret = (*dbp)->open(*dbp,NULL, rutaDb , NULL, DB_BTREE, DB_CREATE, 0))){
 		LoguearDebugging("ENTRA A  DBP->OPEN");
-		(*dbp)->err(*dbp, ret, "%s", rutaDb);
+		//*dbp)->err(*dbp, ret, "%s", rutaDb);
 	}
 	
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY, rutaDb );
@@ -101,7 +101,8 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 	
 	}
 	if ((ret = dbCursor->c_close(dbCursor)) != 0){
-		(*dbp)->err(*dbp, ret, "DBcursor->close");
+		//(*dbp)->err(*dbp, ret, "DBcursor->close");
+		LoguearDebugging("DBcursor->close");
 	}
 	
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,noticia->newsgroup);
