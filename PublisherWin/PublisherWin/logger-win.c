@@ -45,7 +45,7 @@ void EscribirLog(char cTipoLog, char *czData) {
    /* se abre o crea al archivo log */
    arch = CreateFile ( czNombreArch, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
    if(arch == INVALID_HANDLE_VALUE) {
-	  printf("Error al generar el archivo Log. (%d)\n", GetLastError());
+	  //printf("Error al generar el archivo Log. (%d)\n", GetLastError());
       return;
    }
 
