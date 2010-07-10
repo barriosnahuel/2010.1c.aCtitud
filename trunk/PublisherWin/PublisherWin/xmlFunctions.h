@@ -7,5 +7,5 @@
 
 	xmlDocPtr crearXML(struct news* noticia, char* key);
 	int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HANDLE** memoryHandle);
-
+	void encoding(char*cadena);
 #endif
