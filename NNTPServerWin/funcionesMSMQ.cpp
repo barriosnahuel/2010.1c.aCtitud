@@ -1,29 +1,35 @@
 #include <iostream>
 #include"funcionesMSMQ.hpp"
+#include "logger-win.hpp"
 using namespace std;
+extern Logger logger;
 
 HRESULT MsmqProcess::crearCola()
 {
+	logger.LoguearDebugging("--> MsmqProcess::crearCola");
 	OleInitialize(NULL);    // Hay que inicializar OLE para usar el COM de MSMQ//
 	IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
 	qInfo->PathName = ".\\Private$\\colaDeNoticias";
 	try
 	{
-	  cout<<"Se intentara crear la cola de mensajes"<<endl;
 	  qInfo->Create();
-	  cout<<"Se creo la cola de mensajes"<<endl;
+	  logger.LoguearDebugging("Se creo la cola de mensajes");
+	  logger.LoguearInformacion("Se creo la cola de mensajes");
 	}
 	catch (_com_error comerr)
 	{
 		/* En caso de que la cola ya exista, ignoro el error y uso la que ya existe. */
-		cout<<"Ya existe una cola con dicho nombre, por lo tanto no sera necesaria su creacion."<<endl;
+		logger.LoguearDebugging("Ya existe una cola con dicho nombre, por lo tanto no sera necesaria su creacion.");
+		logger.LoguearInformacion("Ya existe una cola con dicho nombre, por lo tanto no sera necesaria su creacion.");
 	}
 	CoUninitialize();
+	logger.LoguearDebugging("<-- MsmqProcess::crearCola");
 	return 0;
 }
 
 IMSMQMessagePtr MsmqProcess::desencolarMensaje()
 {
+	logger.LoguearDebugging("--> MsmqProcess::desencolarMensaje");
   OleInitialize(NULL);                                 // Hay que inicializar OLE//
   IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
   IMSMQQueuePtr pQueue;
@@ -39,16 +45,18 @@ IMSMQMessagePtr MsmqProcess::desencolarMensaje()
   pQueue = qInfo->Open(MQ_RECEIVE_ACCESS, MQ_DENY_NONE); 
   pMsg = pQueue->Receive(&vtMissing, &vtMissing, &wantBody, &timeOut);  //Recibimos el mensaje
   if(pMsg == NULL) {
-	  cout<<"No hay mensajes en la cola" << endl;
+	  logger.LoguearDebugging("No hay mensajes en la cola");
 	  return NULL;
   }
   pQueue->Close();
   CoUninitialize();
   return pMsg;
+  logger.LoguearDebugging("<-- MsmqProcess::desencolarMensaje");
 }
 
 void MsmqProcess::leerMensajes()
 {
+	logger.LoguearDebugging("--> MsmqProcess::leerMensajes");
   OleInitialize(NULL);                                 // Hay que inicializar OLE//
   IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
   IMSMQQueuePtr pQueue;
@@ -64,18 +72,20 @@ void MsmqProcess::leerMensajes()
   pQueue = qInfo->Open(MQ_RECEIVE_ACCESS, MQ_DENY_NONE); 
   pMsg = pQueue->Receive(&vtMissing, &vtMissing, &wantBody, &timeOut);  //Recibimos el mensaje
   if(pMsg == NULL) 
-	  cout<<"No hay mensajes en la cola";
+	  logger.LoguearDebugging("No hay mensajes en la cola");
   else {
 	  cout << "Label: " << pMsg->Label << endl;
 	  cout << "Body: " << (char *)(_bstr_t) pMsg->Body << endl;
   }
   pQueue->Close();
   CoUninitialize();
+  logger.LoguearDebugging("<-- MsmqProcess::leerMensajes");
   return;
 }
 
 void MsmqProcess::insertarMensaje(IMSMQMessagePtr pMsg)
 {	
+	logger.LoguearDebugging("--> MsmqProcess::insertarMensaje");
   OleInitialize(NULL);                                   // Hay que inicializar OLE//
   IMSMQQueueInfoPtr qInfo("MSMQ.MSMQQueueInfo");
   IMSMQQueuePtr qSend;
@@ -85,5 +95,6 @@ void MsmqProcess::insertarMensaje(IMSMQMessagePtr pMsg)
   pMsg->Send(qSend);   //enviamos el mensaje
   qSend->Close();    //Cerramos la cola de mensajería
   CoUninitialize();
+  logger.LoguearDebugging("<-- MsmqProcess::insertarMensaje");
   return;
 }
