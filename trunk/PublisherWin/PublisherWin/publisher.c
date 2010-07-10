@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <process.h>
 #include <string.h>
+#include "logger-win.h"
 
 typedef struct stConfigParameters {
 	int puertoNNTP;
@@ -12,6 +13,8 @@ typedef struct stConfigParameters {
 } stConfigParameters;
 
 #define BUFFERCADSIZE 9
+
+char czNombreProceso[20];
 
 void lecturaDinamica(char** cadena, HANDLE** handler){
 
@@ -63,7 +66,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	respuesta = 'S';
 
 	if( memoryHandler == NULL ) 
-		printf("HeapCreate error.\n");
+		LoguearError("HeapCreate error.");
 
 	printf("<------------------- Ingreso de Noticia aCtitud -------------------> \n");
 
@@ -72,13 +75,15 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		ZeroMemory(head,2);
 		printf("Ingrese el HEAD de la noticia: ");
 		lecturaDinamica(&head,&memoryHandler);
-		printf("HEAD INGRESADO: %s",head);
+		LoguearInformacion("Head ingresado:");
+		LoguearInformacion(head);
 
 		body = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,2);
 		ZeroMemory(body,2);
 		printf("Ingrese el body de la noticia: ");
 		lecturaDinamica(&body,&(memoryHandler));
-		printf("body INGRESADO: %s",body);
+		LoguearInformacion("Body ingresado:");
+		LoguearInformacion(body);
 
 		noticia.largos.newsgrouplen = strlen(stParametros.newsgroup)+1;
 		noticia.newsgroup = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,noticia.largos.newsgrouplen);
@@ -98,13 +103,13 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 
 		noticia.id = (char*)HeapAlloc(memoryHandler,HEAP_ZERO_MEMORY,BERKELEY_ID_LEN);
 		
-		printf("noticia.newsgroup: %s \n",noticia.newsgroup);
-		printf("noticia.head: %s \n",noticia.head);
-		printf("noticia.body: %s \n",noticia.body);
-		printf("noticia.transmitted: %s \n",noticia.transmitted);	
+		LoguearDebugging(noticia.newsgroup);
+		LoguearDebugging(noticia.head);
+		LoguearDebugging(noticia.body);
+		LoguearDebugging(noticia.transmitted);	
 		
 			
-		printf("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
+		LoguearInformacion("<------------------- Acceso a db BERKELEY - aCtitud -------------------> \n");
 		
 		createDb(&dbHandler, &memoryHandler,stParametros.newsgroup);
 		generateNewID(&dbHandler, &noticia.id);
@@ -126,7 +131,9 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 
 	}
 
-	printf("TERMINA DE PROCESAR EL THREAD CLIENTE\n");
+	LoguearInformacion("TERMINA DE PROCESAR EL THREAD CLIENTE");
+	printf("-- Finalizado --\n");
+	printf("-- aCtitud (c) 2010 --");
 	HeapDestroy(memoryHandler);
 	_endthreadex(dwThreadId);
 	return 0;
@@ -145,11 +152,11 @@ unsigned __stdcall senderFunction(void* threadParameters)
 	DB* dbHandler;
 	DWORD dwThreadId = GetCurrentThreadId();
 
-	printf("<------------------- SENDER - aCtitud -------------------> \n");
+	LoguearInformacion("<------------------- SENDER - aCtitud ------------------->");
 	memoryHandler =  HeapCreate(0,1024,0); 
 	dbHandler = NULL;
 	if( memoryHandler == NULL ) 
-		printf("Sender HeapCreate error.\n");
+		LoguearError("Sender HeapCreate error.");
 	
 	createDb(&dbHandler,&memoryHandler,stParametros.newsgroup);
 	
@@ -185,40 +192,24 @@ int main(){
 	stSender.puertoNNTP = atoi(tempPuerto);
 	stSender.tiempoEspera = atoi(tempEsperaSender);
 
+	strcpy_s(czNombreProceso,10,"Publisher\0");
+	LoguearInformacion("--------- Publisher. Inicio OK.");
+
 	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stSender, 0, &threadProcesarRequest))!= 0){
 		CloseHandle(threadCliente);
 	}else{
-		printf("No se pudo crear el thread para procesar el request\n");
+		LoguearError("No se pudo crear el thread para procesar el request.");
 	}
 
-	printf("Sale del thread cliente\n");
-
 	/* TODO nunca puede salir de este bucle. ¿cómo mato al cliente? */
-	while(1){
+	while(threadCliente != 0){
 		Sleep(stSender.tiempoEspera);
 		if((threadSender = (HANDLE)_beginthreadex(NULL, 0,&senderFunction,(void*)&stSender, 0, &threadProcesarSender))!= 0){
 			CloseHandle(threadSender);
 		}else{
-			printf("No se pudo crear el thread para procesar el envío de xml\n");
+			LoguearWarning("No se pudo crear el thread para procesar el envío de xml\n");
 		}
 	}
-
-/**	
-	Leo archivo de configuracion para saber el newsgroup
-    Creo la base Berkeley para dicho newsgroup
-
-    Creo el thread GUIthread
-        - El usuario crea la noticia
-        - Se inserta en la base, si no existía una noticia con ese newsgroup e id!
-        - Queda corriendo esto (??), es decir, inserta la noticia le dice "che inserté", y se queda a la espera de mas insersiones (??), porque si lo finalizo dps como hago para levantar el otro thread (??)
-
-    Creo el XMLsender cada x cantidad de tiempo
-        - Se fija si hay noticias nuevas en la base berkeley del newsgroup
-        - Si hay noticias nuevas, las pasa a formato XML
-        - Se hace el handshake , y luego se envía el XML al NTTPNewsServerProcess
-        - Si no hubo problemas marco la noticia en Berkeley como transmitted (1)
-        - Finaliza el thread
-**/
-	Sleep(10000000);
+	Sleep(5000);
 	return 0;
 }
