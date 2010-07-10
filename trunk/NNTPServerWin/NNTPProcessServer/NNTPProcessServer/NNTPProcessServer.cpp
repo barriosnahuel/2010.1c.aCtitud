@@ -70,9 +70,8 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server, struc
 							Definiciones de funciones
  ***********************************************************************************************/ 
 int main(int argc, char** argv){
-	memset(czNombreProceso, 0, 20);
-    strcpy(czNombreProceso, "NNTP_Process_Srvr\0");
-    strcpy(argv[0], czNombreProceso);
+	ZeroMemory(czNombreProceso,20);
+    strcpy_s(czNombreProceso,20, "NNTP_Process_Srvr\0");
 	logger.LoguearDebugging("--> Main()");
 	
 	//	Carga configuracion
@@ -90,6 +89,7 @@ int main(int argc, char** argv){
 	logger.LoguearInformacion("Intervalo de tiempo:");
 	logger.LoguearInformacion(configuracion.acInterval);
 
+	cout << "------------>>> NNTP Server Win <<<------------" << endl;
 	//	Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
 	colaMsmq.crearCola();
@@ -168,8 +168,7 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	}
 
 	xmlDocPtr doc;
-	xmlNodePtr root; 
-	xmlNodePtr child;
+	xmlNodePtr root;
 	stArticle articulo;
 	char *xmlCompleto = (char*) HeapAlloc( handle, 0, BUFFERSIZE );
 	IMSMQMessagePtr pMsg = colaMsmq.desencolarMensaje();

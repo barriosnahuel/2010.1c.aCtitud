@@ -254,15 +254,15 @@ unsigned __stdcall clientFunction(void* threadParameters)
 
 
 int main(int argc, char** argv){
-	memset(czNombreProceso, 0, 20);
-	strcpy(czNombreProceso, "Xml_News_Process_Server\0");
-	strcpy(argv[0], czNombreProceso);
+	ZeroMemory(czNombreProceso,20);
+	strcpy_s(czNombreProceso,20, "Xml_News_Server\0");
     logger.LoguearDebugging("--> Main()");
 	//Carga configuracion --> Ip y puerto del serividor
 	struct stConfiguracion configuracion;
 	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
 	GetPrivateProfileString("configuracion","IP", configuracion.szDefault,configuracion.serverIP,16,archivoConfiguracion);
 	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
+	cout << "=========> XML News Proccess Server <=========" << endl;
 	cout<<"Proceso levantado en la ip: "<<configuracion.serverIP<<" y en el puerto: "<<configuracion.appPort<<endl;
 
 
