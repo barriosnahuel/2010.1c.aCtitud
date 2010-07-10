@@ -169,7 +169,8 @@ int lastID(DB** dbp)
 
 void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 {
-	int idAuxLen,ret;          
+	size_t idAuxLen;
+	int ret;          
 	DBT key, data;
 	size_t noticiaEnBytesLargo;
 	
@@ -186,13 +187,10 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
     data.size = (unsigned int)noticiaEnBytesLargo;
 	
 	//ID NOTICIA -- Hago esto porque la id me llega como entero, y dps el memcpy se me simplifica
-	//itoa(noticia->id,idAux,10);
-	//idAuxLen = strlen(idAux) + 1;
 	idAuxLen = strlen(noticia->id) + 1;
-	key.data  = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,idAuxLen);		
-	//CopyMemory((char*)key.data,idAux,idAuxLen);
+	key.data  = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,idAuxLen);
 	CopyMemory((char*)key.data,noticia->id,idAuxLen);
-	key.size = idAuxLen;
+	key.size = (unsigned int)idAuxLen;
 	printf("^^^^^^^^^^^^^^^^^^ key.data= %s\n", (char*)key.data);
 	printf("^^^^^^^^^^^^^^^^^^ key.size= %d\n", key.size);
 	CopyMemory((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
