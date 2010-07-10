@@ -2,6 +2,7 @@
 #include "berkeleyFunctions.h" //Dentro tiene la llamada a #include"xmlFunctions"
 #include <time.h>
 #include <string.h>
+#include "logger-win.h"
 
 //El formato propuesto para los mensajes XML es el siguiente: 
 	//	<?xml version="1.0" encoding="iso-8859-1" ?> 
@@ -38,7 +39,7 @@ xmlDocPtr crearXML(struct news* noticia, char* key)
 	char* NEWS     = "news";
 	char* ENCODING = "iso-8859-1";
 	
-	printf("<------------------- creacion XML - aCtitud -------------------> \n");
+	LoguearInformacion("<------------------- creacion XML - aCtitud ------------------->");
 	doc = xmlNewDoc("1.0");
 	doc->encoding = ENCODING; //Propiedad del nodo padre
 	
@@ -84,23 +85,23 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	char* xmlEnBytes;
 	char* responseNNTP;
 	size_t largoHandshake;
-	int largoXmlEnBytes;
+	size_t largoXmlEnBytes;
 
-	printf("################ ENVIO DE XML A NNTPSERVER ################\n");
-	printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);
+	LoguearInformacion("ENVIO DE XML A NNTPSERVER");
+	/*printf("PUERTO: %d IP: %s \n",puertoNNTP,ipNNTP);*/
 	pkg = HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct stIRC_IPC));
 	
 	//################################# HANDSHAKE #################################  
 	//VARIABLES PARA EL HANDSHAKE
-	printf((char*)memoriaXML);
+	/*printf((char*)memoriaXML);*/
 	sprintf_s(pkg->idDescriptor, _countof(pkg->idDescriptor), "%d", seconds);
 	strcpy_s(pkg->payloadDescriptor, _countof(pkg->payloadDescriptor),"1"); //1=REQUEST;
 	strcpy_s(pkg->payloadLength, _countof(pkg->payloadLength),"0000");
 	strcat_s(pkg->idDescriptor, _countof(pkg->idDescriptor),"123456");
 
-	printf("idDescriptor: %s \n", pkg->idDescriptor);
+	/*printf("idDescriptor: %s \n", pkg->idDescriptor);
 	printf("payloadDescriptor : %s \n",pkg->payloadDescriptor);
-	printf("payloadLength: %s \n ",pkg->payloadLength);
+	printf("payloadLength: %s \n ",pkg->payloadLength);*/
 
 	pkg->largos.lenIdDescriptor      = strlen(pkg->idDescriptor) +1;
 	pkg->largos.lenPayloadDescriptor = strlen(pkg->payloadDescriptor) + 1;
@@ -118,12 +119,12 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	
 	//HAGO LA CONEXION CON EL NNTP SERVER
 	if(WSAStartup(MAKEWORD(2,0),&wsaData) != 0){
-		printf("Error en inicializacion de Socket");
+		LoguearError("Error en inicializacion de Socket");
         return 1;
     }
     lhSocket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 	if(lhSocket == INVALID_SOCKET){
-      printf("Socket Invalido ");
+      LoguearError("Socket Invalido");
 	  return 1;
 	}
 
@@ -133,13 +134,14 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
     lSockAddr.sin_addr.s_addr = inet_addr(ipNNTP);
     lConnect = connect(lhSocket,(SOCKADDR *)&lSockAddr,sizeof(SOCKADDR_IN));
     if(lConnect != 0){
-		printf("Connect Error\n");
+		LoguearError("Connect Error");
         return 1;
     }
     lLength = send(lhSocket,handshakeEnBytes,(int)largoHandshake,0);
     
 	if (lLength == SOCKET_ERROR) {
-        printf("Fallo el send del Handshake: %d\n", WSAGetLastError());
+        /*printf("Fallo el send del Handshake: %d\n", WSAGetLastError());*/
+		LoguearError("Fallo el send del handshake.");
         closesocket(lhSocket);
         WSACleanup();
         return 1;
@@ -150,36 +152,40 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
   * SI EL NNTPSERVER NUNCA ME RESPONDE ME QUEDO BLOQUEADO ? COMO HAGO PARA SALIR, COMO HAGO UN TIME OUT (??)
  **/
 	if ( lLength > 0 )
-            printf("Bytes recividos: %d\n", lLength);
+			LoguearInformacion("Recepción ok.");
+            /*printf("Bytes recividos: %d\n", lLength);*/
         else if ( lLength == 0 )
-            printf("Coneccion cerrada\n");
+            LoguearInformacion("Coneccion cerrada");
         else
-            printf("recv fallo: %d\n", WSAGetLastError());
+            /*printf("recv fallo: %d\n", WSAGetLastError());*/
+			LoguearError("Fallo al recibir datos (recv)");
 
-	printf("Recibi del XML Process server como response del handshake lo siguiente -> %s\n", recvbuf);
+	/*printf("Recibi del XML Process server como response del handshake lo siguiente -> %s\n", recvbuf);*/
+	LoguearInformacion("Se recibio respuesta del XML Process server.");
 	//Me interesa que payload recibi, 1 si es un es inválido , si es 2 es válido
 	CopyMemory(&pkg->payloadDescriptor,recvbuf + (LARGOID-1),(LARGOPAYLOAD-1)); //PORQUE ME LO MANDA CON STRCAT
-	printf("PAYLOADDESCRIPTORRRRRRRRRRRRRRRR : %s \n",pkg->payloadDescriptor);
+	/*printf("PAYLOADDESCRIPTORRRRRRRRRRRRRRRR : %s \n",pkg->payloadDescriptor);*/
 	//El NNTP no me pasa los largos, pero como son estáticos los sé de antemano. 
 		//Por eso acá uso constantes.
-	if(pkg->payloadDescriptor == 1){
-		printf("Hanshake invalido: se cerrara la conexión. La noticia no fue transmitida");
+	
+	if(strcmp(pkg->payloadDescriptor,"1")!=0){
+		LoguearError("Hanshake invalido: se cerrara la conexión. La noticia no fue transmitida");
 		return 1;}	
-	else printf("Handshake valido: se procedera a enviar la noticia en XML");
-
+	else 
+		LoguearInformacion("Handshake valido: se procedera a enviar la noticia en XML");
 	
 	//################################# ENVIO EL XML #################################
 	sprintf_s(pkg->payloadLength,5, "%d",tamanioXML+1);
-	printf("tamanioXML: %d \n",tamanioXML+1);
+/*	printf("tamanioXML: %d \n",tamanioXML+1);
 	printf("pkg->payloadLength: %s \n",pkg->payloadLength);	
 
 	printf("idDescriptor: %s \n", pkg->idDescriptor);
 	printf("payloadDescriptor : %s \n",pkg->payloadDescriptor);
-	printf("payloadLength: %s \n ",pkg->payloadLength);
+	printf("payloadLength: %s \n ",pkg->payloadLength);*/
 	
 	pkg->largos.lenPayloadLength = strlen(pkg->payloadLength)+1;	
 
-	largoXmlEnBytes = sizeof(pkg->largos) + pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor + pkg->largos.lenPayloadLength + pkg->payloadLength;//LOS LARGOS SON SIEMPRE FIJOS
+	largoXmlEnBytes = sizeof(pkg->largos) + pkg->largos.lenIdDescriptor + pkg->largos.lenPayloadDescriptor + pkg->largos.lenPayloadLength + (size_t)atoi(pkg->payloadLength);
 	xmlEnBytes = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,largoXmlEnBytes);
 
 	//COPIO EL MENSAJE XML AL PAYLOAD XML
@@ -194,10 +200,11 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 		       pkg->payloadXML,tamanioXML);
 	
 	
-	lLength = send(lhSocket,xmlEnBytes,largoXmlEnBytes,0);
+	lLength = send(lhSocket,xmlEnBytes,(int)largoXmlEnBytes,0);
     
 	if (lLength == SOCKET_ERROR) {
-        printf("Fallo el send del XML: %d\n", WSAGetLastError());
+        /*printf("Fallo el send del XML: %d\n", WSAGetLastError());*/
+		LoguearError("Fallo el send del XML");
         closesocket(lhSocket);
         WSACleanup();
         return 1;
@@ -206,11 +213,15 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	//Recibo la respuesta del NNTPServer
 	lLength = recv(lhSocket, recvbuf, recvbuflen, 0);
         if ( lLength > 0 )
-            printf("Bytes recividos: %d\n", lLength);
+            /*printf("Bytes recividos: %d\n", lLength);*/
+			LoguearInformacion("Respuesta recibida ok.");
 		else if ( lLength == 0 ){
-			printf("Coneccion cerrada\n");return 1;}
+			LoguearInformacion("Coneccion cerrada.");
+			return 1;}
 		else{
-			printf("recv fallo: %d\n", WSAGetLastError()); return 1;}
+			/*printf("recv fallo: %d\n", WSAGetLastError()); */
+			LoguearError("Fallo al recibir datos del NNTP Server (recv).");
+			return 1;}
 	
       //Reutilizo la estructura del envio para manejar el Response
 	CopyMemory(&pkg->idDescriptor,(char*)recvbuf,LARGOID);
@@ -219,7 +230,7 @@ int enviarXML(xmlChar* memoriaXML,int tamanioXML,char* ipNNTP,int puertoNNTP,HAN
 	
 	responseNNTP= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,10);
 	CopyMemory((char*)responseNNTP,(char*)recvbuf + (LARGOID - 1) + (LARGOPAYLOAD -1)+(LARGOPAYLOADLENGTH-1),9); //responde "RequestOK"
-	printf("Response de NNTP: %s",responseNNTP);    
+	/*printf("Response de NNTP: %s",responseNNTP);    */
 	closesocket(lhSocket);
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,pkg);
 	HeapFree(*memoryHandle,HEAP_ZERO_MEMORY,xmlEnBytes);

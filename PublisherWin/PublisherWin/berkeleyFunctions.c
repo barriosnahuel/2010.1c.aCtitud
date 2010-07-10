@@ -1,28 +1,25 @@
 #include "berkeleyFunctions.h"
+#include "logger-win.h"
 
 void createDb(DB** dbp, HANDLE** memoryHandle,char* dbName)
 {
-	char* ruta = "C:\\";
-	char* extension=".db";
-	char* rutaDb = NULL;
+	char* rutaDb;
 	int ret;
-	size_t tamanioRutaDb = strlen(ruta) + strlen(dbName) + strlen(extension) + 1;
+	size_t tamanioRutaDb = strlen(dbName) + 10;
 	
-	rutaDb= (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb); 
-	printf("strlen(%s): %d \n",ruta,strlen(ruta));
-	printf("strlen(%s): %d \n",dbName,strlen(dbName));
-	strcat(rutaDb,ruta);	
-	strcat(rutaDb,dbName);
-	strcat(rutaDb,extension);
-	printf("rutaDB: %s \n", rutaDb);
-	printf("strlen(%s): %d \n",rutaDb,strlen(rutaDb));
+	rutaDb = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,tamanioRutaDb); 
+	sprintf_s(rutaDb,tamanioRutaDb,"C:\\%s.db",dbName);
+
+	LoguearInformacion("Database path ok.");
+	LoguearInformacion(rutaDb);
 	
 	if (!(ret = db_create(&*dbp, NULL, 0))) {
-		fprintf(stderr, "db_create: %s\n", db_strerror(ret));
+		/*fprintf(stderr, "db_create: %s\n", db_strerror(ret));
+		LoguearError("Fallo en db_create.");*/
 	}
 		
 	if (!(ret = (*dbp)->open(*dbp,NULL, rutaDb , NULL, DB_BTREE, DB_CREATE, 0))){
-		printf("ENTRA A  DBP->OPEN \n");
+		LoguearDebugging("ENTRA A  DBP->OPEN");
 		(*dbp)->err(*dbp, ret, "%s", rutaDb);
 	}
 	
@@ -46,9 +43,9 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 	memset (&data, 0, sizeof(data));
 	memset (&key, 0, sizeof(key));
 	
-	noticia = (char*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct news)); 
+	noticia = (news*)HeapAlloc(*memoryHandle,HEAP_ZERO_MEMORY,sizeof(struct news)); 
 	
-	printf("\n ####### Noticias No enviadas ####### \n");
+	LoguearInformacion("Buscando noticias no enviadas.");
 	
 	//Creo el cursor de Berkeley
 	if ((ret = (*dbp)->cursor(*dbp,NULL,&dbCursor,0)) != 0) {
@@ -79,15 +76,16 @@ void noticiasNoEnviadas(DB** dbp,HANDLE** memoryHandle, char* ipNNTP, int puerto
 								  noticia->largos.bodylen);
 
 			
-			printf("Key almacenada   : %s  \n",key.data);
-			printf("NewsGroupNoticia : %s \n",noticia->newsgroup);
-			printf("Head : %s \n",noticia->head);
-			printf("Body : %s \n",noticia->body);
+			LoguearInformacion("Key almacenada:");
+			LoguearInformacion(key.data);
+			LoguearInformacion("NewsGroupNoticia:");
+			LoguearInformacion(noticia->newsgroup);
+			LoguearInformacion("Head:");
+			LoguearInformacion(noticia->head);
 			
 			//PASAR A FORMATO XML
 			doc = crearXML(noticia,key.data);
 			xmlDocDumpFormatMemory(doc,&memoriaXML,&tamanioXML,1);
-			printf("TAMANIO XML: %d", tamanioXML);
 			
 			//ENVIAR A NNTP
 			transmitioANNTPServer = enviarXML(memoriaXML,tamanioXML,ipNNTP,puertoNNTP,&*memoryHandle);
@@ -133,9 +131,6 @@ void generateNewID(DB** dbp, char** buffer){
 	while(**buffer=='0')
 		*buffer= (*buffer)+1;
 
-	printf("+++++++++++++++++++++++++++\n");
-	printf("El nuevo ID generado es: %s\n", *buffer);
-	printf("+++++++++++++++++++++++++++\n");
 }
 
 int lastID(DB** dbp)
@@ -147,13 +142,12 @@ int lastID(DB** dbp)
 	memset (&data, 0, sizeof(data));
 	memset (&key, 0, sizeof(key));
 	
-	printf("\n ####### LASTID ####### \n");
+	LoguearDebugging("Buscando LastId");
 	
 	if ((ret = (*dbp)->cursor(*dbp,NULL,&dbCursor,0)) != 0) {
 		(*dbp)->err(*dbp, ret, "DB->cursor");
 	}
 	while ((ret = dbCursor->c_get(dbCursor, &key, &data, DB_NEXT)) == 0){
-		printf("KEY ALMACENADA : %s  \n",key.data);
 		if(maxID<atoi(key.data))
 			maxID = atoi(key.data);
 		
@@ -174,7 +168,7 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	DBT key, data;
 	size_t noticiaEnBytesLargo;
 	
-	printf("########### putArticle ###########\n");
+	LoguearInformacion("Guardando noticia.");
 	
 	memset(&key, 0, sizeof(key));
 	memset(&data, 0, sizeof(data));
@@ -191,8 +185,6 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	key.data  = HeapAlloc(*memoryHandler,HEAP_ZERO_MEMORY,idAuxLen);
 	CopyMemory((char*)key.data,noticia->id,idAuxLen);
 	key.size = (unsigned int)idAuxLen;
-	printf("^^^^^^^^^^^^^^^^^^ key.data= %s\n", (char*)key.data);
-	printf("^^^^^^^^^^^^^^^^^^ key.size= %d\n", key.size);
 	CopyMemory((char*)data.data,(char*)&noticia->largos,sizeof(noticia->largos));
 	CopyMemory((char*)data.data + sizeof(noticia->largos),noticia->newsgroup,noticia->largos.newsgrouplen);
 	CopyMemory((char*)data.data + sizeof(noticia->largos)+noticia->largos.newsgrouplen,noticia->head,noticia->largos.headlen);
@@ -203,37 +195,18 @@ void putArticle(struct news* noticia,DB** dbp,HANDLE** memoryHandler)
 	
 	switch (ret = (*dbp)->put(*dbp, NULL, &key, &data, DB_NOOVERWRITE)) {
 	case 0:
-		printf("db: %s: Articulo guardado.\n", (char *)key.data);
+		LoguearInformacion("Articulo guardado:");
 		break;
 	case DB_KEYEXIST:
-		printf("db: %s: El articulo ya se encontraba en la base.\n",(char*)key.data);
+		LoguearWarning("El articulo ya se encontraba en la base.");
 		break;
 	default:
-		(*dbp)->err(dbp, ret, "DB->put");
+		(*dbp)->err(*dbp, ret, "DB->put");
 	}
 
 	HeapFree(*memoryHandler,HEAP_ZERO_MEMORY, data.data);
 	HeapFree(*memoryHandler,HEAP_ZERO_MEMORY, key.data );
 
-	/*
-	memset(&key, 0, sizeof(key));
-	memset(&data, 0, sizeof(data));
-	key.data = "34037030";
-	key.size = strlen(key.data) + 1 ;
-	data.data = "Alan";
-	data.size = strlen(data.data) + 1;
-
-	switch (ret = (*dbp)->put(*dbp, NULL, &key, &data, DB_NOOVERWRITE)) {
-	case 0:
-		printf("db: %s: Articulo guardado.\n", (char *)key.data);
-		break;
-	case DB_KEYEXIST:
-		printf("db: %s: El articulo ya se encontraba en la base.\n",(char*)key.data);
-		break;
-	default:
-		(*dbp)->err(dbp, ret, "DB->put");
-	}
-	*/
 	return;
 }
 
