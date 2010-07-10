@@ -517,7 +517,7 @@ char* formatearArticuloAHTML(stArticle* pstArticulo) {
 	LoguearDebugging("--> formatearArticuloAHTML()");
 
 	char* response;
-	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", reemplazarBarraNPorBR(&(*pstArticulo).sHead), (*pstArticulo).sNewsgroup, reemplazarBarraNPorBR(&(*pstArticulo).sBody));
+	asprintf(&response, "<HTML><HEAD><TITLE>%s</TITLE></HEAD><BODY><P><B>Grupo de noticias: %s</B></P><P>%s</P></BODY></HTML>", (*pstArticulo).sHead, (*pstArticulo).sNewsgroup, reemplazarBarraNPorBR(&(*pstArticulo).sBody));
 
 	LoguearDebugging("<-- formatearArticuloAHTML()");
 	return response;
