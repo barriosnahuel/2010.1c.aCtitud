@@ -57,6 +57,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	char *head;
 	char *body;
 	char respuesta;
+	int respuestaCorrecta= 0;
 	DWORD dwThreadId = GetCurrentThreadId();
 
 	stConfigParameters stParametros = *((stConfigParameters*) threadParameters);
@@ -117,10 +118,26 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 		putArticle(&noticia,&dbHandler,&memoryHandler);	
 		closeDb(&dbHandler);
 
+/*
+	Asi estaba antes.
 		printf("Desea publicar otra noticia S/N:");
 		scanf_s("%c",&respuesta,1);
 		respuesta = toupper(respuesta);
 		fflush(stdin);
+*/
+
+		/*	Asi lo deje.	*/
+		while(!respuestaCorrecta){
+			printf("Desea publicar otra noticia S/N:");
+			scanf_s("%c", &respuesta, 1);
+			respuesta = toupper(respuesta);
+			fflush(stdin);
+			if(respuesta=='S' || respuesta=='N')
+				respuestaCorrecta= 1;
+			else
+				respuestaCorrecta= 0;
+		}
+		respuestaCorrecta= 0;/*	Cuando salgo, tengo que volver a ponerlo en 0, para que vuelva a entrar por "primera vez" luego de haber ingresado la n+1 noticia.	*/
 
 		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,head);
 		HeapFree(memoryHandler,HEAP_ZERO_MEMORY,body);
