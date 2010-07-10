@@ -248,7 +248,8 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 		logger.LoguearError("Debido a que hubo un problema con OpenDS el mensaje se reencolara para su posterior procesamiento.");
 		colaMsmq.insertarMensaje(pMsg);
 		openDSEstaCaido = 1;
-	} else if((stPLDAPSession->errorCode != 0) && (stPLDAPSession->errorCode != 81)) {
+	} 
+	if((stPLDAPSession->errorCode != 0) && (stPLDAPSession->errorCode != 81)) {
 		logger.LoguearError("Problema al insertar el articulo. El articulo se descartara");
 	}
 	else {
