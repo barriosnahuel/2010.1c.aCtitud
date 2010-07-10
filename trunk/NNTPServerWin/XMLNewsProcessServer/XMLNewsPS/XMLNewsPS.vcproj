@@ -176,6 +176,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\logger-win.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\xmlNewsPS.cpp"
 				>
 			</File>
@@ -187,6 +191,10 @@
 			>
 			<File
 				RelativePath="..\..\funcionesMSMQ.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\logger-win.hpp"
 				>
 			</File>
 		</Filter>
