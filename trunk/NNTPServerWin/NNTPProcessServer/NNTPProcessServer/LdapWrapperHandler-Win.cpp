@@ -13,10 +13,13 @@
 #include <windows.h>
 #include <winbase.h>
 
+#include "../../logger-win.hpp"
 #include "LdapWrapperHandler-Win.hpp"
 #define BUFFERSIZE 1024
 
 using namespace std;
+extern Logger logger;
+
 
 /*	Constantes de OpenDS	*/
 #define OPENDS_SCHEMA "ou=so,dn=utn,dn=edu"
@@ -36,26 +39,29 @@ int crearConexionLDAP(	char* sIp
 
 	HANDLE handle= HeapCreate(0, 1024, 0); 
 	if(handle==NULL)
-		cout << "HeapCreate error." << endl; 
+		logger.LoguearError("HeapCreate error.");
+		
 
 	/*	Seteo sOpenDSLocation bajo el formato:	ldap://localhost:4444	*/
 	char* sOpenDSLocation= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
 	if(sOpenDSLocation==NULL) 
-		cout << "HeapAlloc error." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapAlloc() para la variable sOpenDSLocation.");
 
 	strcpy(sOpenDSLocation, "ldap://");
 	strcat(sOpenDSLocation, sIp);
 	strcat(sOpenDSLocation, ":");
 	char* sPort= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
 	if(sPort==NULL) 
-		cout << "HeapAlloc error." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapAlloc() para la variable sPort.");
 	itoa(uiPort, sPort, 10);
 	
 	strcat(sOpenDSLocation, sPort);
 	if( !HeapFree(handle, 0, sPort) )
-		cout << "HeapFree error en sPort." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapFree() para la variable sPort.");
 
-	cout << "La URL de LDAP es: " << sOpenDSLocation << endl;
+	logger.LoguearDebugging("La URL de OpenDS/LDAP es:");
+	logger.LoguearDebugging(sOpenDSLocation);
+	
 
 	/* Inicializamos el contexto. */	
 	(*pstPLDAPContextOperations)->initialize(*pstPLDAPContext, sOpenDSLocation);
@@ -63,11 +69,11 @@ int crearConexionLDAP(	char* sIp
 			*pstPLDAPContext, "cn=Directory Manager", "password");
 
 	if( !HeapFree(handle, 0, sOpenDSLocation) )
-		cout << "HeapFree error en sOpenDSLocation." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapFree() para la variable sOpenDSLocation.");
 
 	// Destruyo el heap. 
 	if( !HeapDestroy(handle) )
-	  cout << "HeapDestroy error." << endl; 
+	  logger.LoguearError("Ocurrio un error en HeapDestroy().");
 
 	/* Se inicia la session. Se establece la conexion con el servidor LDAP. */
 	(*pstPLDAPSessionOperations)->startSession(*pstPLDAPSession);
@@ -95,36 +101,39 @@ int crearConexionLDAP(	char* sIp
  * Retorna un char* de la forma: "utnArticleID=12345,ou=so,dn=utn,dn=edu"
  */
 char* getDNFor(int dArticleID){
+	logger.LoguearDebugging("--> getDNFor()");
 	HANDLE handle= HeapCreate(0, 1024, 0); 
 	if(handle==NULL)
-		cout << "HeapCreate error." << endl; 
+		logger.LoguearError("HeapCreate error.");
 
 	char* sDn= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
 	if(sDn==NULL) 
-		cout << "HeapAlloc error." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapAlloc() para la variable sDn.");
 
 	strcpy(sDn, OPENDS_ATTRIBUTE_ARTICLE_ID);
 	strcat(sDn, "=");
 	
 	char* sArticleID= (char*) HeapAlloc(handle, 0, BUFFERSIZE); 
 	if(sArticleID==NULL) 
-		cout << "HeapAlloc error." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapAlloc() para la variable sArticleID.");
 	itoa(dArticleID, sArticleID, 10);
 	strcat(sDn, sArticleID);
 	if( !HeapFree(handle, 0, sArticleID) )
-		cout << "HeapFree error en sArticleID." << endl; 
+		logger.LoguearError("Ocurrio un error en HeapFree() para la variable sArticleID.");
 
 	strcat(sDn, ",");
 	strcat(sDn, OPENDS_SCHEMA);
-	cout << "sdn vale: " << sDn << endl;
+	logger.LoguearDebugging("El SDN vale:");
+	logger.LoguearDebugging(sDn);
 
+	logger.LoguearDebugging("<-- getDNFor()");
 	return sDn;
 }
 
 VOID updateEntry(PLDAP_SESSION			stSession
 				, PLDAP_SESSION_OP		stSessionOperations
 				, stArticle				stArticulo) {
-
+	logger.LoguearDebugging("--> updateEntry()");
 	PLDAP_ENTRY_OP stEntryOperations= newLDAPEntryOperations();
 	PLDAP_ATTRIBUTE_OP stAttributeOperations= newLDAPAttributeOperations();
 
@@ -139,12 +148,13 @@ VOID updateEntry(PLDAP_SESSION			stSession
 	stEntryOperations->editAttribute(entry, stAttributeOperations->createAttribute(OPENDS_ATTRIBUTE_ARTICLE_BODY, 1, stArticulo.sBody));
 
 	stSessionOperations->editEntry(stSession, entry);
+	logger.LoguearDebugging("<-- updateEntry()");
 }
 
 VOID insertEntry(PLDAP_SESSION 			stSession
 				, PLDAP_SESSION_OP 		stSessionOperations
 				, stArticle 			stArticulo){
-
+	logger.LoguearDebugging("--> insertEntry()");
 	PLDAP_ENTRY_OP stEntryOperations= newLDAPEntryOperations();
 	PLDAP_ATTRIBUTE_OP stAttributeOperations= newLDAPAttributeOperations();
 
@@ -161,12 +171,13 @@ VOID insertEntry(PLDAP_SESSION 			stSession
 
 	/* inserto la entry en el directorio */
 	stSessionOperations->addEntry(stSession, entry);
+	logger.LoguearDebugging("<-- insertEntry()");
 }
 
 VOID deleteEntry(PLDAP_SESSION 			stSession
 				, PLDAP_SESSION_OP 		stSessionOperations
 				, unsigned int 			uiArticleID) {
-
+logger.LoguearDebugging("--> deleteEntry()");
 	PLDAP_ENTRY_OP stEntryOperations= newLDAPEntryOperations();
 
 	/* creo una nueva entry.
@@ -180,7 +191,7 @@ VOID deleteEntry(PLDAP_SESSION 			stSession
 	/* Se puede eliminar ena entry pasando un objeto entry como parametro
 	sessionOp->deleteEntryObj(session, entry);*/
 	/* O se puede eliminar una entry pasando el dn correspondiente */
-
+logger.LoguearDebugging("<-- deleteEntry()");
 }
 
 /**
@@ -190,7 +201,7 @@ VOID deleteEntry(PLDAP_SESSION 			stSession
 VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
 							, PLDAP_SESSION_OP 		stPLDAPSessionOperations
 							, char* 				sCriterio){
-
+	logger.LoguearDebugging("--> selectAndPrintEntries()");
 	/* hago una consulta en una determinada rama aplicando la siguiente condicion */
 
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
@@ -227,12 +238,15 @@ VOID selectAndPrintEntries(	  PLDAP_SESSION 		stPLDAPSession
     /* libero los recursos */
     freeLDAPIterator(iterator);
     freeLDAPRecordOperations(recordOp);
+	logger.LoguearDebugging("<-- selectAndPrintEntries()");
 }
 
 VOID liberarRecursosLdap(PLDAP_CONTEXT stPLDAPContext, PLDAP_CONTEXT_OP stPLDAPContextOperations, 
 						 PLDAP_SESSION stPLDAPSession, PLDAP_SESSION_OP stPLDAPSessionOperations) {
+	logger.LoguearDebugging("--> liberarRecursosLdap()");
 	freeLDAPSessionOperations(stPLDAPSessionOperations);
 	freeLDAPSession(stPLDAPSession);
 	freeLDAPContext(stPLDAPContext);
 	freeLDAPContextOperations(stPLDAPContextOperations);
+	logger.LoguearDebugging("<-- liberarRecursosLdap()");
 }
