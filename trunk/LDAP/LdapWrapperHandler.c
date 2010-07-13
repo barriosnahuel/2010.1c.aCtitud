@@ -245,14 +245,14 @@ int selectEntries(	  char*					pczListado[]
 			}
 			/* libero los recursos consumidos por el record */
 			freeLDAPRecord(record);
-
+		}
 		    /* libero los recursos */
 		    freeLDAPIterator(iterator);
 		    freeLDAPRecordOperations(recordOp);
 
 		    LoguearDebugging("<-- selectEntries()");
 		    return 1;
-		}
+		
 	} else {
 		LoguearInformacion("El resultSet devuelto es NULL.");
 		LoguearError("La conexion con OpenDS se perdio. Por favor verifique que OpenDS esta levantado y reinicie este proceso para volver a conectarse.");
