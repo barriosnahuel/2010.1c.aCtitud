@@ -149,8 +149,10 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 	LoguearInformacion(sLogMessage);
 
 	asprintf(&sLogMessage, "Esta por romper en el searchEntry");
+	LoguearInformacion(sLogMessage);
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
 	asprintf(&sLogMessage, "Pase el search entry");
+	LoguearInformacion(sLogMessage);
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
@@ -158,10 +160,13 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
 	asprintf(&sLogMessage, "por hacer le iterator");
+	LoguearInformacion(sLogMessage);
 	iterator = resultSet->iterator;
 	asprintf(&sLogMessage, "Pase el iterator");
+	LoguearInformacion(sLogMessage);
 	if(iterator->hasNext(resultSet)) {
 		asprintf(&sLogMessage, "entre al if");
+		LoguearInformacion(sLogMessage);
 		LoguearDebugging("Se encontro un articulo con la condicion especificada.");
 
 		PLDAP_RECORD record = iterator->next(resultSet);
