@@ -192,6 +192,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 		}
 	} else {
 		LoguearInformacion("El resultSet devuelto es NULL.");
+		LoguearError("La conexion con OpenDS se perdio. Por favor verifique que OpenDS esta levantado y reinicie este proceso para volver a conectarse.");
 		stArticleToReturn.uiArticleID= -1;
 	}
 	
