@@ -649,7 +649,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sGrupoDeNoticias);
 	
 	/* Si el diario no tiene noticias significa que no existe dicho diario. Por lo tanto es un 404. */
-	if(uiCantidadDeNoticias == 0) || (uiCantidadDeNoticias == -1){
+	if((uiCantidadDeNoticias == 0) || (uiCantidadDeNoticias == -1)){
 		char* error404;
 		asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
 		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()");
