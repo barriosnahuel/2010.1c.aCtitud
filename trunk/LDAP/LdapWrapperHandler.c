@@ -148,15 +148,20 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 	asprintf(&sLogMessage, "El criterio por el que se va a buscar en OpenDS es: %s", sCriterio);
 	LoguearInformacion(sLogMessage);
 
+	asprintf(&sLogMessage, "Esta por romper en el searchEntry");
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
+	asprintf(&sLogMessage, "Pase el search entry");
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
 	stArticle stArticleToReturn;
 
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
+	asprintf(&sLogMessage, "por hacer le iterator");
 	iterator = resultSet->iterator;
+	asprintf(&sLogMessage, "Pase el iterator");
 	if(iterator->hasNext(resultSet)) {
+		asprintf(&sLogMessage, "entre al if");
 		LoguearDebugging("Se encontro un articulo con la condicion especificada.");
 
 		PLDAP_RECORD record = iterator->next(resultSet);
