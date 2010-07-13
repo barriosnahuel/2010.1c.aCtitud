@@ -156,7 +156,7 @@ int obtenerListadoNoticiasParaUnGrupo( stArticle			pstArticleListado[]
 	LoguearInformacion(sLogMessage);
 
 	LoguearDebugging("Hago el select a OpenDS");
-	unsigned int uiCantidadDeNoticias= 0;
+	int uiCantidadDeNoticias= 0;
 	if(selectArticles(pstArticleListado, &uiCantidadDeNoticias, stPLDAPSession, stPLDAPSessionOperations, sCriterio) == 0) {
 		LoguearDebugging("<-- obtenerListadoGruposDeNoticias()");
 		return -1;
