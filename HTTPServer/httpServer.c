@@ -550,12 +550,13 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 		buscarNoticiaEnBD(&stArticulo, sGrupoDeNoticias, sArticleID,
 				(*pstParametros).pstPLDAPSession,
 				(*pstParametros).pstPLDAPSessionOperations);
+
+		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
+		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
 		
 	}
 	if(stArticulo.uiArticleID != -1) {
 		
-		/*	Como no la encontre en Cache, ahora la guardo en cache para que este la proxima vez.	*/
-		guardarNoticiaEnCache(stArticulo,sGrupoDeNoticias,grupoSinEspacios,&pstParametros->memCluster);
 		
 		char* aviso200;
 		asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
