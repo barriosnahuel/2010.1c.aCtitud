@@ -46,8 +46,9 @@ stArticle getArticle(PLDAP_SESSION stPLDAPSession,
 
 /**
  * Selecciona un conjunto de entries en base al criterio que se le pasa.
+ * Si encuentra algo (o vacio) devolvera 1. Si el resultado es NULL (xq cayo open ds) devuelve 0.
  */
-VOID selectEntries(char* pczListado[], unsigned int* puiCantidadEntries,
+int selectEntries(char* pczListado[], unsigned int* puiCantidadEntries,
 		PLDAP_SESSION stPLDAPSession,
 		PLDAP_SESSION_OP stPLDAPSessionOperations, char* sCriterio);
 
@@ -55,7 +56,7 @@ VOID selectEntries(char* pczListado[], unsigned int* puiCantidadEntries,
  * Selecciona un listado de articulos, en base al criterio que se le pasa
  * y los agrega uno a uno en pczListado[] el cual es parametro I/O y es un array de stArticle.
  */
-VOID selectArticles(stArticle pczListado[], unsigned int* puiCantidadEntries,
+int selectArticles(stArticle pczListado[], unsigned int* puiCantidadEntries,
 		PLDAP_SESSION stPLDAPSession,
 		PLDAP_SESSION_OP stPLDAPSessionOperations, char* sCriterio);
 

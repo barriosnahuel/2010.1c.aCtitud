@@ -157,7 +157,11 @@ int obtenerListadoNoticiasParaUnGrupo( stArticle			pstArticleListado[]
 
 	LoguearDebugging("Hago el select a OpenDS");
 	unsigned int uiCantidadDeNoticias= 0;
-	selectArticles(pstArticleListado, &uiCantidadDeNoticias, stPLDAPSession, stPLDAPSessionOperations, sCriterio);
+	if(selectArticles(pstArticleListado, &uiCantidadDeNoticias, stPLDAPSession, stPLDAPSessionOperations, sCriterio) == 0) {
+		LoguearDebugging("<-- obtenerListadoGruposDeNoticias()");
+		return -1;
+	}
+	
 
 	LoguearDebugging("<-- obtenerListadoNoticiasParaUnGrupo()");
 	return uiCantidadDeNoticias;
@@ -183,7 +187,11 @@ int obtenerListadoGruposDeNoticias(	  char*					pListadoGruposDeNoticias[]
 	memset(pListadoGruposDeNoticias, 0, 1000);/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 
 	char* listadoGrupoNoticiasRepetidos[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
-	selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, stPLDAPSession, stPLDAPSessionOperations, sCriterio);
+	if(selectEntries(listadoGrupoNoticiasRepetidos, &cantidadDeGrupos, stPLDAPSession, stPLDAPSessionOperations, sCriterio) == 0) {
+		LoguearDebugging("<-- obtenerListadoGruposDeNoticias()");
+		return -1;
+	}
+	
 
 	asprintf(&sLogMessage, "Se encontraron %d grupos de noticias (contando repetidos).", cantidadDeGrupos);
 	LoguearInformacion(sLogMessage);

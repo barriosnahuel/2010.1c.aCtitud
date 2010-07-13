@@ -126,7 +126,7 @@ void gestionarSenialCtrlC(int senial);
  * y visualizar bien la pagina HTML.
  */
 char* formatearArticuloAHTML(stArticle* pstArticulo);
-char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias);
+char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], int uiCantidadDeNoticias);
 char* formatearListadoDeGruposDeNoticiasAHTML(char* listadoGruposDeNoticias[], int len);
 /**
  * Arma un tag a de HTML con un hipervinculo al sURL que se le pasa como parametro,
@@ -581,21 +581,27 @@ char* processRequestTypeUnaNoticia(char* sGrupoDeNoticias, char* sArticleID,
 char* processRequestTypeListadoGruposDeNoticias(stThreadParameters* pstParametros) {
 	LoguearDebugging("--> processRequestTypeListadoGrupoDeNoticias()");
 	
-	/* Apenas entro aca mando un 200 OK porque siempre se va a poder procesar el listado de grupos de noticias. */
-	char* aviso200;
-	asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
-	int lenAviso200 = strlen(aviso200);
-	int bytesEnviadosDeAviso;
-	
-	if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
-		LoguearError("No se pudo enviar el 200 OK al cliente.");
-	}
 
 	char* listadoGrupoNoticiasSinRepetir[1000];
-	unsigned int cantidadDeGruposSinRepetir= obtenerListadoGruposDeNoticias(listadoGrupoNoticiasSinRepetir, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations));
+	int cantidadDeGruposSinRepetir= obtenerListadoGruposDeNoticias(listadoGrupoNoticiasSinRepetir, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations));
 
-	LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()");
-	return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
+	if(cantidadDeGruposSinRepetir != -1) {
+		char* aviso200;
+		asprintf(&aviso200, "HTTP/1.1 200 OK\nContent-type: text/html\n\n");
+		int lenAviso200 = strlen(aviso200);
+		int bytesEnviadosDeAviso;
+			
+		if ((bytesEnviadosDeAviso = send(pstParametros->ficheroCliente, aviso200, lenAviso200, 0)) == -1) {
+			LoguearError("No se pudo enviar el 200 OK al cliente.");
+		}
+		LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()");
+		return formatearListadoDeGruposDeNoticiasAHTML(listadoGrupoNoticiasSinRepetir, cantidadDeGruposSinRepetir);
+	} else {
+		char* error404;
+		asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
+		LoguearDebugging("<-- processRequestTypeListadoGrupoDeNoticias()");
+		return error404;
+	}
 }
 
 
@@ -640,10 +646,10 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 	stArticle listadoNoticias[1000];/*	TODO: Chequear este 1000, ver como deshardcodearlo	*/
 
 	LoguearDebugging("Llamo al metodo obtenerListadoNoticiasParaUnGrupo() provisto por aCtitud.");
-	unsigned int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sGrupoDeNoticias);
+	int uiCantidadDeNoticias= obtenerListadoNoticiasParaUnGrupo(listadoNoticias, (*(*pstParametros).pstPLDAPSession), (*(*pstParametros).pstPLDAPSessionOperations), sGrupoDeNoticias);
 	
 	/* Si el diario no tiene noticias significa que no existe dicho diario. Por lo tanto es un 404. */
-	if(uiCantidadDeNoticias == 0) {
+	if(uiCantidadDeNoticias == 0) || (uiCantidadDeNoticias == -1){
 		char* error404;
 		asprintf(&error404, "HTTP/1.1 404 Not Found\nContent-type: text/html\n\n");
 		LoguearDebugging("<-- processRequestTypeListadoDeNoticias()");
@@ -664,7 +670,7 @@ char* processRequestTypeListadoDeNoticias(char* sGrupoDeNoticias, stThreadParame
 
 }
 
-char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], unsigned int uiCantidadDeNoticias){
+char* formatearListadoDeNocitiasAHTML(char* sGrupoDeNoticias, stArticle listadoDeNoticias[], int uiCantidadDeNoticias){
 	LoguearDebugging("--> formatearListadoDeNocitiasAHTML()");
 
 	/*	1+OPEN...+1+OPEN...5+1 Es igual a: /nombreGrupoNoticia/noticiaID.html\0	*/
