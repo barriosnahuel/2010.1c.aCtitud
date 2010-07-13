@@ -207,7 +207,7 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
  * 		1:	sGrupoDeNoticia
  * 		2:	sBody, sHead
  */
-VOID selectEntries(	  char*					pczListado[]
+int selectEntries(	  char*					pczListado[]
 					, unsigned int*			puiCantidadEntries
 					, PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
@@ -224,33 +224,46 @@ VOID selectEntries(	  char*					pczListado[]
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
-	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
-	iterator = resultSet->iterator;
-	if(!(iterator->hasNext(resultSet)))
-		LoguearInformacion("No hay ninguna entry para el criterio especificado.");
-	for(*puiCantidadEntries= 0; iterator->hasNext(resultSet); (*puiCantidadEntries)++) {
-		PLDAP_RECORD record = iterator->next(resultSet);
+	if(resultSet != NULL) {
+		/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
+		iterator = resultSet->iterator;
+		if(!(iterator->hasNext(resultSet)))
+			LoguearInformacion("No hay ninguna entry para el criterio especificado.");
+		for(*puiCantidadEntries= 0; iterator->hasNext(resultSet); (*puiCantidadEntries)++) {
+			PLDAP_RECORD record = iterator->next(resultSet);
+	
+			/* Itero sobre los campos de cada uno de los record */
+			unsigned int i;
+			while(recordOp->hasNextField(record)) {
+	
+				PLDAP_FIELD field = recordOp->nextField(record);
+				if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)==0)
+					asprintf(&(pczListado[*puiCantidadEntries]), "%s", (char*)field->values[0]);
+	
+				/* se libera la memoria utilizada por el field si este ya no es necesario. */
+				freeLDAPField(field);
+			}
+			/* libero los recursos consumidos por el record */
+			freeLDAPRecord(record);
 
-		/* Itero sobre los campos de cada uno de los record */
-		unsigned int i;
-		while(recordOp->hasNextField(record)) {
+		    /* libero los recursos */
+		    freeLDAPIterator(iterator);
+		    freeLDAPRecordOperations(recordOp);
 
-			PLDAP_FIELD field = recordOp->nextField(record);
-			if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)==0)
-				asprintf(&(pczListado[*puiCantidadEntries]), "%s", (char*)field->values[0]);
-
-			/* se libera la memoria utilizada por el field si este ya no es necesario. */
-			freeLDAPField(field);
+		    LoguearDebugging("<-- selectEntries()");
+		    return 1;
 		}
-		/* libero los recursos consumidos por el record */
-		freeLDAPRecord(record);
+	} else {
+		LoguearInformacion("El resultSet devuelto es NULL.");
+		LoguearError("La conexion con OpenDS se perdio. Por favor verifique que OpenDS esta levantado y reinicie este proceso para volver a conectarse.");
+
+	    /* libero los recursos */
+	    freeLDAPIterator(iterator);
+	    freeLDAPRecordOperations(recordOp);
+
+	    LoguearDebugging("<-- selectEntries()");
+	    return 0;
 	}
-
-    /* libero los recursos */
-    freeLDAPIterator(iterator);
-    freeLDAPRecordOperations(recordOp);
-
-    LoguearDebugging("<-- selectEntries()");
 }
 
 /**
@@ -260,7 +273,7 @@ VOID selectEntries(	  char*					pczListado[]
  * 		1:	sGrupoDeNoticia
  * 		2:	sBody, sHead
  */
-VOID selectArticles(  stArticle				pczListado[]
+int selectArticles(  stArticle				pczListado[]
 					, unsigned int*			puiCantidadEntries
 					, PLDAP_SESSION 		stPLDAPSession
 					, PLDAP_SESSION_OP 		stPLDAPSessionOperations
@@ -276,44 +289,58 @@ VOID selectArticles(  stArticle				pczListado[]
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
-	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
-	iterator = resultSet->iterator;
-	if(!(iterator->hasNext(resultSet)))
-		LoguearInformacion("No hay ninguna entry para el criterio especificado.");
-	for(*puiCantidadEntries= 0; iterator->hasNext(resultSet); (*puiCantidadEntries)++) {
-		LoguearDebugging("Itero por un articulo.");
-		PLDAP_RECORD record = iterator->next(resultSet);
-		stArticle stArticle;
-
-		/* Itero sobre los campos de cada uno de los record */
-		unsigned int i;
-		while(recordOp->hasNextField(record)) {
-			LoguearDebugging("Itero por un campo de un articulo.");
-
-			PLDAP_FIELD field = recordOp->nextField(record);
-			if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
-				asprintf(&(stArticle.sBody), "%s", (char*)field->values[0]);
-			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_HEAD)==0)
-				asprintf(&(stArticle.sHead), "%s", (char*)field->values[0]);
-			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_ID)==0)
-				stArticle.uiArticleID= atoi((char*)field->values[0]);
-			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)==0)
-				asprintf(&(stArticle.sNewsgroup), "%s", (char*)field->values[0]);
-
-			/* se libera la memoria utilizada por el field si este ya no es necesario. */
-			freeLDAPField(field);
+	if(resultSet != NULL) {
+		/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
+		iterator = resultSet->iterator;
+		if(!(iterator->hasNext(resultSet)))
+			LoguearInformacion("No hay ninguna entry para el criterio especificado.");
+		for(*puiCantidadEntries= 0; iterator->hasNext(resultSet); (*puiCantidadEntries)++) {
+			LoguearDebugging("Itero por un articulo.");
+			PLDAP_RECORD record = iterator->next(resultSet);
+			stArticle stArticle;
+	
+			/* Itero sobre los campos de cada uno de los record */
+			unsigned int i;
+			while(recordOp->hasNextField(record)) {
+				LoguearDebugging("Itero por un campo de un articulo.");
+	
+				PLDAP_FIELD field = recordOp->nextField(record);
+				if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
+					asprintf(&(stArticle.sBody), "%s", (char*)field->values[0]);
+				else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_HEAD)==0)
+					asprintf(&(stArticle.sHead), "%s", (char*)field->values[0]);
+				else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_ID)==0)
+					stArticle.uiArticleID= atoi((char*)field->values[0]);
+				else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_GROUP_NAME)==0)
+					asprintf(&(stArticle.sNewsgroup), "%s", (char*)field->values[0]);
+	
+				/* se libera la memoria utilizada por el field si este ya no es necesario. */
+				freeLDAPField(field);
+			}
+			pczListado[*puiCantidadEntries]= stArticle;
+	
+			/* libero los recursos consumidos por el record */
+			freeLDAPRecord(record);
 		}
-		pczListado[*puiCantidadEntries]= stArticle;
 
-		/* libero los recursos consumidos por el record */
-		freeLDAPRecord(record);
+	    /* libero los recursos */
+	    freeLDAPIterator(iterator);
+	    freeLDAPRecordOperations(recordOp);
+
+	    LoguearDebugging("<-- selectArticles()");
+	    return 1;
+		
+	} else {
+		LoguearInformacion("El resultSet devuelto es NULL.");
+		LoguearError("La conexion con OpenDS se perdio. Por favor verifique que OpenDS esta levantado y reinicie este proceso para volver a conectarse.");
+		
+		/* libero los recursos */
+		freeLDAPIterator(iterator);
+		freeLDAPRecordOperations(recordOp);
+
+		LoguearDebugging("<-- selectArticles()");
+		return 0;
 	}
-
-    /* libero los recursos */
-    freeLDAPIterator(iterator);
-    freeLDAPRecordOperations(recordOp);
-
-    LoguearDebugging("<-- selectArticles()");
 }
 
 /**
