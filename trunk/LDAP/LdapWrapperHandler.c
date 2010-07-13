@@ -148,57 +148,53 @@ stArticle getArticle( PLDAP_SESSION 		stPLDAPSession
 	asprintf(&sLogMessage, "El criterio por el que se va a buscar en OpenDS es: %s", sCriterio);
 	LoguearInformacion(sLogMessage);
 
-	asprintf(&sLogMessage, "Esta por romper en el searchEntry");
-	LoguearInformacion(sLogMessage);
 	PLDAP_RESULT_SET resultSet      = stPLDAPSessionOperations->searchEntry(stPLDAPSession, OPENDS_SCHEMA, sCriterio);
-	asprintf(&sLogMessage, "Pase el search entry");
-	LoguearInformacion(sLogMessage);
 	PLDAP_ITERATOR iterator         = NULL;
 	PLDAP_RECORD_OP recordOp        = newLDAPRecordOperations();
 
 	stArticle stArticleToReturn;
 
 	/* itero sobre los registros obtenidos a traves de un iterador que conoce la implementacion del recordset */
-	asprintf(&sLogMessage, "por hacer le iterator");
-	LoguearInformacion(sLogMessage);
-	iterator = resultSet->iterator;
-	asprintf(&sLogMessage, "Pase el iterator");
-	LoguearInformacion(sLogMessage);
-	if(iterator->hasNext(resultSet)) {
-		asprintf(&sLogMessage, "entre al if");
-		LoguearInformacion(sLogMessage);
-		LoguearDebugging("Se encontro un articulo con la condicion especificada.");
+	if(resultSet != NULL) {
+		iterator = resultSet->iterator;
+		if(iterator->hasNext(resultSet)) {
+			LoguearInformacion(sLogMessage);
+			LoguearDebugging("Se encontro un articulo con la condicion especificada.");
 
-		PLDAP_RECORD record = iterator->next(resultSet);
+			PLDAP_RECORD record = iterator->next(resultSet);
 
-		/* Itero sobre los campos de cada uno de los record */
-		while(recordOp->hasNextField(record)) {
-			LoguearDebugging("Itero por un campo de un articulo.");
+			/* Itero sobre los campos de cada uno de los record */
+			while(recordOp->hasNextField(record)) {
+				LoguearDebugging("Itero por un campo de un articulo.");
 
-			PLDAP_FIELD field = recordOp->nextField(record);
-			if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
-				asprintf(&(stArticleToReturn.sBody), "%s", (char*)field->values[0]);
-			else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_HEAD)==0)
-				asprintf(&(stArticleToReturn.sHead), "%s", (char*)field->values[0]);
+				PLDAP_FIELD field = recordOp->nextField(record);
+				if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_BODY)==0)
+					asprintf(&(stArticleToReturn.sBody), "%s", (char*)field->values[0]);
+				else if(strcmp(field->name, OPENDS_ATTRIBUTE_ARTICLE_HEAD)==0)
+					asprintf(&(stArticleToReturn.sHead), "%s", (char*)field->values[0]);
 
-			/* se libera la memoria utilizada por el field si este ya no es necesario. */
-			freeLDAPField(field);
+				/* se libera la memoria utilizada por el field si este ya no es necesario. */
+				freeLDAPField(field);
+			}
+			/* libero los recursos consumidos por el record */
+			freeLDAPRecord(record);
+
+			asprintf(&(stArticleToReturn.sNewsgroup), "%s", sGrupoDeNoticias);
+			stArticleToReturn.uiArticleID= atoi(sArticleID);
+			LoguearInformacion("Se seteo bien el articulo recuperado de OpenDS.");
+			}
+		else{
+			LoguearDebugging("No hay ninguna entry que cumpla el criterio recibido.");
+			/*	Seteo en -1 el ID del articulo para ver si se encontro
+				un articulo con las condiciones especificadas o no.
+			 */
+			stArticleToReturn.uiArticleID= -1;
 		}
-		/* libero los recursos consumidos por el record */
-		freeLDAPRecord(record);
-
-		asprintf(&(stArticleToReturn.sNewsgroup), "%s", sGrupoDeNoticias);
-		stArticleToReturn.uiArticleID= atoi(sArticleID);
-		LoguearInformacion("Se seteo bien el articulo recuperado de OpenDS.");
-	}
-	else{
-		LoguearDebugging("No hay ninguna entry que mostrar.");
-		/*	Seteo en -1 el ID del articulo para ver si se encontro
-			un articulo con las condiciones especificadas o no.
-		 */
+	} else {
+		LoguearInformacion("El resultSet devuelto es NULL.");
 		stArticleToReturn.uiArticleID= -1;
 	}
-
+	
 	LoguearDebugging("<-- getArticle()");
 	return stArticleToReturn;
 }
