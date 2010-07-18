@@ -40,8 +40,20 @@ int Valida_IP(const char *ip) {
    ptr = strtok(ipaux, "." );
    while(ptr) {
       tam = strlen(ptr);
-      if ( tam < 1 || tam > 3 ) return 0;
-      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;
+      if ( tam < 1 || tam > 3 ) return 0;					/*	Se valida que la longitud sea de 1 a 3	*/
+
+      /*	Valido que cada caracter sea un numero, y no haya letras	*/
+      int idx;
+      for(idx= 0; idx<tam; i++){
+    	  printf("ptr+idx vale: %d\n", *(ptr+idx));
+    	  if(!isdigit(*(ptr+idx))){
+    		  printf("encontro uno que pifia.\n");
+    		  return 0;
+    	  }
+      }
+
+
+      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255	*/
       ptr = strtok ( NULL, "." );
       cont = cont + 1;
    }
@@ -53,7 +65,7 @@ int CargaConfiguracion(char *pszNombreArchivo, stConfiguracion *stConf) {
 	FILE *pfsArchConfig;
 	char *szLinea, *pszAux;
 
-	szLinea = (char *)malloc(100+2); /* l�nea que se va a leer */
+	szLinea = (char *)malloc(100+2); /* linea que se va a leer */
 	pszAux = (char *)malloc(1000); /* se va a guardar todo el archivo */
 
 	if((pfsArchConfig = fopen(pszNombreArchivo,"rt")) == NULL) {
