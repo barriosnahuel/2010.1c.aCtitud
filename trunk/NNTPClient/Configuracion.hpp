@@ -20,7 +20,6 @@ class Configuracion {
         int cargarDesdeArchivo(const char *czFilename);
         int cargarDesdeParametros(const char *czHost, int iPort);
         int Valida_IP(const char *ip);
-        int ValidaNumero(const char *buffer, int chequeaSigno);
 
         char * getServidor(void);
         int getPuerto(void);
