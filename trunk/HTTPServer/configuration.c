@@ -44,7 +44,7 @@ int Valida_IP(const char *ip) {
 
       /*	Valido que cada caracter sea un numero, y no haya letras	*/
       int idx;
-      for(idx= 0; idx<tam; i++){
+      for(idx= 0; idx<tam; idx++){
     	  printf("ptr+idx vale: %d\n", *(ptr+idx));
     	  if(!isdigit(*(ptr+idx))){
     		  printf("encontro uno que pifia.\n");
