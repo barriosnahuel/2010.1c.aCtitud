@@ -45,15 +45,11 @@ int Valida_IP(const char *ip) {
       /*	Valido que cada caracter sea un numero, y no haya letras	*/
       int idx;
       for(idx= 0; idx<tam; idx++){
-    	  printf("ptr+idx vale: %d\n", *(ptr+idx));
-    	  if(!isdigit(*(ptr+idx))){
-    		  printf("encontro uno que pifia.\n");
+    	  if(!isdigit(*(ptr+idx)))
     		  return 0;
-    	  }
       }
 
-
-      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255	*/
+      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255*/
       ptr = strtok ( NULL, "." );
       cont = cont + 1;
    }
