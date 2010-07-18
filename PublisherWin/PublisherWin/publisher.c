@@ -46,8 +46,54 @@ void lecturaDinamica(char** cadena, HANDLE** handler){
 	fflush(stdin);
 }
 
+int Valida_IP(const char *ip) {
+   int tam, cont, idx;
+   char *ptr, ipaux[15+1];
+   cont = 0;
+   idx= 0;
 
+   if (!ip) return 0;
+   strcpy(ipaux, ip);
+   ptr = strtok(ipaux, "." );
+   while(ptr) {
+      tam = strlen(ptr);
+      if ( tam < 1 || tam > 3 ) return 0;					/*	Se valida que la longitud sea de 1 a 3	*/
 
+      /*	Valido que cada caracter sea un numero, y no haya letras	*/
+      for(idx= 0; idx<tam; idx++){
+    	  if(!isdigit(*(ptr+idx)))
+    		  return 0;
+      }
+
+      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255*/
+      ptr = strtok ( NULL, "." );
+      cont = cont + 1;
+   }
+   if (cont < 4) return 0;									/*	Valido que la IP tenga al menos 4 partes.	*/
+   return 1;
+}
+
+int ValidaNumero(const char *buffer, int chequeaSigno) {
+	int idx= 0;
+
+	/*	Si hay que validar que el numero puede tener signo, entonces valido que el primer caracter sea -/+	*/
+	if(chequeaSigno==1){
+		idx= 1;
+
+		if(!isdigit(*buffer) && *buffer!='-' && *buffer!='+')
+			return 0;
+	}
+	
+	/*	Valido que cada caracter sea un numero, y no haya letras	*/
+	while(idx<strlen(buffer)){
+		if(!isdigit(*(buffer+idx)))
+			return 0;
+
+		idx++;
+	}
+	
+	return 1;
+}
 
 unsigned __stdcall publisherFunction(void* threadParameters)
 {
@@ -187,9 +233,9 @@ unsigned __stdcall senderFunction(void* threadParameters)
 }
 
 int main(){
-
 	char tempEsperaSender[32];
 	char tempPuerto[8];
+	int hayErrorDeConfiguracion= 0;
 	stConfigParameters stSender;
 
 	/* THREAD CLIENTE */
@@ -202,15 +248,55 @@ int main(){
 
 	/* CONFIGURACION */
 	LPCSTR archivoConfiguracion = ".\\PublisherWin.ini";
-	GetPrivateProfileString("configuracion","IPNNTP",0,stSender.ipNNTP,16,archivoConfiguracion);
-	GetPrivateProfileString("configuracion","PUERTONNTP",0,tempPuerto,8,archivoConfiguracion);
-	GetPrivateProfileString("configuracion","TIEMPO",0,tempEsperaSender,32,archivoConfiguracion);
-	GetPrivateProfileString("configuracion","NEWSGROUP",0,stSender.newsgroup,100,archivoConfiguracion);
-	stSender.puertoNNTP = atoi(tempPuerto);
-	stSender.tiempoEspera = atoi(tempEsperaSender);
 
+	/*	Esto es para el log	*/
 	strcpy_s(czNombreProceso,10,"Publisher\0");
-	LoguearInformacion("--------- Publisher. Inicio OK.");
+
+	/*	Levanto las propiedades del archivo de configuracion y las valido	*/
+	GetPrivateProfileString("configuracion","IPNNTP",0,stSender.ipNNTP,16,archivoConfiguracion);
+	if(!Valida_IP(stSender.ipNNTP)){
+		LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.");
+		hayErrorDeConfiguracion= 1;
+	}
+
+	GetPrivateProfileString("configuracion","PUERTONNTP",0,tempPuerto,8,archivoConfiguracion);
+	if(!ValidaNumero(tempPuerto, 0)){
+		LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado.");
+		hayErrorDeConfiguracion= 1;
+	}
+	else
+		stSender.puertoNNTP = atoi(tempPuerto);
+
+	GetPrivateProfileString("configuracion","TIEMPO",0,tempEsperaSender,32,archivoConfiguracion);
+	if(!ValidaNumero(tempEsperaSender, 1)){
+		LoguearError("Archivo de configuracion incorrecto, El tiempo de intervalo no esta bien formado.");
+		hayErrorDeConfiguracion= 1;
+	}
+	else {
+		stSender.tiempoEspera = atoi(tempEsperaSender);
+		if(stSender.tiempoEspera<=0){
+			LoguearError("Archivo de configuracion incorrecto, El tiempo de intervalo debe ser mayor a cero.");
+			hayErrorDeConfiguracion= 1;
+		}
+	}
+	GetPrivateProfileString("configuracion","NEWSGROUP",0,stSender.newsgroup,100,archivoConfiguracion);
+
+	if(hayErrorDeConfiguracion){
+		printf("\n\n--\nEl archivo de configuracion contiene errores, corrijalos y vuelva a iniciar el Publisher.\taCtitud.\n\n");
+	
+		system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
+		return 0;
+	}
+	
+	LoguearInformacion("Archivo de configuracion cargado correctamente con los valores:");
+	LoguearInformacion("IPNNTP:");
+	LoguearInformacion(stSender.ipNNTP);
+	LoguearInformacion("Puerto NNTP Server (XML News Process Server):");
+	LoguearInformacion(tempPuerto);
+	LoguearInformacion("Intervalo de tiempo: ");
+	LoguearInformacion(tempEsperaSender);
+	LoguearInformacion("Nombre del newsgroup:");
+	LoguearInformacion(stSender.newsgroup);
 
 	if((threadCliente = (HANDLE)_beginthreadex(NULL, 0,&publisherFunction,(void*)&stSender, 0, &threadProcesarRequest))!= 0){
 		CloseHandle(threadCliente);
