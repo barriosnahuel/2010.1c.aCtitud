@@ -93,12 +93,7 @@ int main(int argn, char *argv[]){
 		cout << "ERROR: Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada." << endl;
 		hayErrorConfiguracion= 1;
 	}
-	if(!confCliente.ValidaNumero(confCliente.getPuerto(), 0)){
-		logger.LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado.", "NNTPClient");
-		cout << "ERROR: Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado." << endl;
-		hayErrorConfiguracion= 1;
-	}
-	else if(confCliente.getPuerto()<1){
+	if(confCliente.getPuerto()<1){
 		logger.LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no es correcto.", "NNTPClient");
 		cout << "ERROR: Archivo de configuracion incorrecto, el puerto de NNTP no es correcto." << endl;
 		hayErrorConfiguracion= 1;

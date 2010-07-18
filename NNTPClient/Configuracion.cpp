@@ -137,25 +137,3 @@ int Configuracion::Valida_IP(const char *ip) {
    if (cont < 4) return 0;									/*	Valido que la IP tenga al menos 4 partes.	*/
    return 1;
 }
-
-int Configuracion::ValidaNumero(const char *buffer, int chequeaSigno) {
-	int idx= 0;
-
-	/*	Si hay que validar que el numero puede tener signo, entonces valido que el primer caracter sea -/+	*/
-	if(chequeaSigno==1){
-		idx= 1;
-
-		if(!isdigit(*buffer) && *buffer!='-' && *buffer!='+')
-			return 0;
-	}
-
-	/*	Valido que cada caracter sea un numero, y no haya letras	*/
-	while(idx<strlen(buffer)){
-		if(!isdigit(*(buffer+idx)))
-			return 0;
-
-		idx++;
-	}
-
-	return 1;
-}
