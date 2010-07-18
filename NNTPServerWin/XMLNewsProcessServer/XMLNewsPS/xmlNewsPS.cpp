@@ -79,6 +79,55 @@ int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server,struct
 
 };
 
+int Valida_IP(const char *ip) {
+   int tam, cont, idx;
+   char *ptr, ipaux[15+1];
+   cont = 0;
+   idx= 0;
+
+   if (!ip) return 0;
+   strcpy(ipaux, ip);
+   ptr = strtok(ipaux, "." );
+   while(ptr) {
+      tam = strlen(ptr);
+      if ( tam < 1 || tam > 3 ) return 0;					/*	Se valida que la longitud sea de 1 a 3	*/
+
+      /*	Valido que cada caracter sea un numero, y no haya letras	*/
+      for(idx= 0; idx<tam; idx++){
+    	  if(!isdigit(*(ptr+idx)))
+    		  return 0;
+      }
+
+      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255*/
+      ptr = strtok ( NULL, "." );
+      cont = cont + 1;
+   }
+   if (cont < 4) return 0;									/*	Valido que la IP tenga al menos 4 partes.	*/
+   return 1;
+}
+
+int ValidaNumero(const char *buffer, int chequeaSigno) {
+	int idx= 0;
+
+	/*	Si hay que validar que el numero puede tener signo, entonces valido que el primer caracter sea -/+	*/
+	if(chequeaSigno==1){
+		idx= 1;
+
+		if(!isdigit(*buffer) && *buffer!='-' && *buffer!='+')
+			return 0;
+	}
+	
+	/*	Valido que cada caracter sea un numero, y no haya letras	*/
+	while(idx<strlen(buffer)){
+		if(!isdigit(*(buffer+idx)))
+			return 0;
+
+		idx++;
+	}
+	
+	return 1;
+}
+
 unsigned __stdcall clientFunction(void* threadParameters)
 {
 	logger.LoguearDebugging("--> clientFunction()");
@@ -259,12 +308,29 @@ int main(int argc, char** argv){
     logger.LoguearDebugging("--> Main()");
 	//Carga configuracion --> Ip y puerto del serividor
 	struct stConfiguracion configuracion;
+	int hayErrorDeConfiguracion= 0;
 	LPCSTR archivoConfiguracion = "..\\configuracion.ini";
 	GetPrivateProfileString("configuracion","IP", configuracion.szDefault,configuracion.serverIP,16,archivoConfiguracion);
+	if(!Valida_IP(configuracion.serverIP)){
+		logger.LoguearError("Archivo de configuracion incorrecto, la IP no esta bien formada.");
+		hayErrorDeConfiguracion= 1;
+	}
+
 	GetPrivateProfileString("configuracion","PUERTO", configuracion.szDefault,configuracion.appPort,6,archivoConfiguracion);
+	if(!ValidaNumero(configuracion.appPort, 0)){
+		logger.LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado.");
+		hayErrorDeConfiguracion= 1;
+	}
+
+	if(hayErrorDeConfiguracion){
+		cout << "\n\n--\nEl archivo de configuracion contiene errores, corrijalos y vuelva a iniciar el Publisher.\taCtitud.\n" << endl;
+	
+		system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
+		return 0;
+	}
+
 	cout << "=========> XML News Proccess Server <=========" << endl;
 	cout<<"Proceso levantado en la ip: "<<configuracion.serverIP<<" y en el puerto: "<<configuracion.appPort<<endl;
-
 
 	//Creo la cola MSMQ o me fijo que ya exista.
 	MsmqProcess colaMsmq;
