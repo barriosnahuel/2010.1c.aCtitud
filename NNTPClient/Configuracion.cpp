@@ -110,3 +110,30 @@ char *Configuracion::GetVal(const char *sValBuff, const char *sBuff){
     delete [] sVal2;
     return sVal;
 }
+
+int Configuracion::Valida_IP(const char *ip) {
+   int tam, cont, idx;
+   char *ptr, ipaux[15+1];
+   cont = 0;
+   idx= 0;
+
+   if (!ip) return 0;
+   strcpy(ipaux, ip);
+   ptr = strtok(ipaux, "." );
+   while(ptr) {
+      tam = strlen(ptr);
+      if ( tam < 1 || tam > 3 ) return 0;					/*	Se valida que la longitud sea de 1 a 3	*/
+
+      /*	Valido que cada caracter sea un numero, y no haya letras	*/
+      for(idx= 0; idx<tam; idx++){
+    	  if(!isdigit(*(ptr+idx)))
+    		  return 0;
+      }
+
+      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255*/
+      ptr = strtok ( NULL, "." );
+      cont = cont + 1;
+   }
+   if (cont < 4) return 0;									/*	Valido que la IP tenga al menos 4 partes.	*/
+   return 1;
+}

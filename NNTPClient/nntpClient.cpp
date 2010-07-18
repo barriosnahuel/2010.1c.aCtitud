@@ -87,6 +87,11 @@ int main(int argn, char *argv[]){
             return EXIT_FAILURE;
             break;
     };
+	if(!confCliente.Valida_IP(confCliente.getServidor())){
+		logger.LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.");
+		hayErrorDeConfiguracion= 1;
+	}
+
     
     NNTPClientDAO dao;
     dao.abrirConexion(confCliente.getServidor(), confCliente.getPuerto()); // Abrimos la conexion
@@ -112,7 +117,7 @@ int main(int argn, char *argv[]){
             dao.enviarMensaje(comando.cadenaIngresada());
             comando.setRespuestaObtenida(dao.recibirRespuesta());
             if(comando.respuestaObtenida() == "") {
-            	cout << "Servidor caído" << endl;
+            	cout << "Servidor caï¿½do" << endl;
 				//Cierro la conexion.
 				dao.cerrarConexion();
 
@@ -142,4 +147,3 @@ int main(int argn, char *argv[]){
     pthread_mutex_unlock(&semUI);
     return EXIT_SUCCESS;
 }
-
