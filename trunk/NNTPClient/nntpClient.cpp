@@ -88,8 +88,11 @@ int main(int argn, char *argv[]){
             break;
     };
 	if(!confCliente.Valida_IP(confCliente.getServidor())){
-		logger.LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.");
-		hayErrorDeConfiguracion= 1;
+		logger.LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.", "NNTPClient");
+
+		cout << "\n\n--\nEl archivo de configuracion contiene errores, corrijalo y vuelva a iniciar la aplicacion." << endl;
+	    cout << "\n-------------------------------" << endl;
+	    cout << "-- Gracias por usar NNTPClient." << endl;
 	}
 
     
