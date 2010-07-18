@@ -66,20 +66,51 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 
 int crearConexionSocket(SOCKET* ficheroServer, struct sockaddr_in* server, struct stConfiguracion* stConfiguracion);
 
+int Valida_IP(const char *ip);
+int ValidaNumero(const char *buffer, int chequeaSigno);
+
 /***********************************************************************************************
 							Definiciones de funciones
  ***********************************************************************************************/ 
 int main(int argc, char** argv){
 	ZeroMemory(czNombreProceso,20);
-    strcpy_s(czNombreProceso,20, "NNTP_Process_Srvr\0");
+	strcpy_s(czNombreProceso,20, "NNTP_Process_Srvr\0");
 	logger.LoguearDebugging("--> Main()");
 	
 	//	Carga configuracion
 	struct stConfiguracion configuracion;
 	LPCSTR archivoConfiguracion= "..\\configuracion.ini";
+	int hayErrorDeConfiguracion= 0;
+
 	GetPrivateProfileString("configuracion","OpenDSServer", configuracion.szDefault, configuracion.acOpenDSServer, 16, archivoConfiguracion);
+	if(!Valida_IP(configuracion.acOpenDSServer)){
+		logger.LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.");
+		hayErrorDeConfiguracion= 1;
+	}
+
 	GetPrivateProfileString("configuracion","OpenDSPort", configuracion.szDefault, configuracion.acOpenDSPort, 6, archivoConfiguracion);
+	if(!ValidaNumero(configuracion.acOpenDSPort, 0)){
+		logger.LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado.");
+		hayErrorDeConfiguracion= 1;
+	}
+
 	GetPrivateProfileString("configuracion","Interval", configuracion.szDefault, configuracion.acInterval, 10, archivoConfiguracion);
+	if(!ValidaNumero(configuracion.acInterval, 1)){
+		logger.LoguearError("Archivo de configuracion incorrecto, El tiempo de intervalo no esta bien formado.");
+		hayErrorDeConfiguracion= 1;
+	}
+	else if(atoi(configuracion.acInterval)<=0){
+		logger.LoguearError("Archivo de configuracion incorrecto, El tiempo de intervalo debe ser mayor a cero.");
+		hayErrorDeConfiguracion= 1;	
+	}
+
+	if(hayErrorDeConfiguracion){
+		cout << "\n\n--\nEl archivo de configuracion contiene errores, corrijalos y vuelva a iniciar el Publisher.\taCtitud.\n" << endl;
+	
+		system("PAUSE");	/*	Esto es para que el usuario tenga que tocar una tecla para cerrar la consola.	*/
+		return 0;
+	}
+
 	logger.LoguearDebugging("Archivo de configuracion cargado correctamente.");
 	logger.LoguearInformacion("Archivo de configuracion cargado con:");
 	logger.LoguearInformacion("Puerto OpenDS:");
@@ -274,5 +305,54 @@ int consumirMensajesYAlmacenarEnBD(	MsmqProcess colaMsmq
 	}
 
 	logger.LoguearDebugging("<-- consumirMensajesYAlmacenarEnBD()");
+	return 1;
+}
+
+int Valida_IP(const char *ip) {
+   int tam, cont, idx;
+   char *ptr, ipaux[15+1];
+   cont = 0;
+   idx= 0;
+
+   if (!ip) return 0;
+   strcpy(ipaux, ip);
+   ptr = strtok(ipaux, "." );
+   while(ptr) {
+      tam = strlen(ptr);
+      if ( tam < 1 || tam > 3 ) return 0;					/*	Se valida que la longitud sea de 1 a 3	*/
+
+      /*	Valido que cada caracter sea un numero, y no haya letras	*/
+      for(idx= 0; idx<tam; idx++){
+    	  if(!isdigit(*(ptr+idx)))
+    		  return 0;
+      }
+
+      if ( atoi(ptr) < 0 || atoi(ptr) > 255 ) return 0;		/*	Se valida que sea un numero entre 0-255*/
+      ptr = strtok ( NULL, "." );
+      cont = cont + 1;
+   }
+   if (cont < 4) return 0;									/*	Valido que la IP tenga al menos 4 partes.	*/
+   return 1;
+}
+
+int ValidaNumero(const char *buffer, int chequeaSigno) {
+	int idx= 0;
+
+	/*	Si hay que validar que el numero puede tener signo, entonces valido que el primer caracter sea -/+	*/
+	if(chequeaSigno==1){
+		idx= 1;
+
+		if(!isdigit(*buffer) && *buffer!='-' && *buffer!='+')
+			return 0;
+	}
+	
+	/*	Valido que cada caracter sea un numero, y no haya letras	*/
+	while(idx<strlen(buffer)){
+		if(!isdigit(*(buffer+idx)))
+			return 0;
+
+		idx++;
+	}
+	
 	return 1;
 }
