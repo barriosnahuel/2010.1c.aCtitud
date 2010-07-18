@@ -61,7 +61,7 @@ unsigned __stdcall publisherFunction(void* threadParameters)
 	DWORD dwThreadId = GetCurrentThreadId();
 
 	stConfigParameters stParametros = *((stConfigParameters*) threadParameters);
-	memoryHandler =  HeapCreate(0,1024,0);
+	memoryHandler =  HeapCreate(0,0,0);
 	dbHandler = NULL;
 
 	respuesta = 'S';
