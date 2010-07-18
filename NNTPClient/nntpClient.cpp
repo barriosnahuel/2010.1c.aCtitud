@@ -60,6 +60,7 @@ int main(int argn, char *argv[]){
     char *rtaHilo = NULL;
 
     Configuracion confCliente;
+    int hayErrorConfiguracion= 0;
 
     cout << "* Iniciando NNTPClient v1.0..." << endl;
 
@@ -89,13 +90,29 @@ int main(int argn, char *argv[]){
     };
 	if(!confCliente.Valida_IP(confCliente.getServidor())){
 		logger.LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.", "NNTPClient");
-
-		cout << "\n\n--\nEl archivo de configuracion contiene errores, corrijalo y vuelva a iniciar la aplicacion." << endl;
-	    cout << "\n-------------------------------" << endl;
-	    cout << "-- Gracias por usar NNTPClient." << endl;
+		cout << "ERROR: Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada." << endl;
+		hayErrorConfiguracion= 1;
+	}
+	if(!confCliente.ValidaNumero(confCliente.getPuerto(), 0)){
+		logger.LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado.", "NNTPClient");
+		cout << "ERROR: Archivo de configuracion incorrecto, el puerto de NNTP no esta bien formado." << endl;
+		hayErrorConfiguracion= 1;
+	}
+	else if(confCliente.getPuerto()<1){
+		logger.LoguearError("Archivo de configuracion incorrecto, el puerto de NNTP no es correcto.", "NNTPClient");
+		cout << "ERROR: Archivo de configuracion incorrecto, el puerto de NNTP no es correcto." << endl;
+		hayErrorConfiguracion= 1;
 	}
 
-    
+	if(hayErrorConfiguracion){
+		cout << "\n\n--\nEl archivo de configuracion contiene errores, corrijalo y vuelva a iniciar la aplicacion." << endl;
+		cout << "\n-------------------------------" << endl;
+		cout << "-- Gracias por usar NNTPClient." << endl;
+		sleep(10000);
+		return 0;
+	}
+
+
     NNTPClientDAO dao;
     dao.abrirConexion(confCliente.getServidor(), confCliente.getPuerto()); // Abrimos la conexion
 
