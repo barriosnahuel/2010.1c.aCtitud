@@ -87,6 +87,10 @@ int main(int argn, char *argv[]){
             return EXIT_FAILURE;
             break;
     };
+/*	ToDo: Terminar esta validacion, estan copiadas exactamente igual de las otras aplicaciones, pero aca no anda.
+	Pincha porque encuentra mas de 3 "digitos" en la ultima parte de la IP, es decir, una vez que ya recorrio
+	192.168.0.103 el strtok le devuelve uno mas.. y entonces pincha, como si recibiera 192.168.0.1034
+
 	if(!confCliente.Valida_IP(confCliente.getServidor())){
 		logger.LoguearError("Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada.", "NNTPClient");
 		cout << "ERROR: Archivo de configuracion incorrecto, la IP del NNTP no esta bien formada." << endl;
@@ -97,7 +101,7 @@ int main(int argn, char *argv[]){
 		sleep(10);
 		return EXIT_FAILURE;
 	}
-
+*/
 
 
     NNTPClientDAO dao;
