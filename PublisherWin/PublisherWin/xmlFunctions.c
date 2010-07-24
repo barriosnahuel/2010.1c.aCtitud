@@ -51,6 +51,8 @@ void encoding(char*cadena)
 			{cadena[i]='o';break;}
 		case -93:
 			{cadena[i]='u';break;}
+		case 38:
+			{cadena[i]='Y';break;}
 		}
 	}
 	return;
